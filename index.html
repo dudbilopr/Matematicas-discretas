@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso de Matemáticas Discretas</title>
+    
+    <!-- Chosen Palette: Tech-Inspired & Professional (Blues & Greens) -->
+    <!-- Application Structure Plan: The application uses a single-page, tab-based structure. The main navigation allows users to switch between two core modules ('Fundamentos' and 'Avanzado'). This design was chosen for its simplicity and intuitive user flow, allowing students to easily access all course topics without leaving the page. The card-based layout for topics provides a clear, organized, and scannable overview of the curriculum. -->
+    <!-- Visualization & Content Choices: Report Info: Course topics and resources. -> Goal: Organize & Inform. -> Viz/Presentation Method: Thematic sections with content cards. Each card contains a topic title, a description, and links to resources. -> Interaction: Tab navigation to filter content by module. Resource links open in new tabs. -> Justification: This structure is highly effective for educational content, as it logically groups related topics and makes resources easily accessible. It avoids cognitive overload by presenting one module at a time. -> Library/Method: Vanilla JavaScript for tab functionality, Tailwind CSS for layout and styling. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Raleway:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: #ECF0F1;
+        }
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link.active {
+            background-color: #1ABC9C;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <header class="bg-[#2C3E50] text-white shadow-lg">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight">Curso de Matemáticas Discretas</h1>
+            <p class="mt-4 text-lg text-slate-300 max-w-3xl mx-auto">Un viaje a través de la lógica, las estructuras y los algoritmos que fundamentan la ciencia de la computación.</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 py-12">
+        <nav id="course-nav" role="tablist" aria-label="Navegación del curso" class="flex justify-center flex-wrap gap-4 mb-12">
+            <a href="#fundamentos" id="tab-1" role="tab" aria-controls="module-1" aria-selected="true" class="nav-link active text-base font-semibold py-3 px-6 bg-white rounded-full shadow-md text-slate-700">
+                Módulo 1: Fundamentos Lógicos
+            </a>
+            <a href="#avanzado" id="tab-2" role="tab" aria-controls="module-2" aria-selected="false" class="nav-link text-base font-semibold py-3 px-6 bg-white rounded-full shadow-md text-slate-700">
+                Módulo 2: Estructuras Avanzadas
+            </a>
+        </nav>
+
+        <section id="module-1" role="tabpanel" aria-labelledby="tab-1" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <article class="card bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-[#2C3E50]">Tema 1: Lógica Proposicional</h3>
+                    <p class="mt-2 text-slate-600">Aprende a manipular métodos formales de lógica, utilizando la lógica simbólica para la representación y demostración de problemas.</p>
+                </div>
+                <div class="mt-auto bg-slate-50 p-4 border-t border-slate-200">
+                    <ul class="flex justify-around items-center text-center text-sm font-medium text-slate-600">
+                        <li><a href="https://dudbilopr.github.io/Matematicas-discretas/Clase_1.html" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-file-powerpoint block text-2xl mb-1"></i><span>Clase</span></a></li>
+                        <li><a href="https://drive.google.com/drive/folders/18JeHUh7mPGTEFlG_CGsqNsQkmI_xth8k?usp=sharing" target="_blank" class="hover:text-[#1ABC9C]"><i class="fab fa-google-drive block text-2xl mb-1"></i><span>Código</span></a></li>
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-flask block text-2xl mb-1"></i><span>Taller</span></a></li>
+                    </ul>
+                </div>
+            </article>
+
+            <article class="card bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-[#2C3E50]">Tema 2: Demostración e Inducción</h3>
+                    <p class="mt-2 text-slate-600">Desarrolla la capacidad de razonamiento y demostración, con énfasis en el poderoso principio de la inducción matemática para probar propiedades.</p>
+                </div>
+                <div class="mt-auto bg-slate-50 p-4 border-t border-slate-200">
+                    <ul class="flex justify-around items-center text-center text-sm font-medium text-slate-600">
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-file-powerpoint block text-2xl mb-1"></i><span>Clase</span></a></li>
+                        <li><a href="https://drive.google.com/drive/folders/18JeHUh7mPGTEFlG_CGsqNsQkmI_xth8k?usp=sharing" target="_blank" class="hover:text-[#1ABC9C]"><i class="fab fa-google-drive block text-2xl mb-1"></i><span>Código</span></a></li>
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-flask block text-2xl mb-1"></i><span>Taller</span></a></li>
+                    </ul>
+                </div>
+            </article>
+
+            <article class="card bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-[#2C3E50]">Tema 3: Teoría de Conjuntos</h3>
+                    <p class="mt-2 text-slate-600">Explora los fundamentos de la teoría de conjuntos y funciones, esenciales para la organización y manipulación de datos discretos.</p>
+                </div>
+                <div class="mt-auto bg-slate-50 p-4 border-t border-slate-200">
+                    <ul class="flex justify-around items-center text-center text-sm font-medium text-slate-600">
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-file-powerpoint block text-2xl mb-1"></i><span>Clase</span></a></li>
+                        <li><a href="https://drive.google.com/drive/folders/18JeHUh7mPGTEFlG_CGsqNsQkmI_xth8k?usp=sharing" target="_blank" class="hover:text-[#1ABC9C]"><i class="fab fa-google-drive block text-2xl mb-1"></i><span>Código</span></a></li>
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-flask block text-2xl mb-1"></i><span>Taller</span></a></li>
+                    </ul>
+                </div>
+            </article>
+
+            <article class="card bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-[#2C3E50]">Tema 4: Sistemas de Numeración y Representación de Datos</h3>
+                    <p class="mt-2 text-slate-600">Comprende los sistemas de numeración y la representación de datos, la base para la computación y la criptografía.</p>
+                </div>
+                <div class="mt-auto bg-slate-50 p-4 border-t border-slate-200">
+                    <ul class="flex justify-around items-center text-center text-sm font-medium text-slate-600">
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-file-powerpoint block text-2xl mb-1"></i><span>Clase</span></a></li>
+                        <li><a href="https://drive.google.com/drive/folders/18JeHUh7mPGTEFlG_CGsqNsQkmI_xth8k?usp=sharing" target="_blank" class="hover:text-[#1ABC9C]"><i class="fab fa-google-drive block text-2xl mb-1"></i><span>Código</span></a></li>
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-flask block text-2xl mb-1"></i><span>Taller</span></a></li>
+                    </ul>
+                </div>
+            </article>
+        </section>
+
+        <section id="module-2" role="tabpanel" aria-labelledby="tab-2" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+             <article class="card bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-[#2C3E50]">Tema 5: Relaciones y Estructuras de Orden</h3>
+                    <p class="mt-2 text-slate-600">Analiza las relaciones entre elementos de conjuntos, incluyendo órdenes parciales y de equivalencia, y su representación visual mediante diagramas de Hasse.</p>
+                </div>
+                <div class="mt-auto bg-slate-50 p-4 border-t border-slate-200">
+                    <ul class="flex justify-around items-center text-center text-sm font-medium text-slate-600">
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-file-powerpoint block text-2xl mb-1"></i><span>Clase</span></a></li>
+                        <li><a href="https://drive.google.com/drive/folders/18JeHUh7mPGTEFlG_CGsqNsQkmI_xth8k?usp=sharing" target="_blank" class="hover:text-[#1ABC9C]"><i class="fab fa-google-drive block text-2xl mb-1"></i><span>Código</span></a></li>
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-flask block text-2xl mb-1"></i><span>Taller</span></a></li>
+                    </ul>
+                </div>
+            </article>
+
+            <article class="card bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-[#2C3E50]">Tema 6: Principios de Conteo y Recurrencia</h3>
+                    <p class="mt-2 text-slate-600">Domina las técnicas para contar y organizar elementos, fundamentales en la probabilidad, la combinatoria y el análisis de algoritmos.</p>
+                </div>
+                <div class="mt-auto bg-slate-50 p-4 border-t border-slate-200">
+                    <ul class="flex justify-around items-center text-center text-sm font-medium text-slate-600">
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-file-powerpoint block text-2xl mb-1"></i><span>Clase</span></a></li>
+                        <li><a href="https://drive.google.com/drive/folders/18JeHUh7mPGTEFlG_CGsqNsQkmI_xth8k?usp=sharing" target="_blank" class="hover:text-[#1ABC9C]"><i class="fab fa-google-drive block text-2xl mb-1"></i><span>Código</span></a></li>
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-flask block text-2xl mb-1"></i><span>Taller</span></a></li>
+                    </ul>
+                </div>
+            </article>
+
+            <article class="card bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-[#2C3E50]">Tema 7: Teoría de Grafos y Árboles</h3>
+                    <p class="mt-2 text-slate-600">Visualiza y analiza estructuras de datos complejas mediante grafos y árboles, esenciales en el diseño de redes y algoritmos.</p>
+                </div>
+                <div class="mt-auto bg-slate-50 p-4 border-t border-slate-200">
+                    <ul class="flex justify-around items-center text-center text-sm font-medium text-slate-600">
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-file-powerpoint block text-2xl mb-1"></i><span>Clase</span></a></li>
+                        <li><a href="https://drive.google.com/drive/folders/18JeHUh7mPGTEFlG_CGsqNsQkmI_xth8k?usp=sharing" target="_blank" class="hover:text-[#1ABC9C]"><i class="fab fa-google-drive block text-2xl mb-1"></i><span>Código</span></a></li>
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-flask block text-2xl mb-1"></i><span>Taller</span></a></li>
+                    </ul>
+                </div>
+            </article>
+
+            <article class="card bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-[#2C3E50]">Tema 8: Álgebra de Boole y Circuitos Lógicos</h3>
+                    <p class="mt-2 text-slate-600">Explora el álgebra de Boole y su aplicación en la simplificación y diseño de circuitos lógicos digitales, un pilar de la informática.</p>
+                </div>
+                <div class="mt-auto bg-slate-50 p-4 border-t border-slate-200">
+                    <ul class="flex justify-around items-center text-center text-sm font-medium text-slate-600">
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-file-powerpoint block text-2xl mb-1"></i><span>Clase</span></a></li>
+                        <li><a href="https://drive.google.com/drive/folders/18JeHUh7mPGTEFlG_CGsqNsQkmI_xth8k?usp=sharing" target="_blank" class="hover:text-[#1ABC9C]"><i class="fab fa-google-drive block text-2xl mb-1"></i><span>Código</span></a></li>
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-flask block text-2xl mb-1"></i><span>Taller</span></a></li>
+                    </ul>
+                </div>
+            </article>
+
+            <article class="card bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-[#2C3E50]">Tema 9: Introducción a la Complejidad Computacional</h3>
+                    <p class="mt-2 text-slate-600">Introduce los fundamentos de la complejidad computacional, crucial para evaluar la eficiencia de algoritmos y resolver problemas complejos.</p>
+                </div>
+                <div class="mt-auto bg-slate-50 p-4 border-t border-slate-200">
+                    <ul class="flex justify-around items-center text-center text-sm font-medium text-slate-600">
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-file-powerpoint block text-2xl mb-1"></i><span>Clase</span></a></li>
+                        <li><a href="https://drive.google.com/drive/folders/18JeHUh7mPGTEFlG_CGsqNsQkmI_xth8k?usp=sharing" target="_blank" class="hover:text-[#1ABC9C]"><i class="fab fa-google-drive block text-2xl mb-1"></i><span>Código</span></a></li>
+                        <li><a href="#" target="_blank" class="hover:text-[#1ABC9C]"><i class="fas fa-flask block text-2xl mb-1"></i><span>Taller</span></a></li>
+                    </ul>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <footer class="bg-[#2C3E50] text-slate-400 mt-12">
+        <div class="container mx-auto px-6 py-4 text-center text-sm">
+            <p>&copy; 2025 Departamento de Ciencias de la Computación. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('[role="tab"]');
+            const tabPanels = document.querySelectorAll('[role="tabpanel"]');
+
+            const switchTab = (newTab) => {
+                tabs.forEach(tab => {
+                    tab.classList.remove('active');
+                    tab.setAttribute('aria-selected', 'false');
+                });
+                
+                newTab.classList.add('active');
+                newTab.setAttribute('aria-selected', 'true');
+
+                tabPanels.forEach(panel => {
+                    panel.classList.add('hidden');
+                });
+
+                const controlledPanel = document.getElementById(newTab.getAttribute('aria-controls'));
+                if (controlledPanel) {
+                    controlledPanel.classList.remove('hidden');
+                }
+            };
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchTab(e.currentTarget);
+                });
+                
+                tab.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        switchTab(e.currentTarget);
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
