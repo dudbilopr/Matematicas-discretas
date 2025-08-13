@@ -55,7 +55,7 @@
     Library/Method: Vanilla JS for slide navigation, the interactive truth table generator, and the quiz logic. Tailwind CSS for all styling and layout. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; padding: 0; height: 100%; padding-top: 4rem; /* Global padding for fixed header */ }
+        body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; padding: 0; height: 100%; /* Removed padding-top from body */ }
         .slide {
             display: none;
             width: 100vw;
@@ -64,7 +64,7 @@
             justify-content: flex-start; /* Align content to the top */
             align-items: center;
             padding: 2rem; /* Reduced padding for more content space */
-            padding-top: 1rem; /* Adjusted top padding for content below header */
+            padding-top: 2rem; /* Adjusted top padding for content, as fixed header is gone */
             padding-bottom: 6rem; /* Increased bottom padding to prevent overlap with nav buttons */
             text-align: center;
             background-color: #fdf6e3; /* Light background */
@@ -78,7 +78,7 @@
         @media (min-width: 768px) {
             .slide {
                 padding: 4rem;
-                padding-top: 2rem; /* Adjusted top padding for content below header on larger screens */
+                padding-top: 3rem; /* Adjusted top padding for content on larger screens */
                 padding-bottom: 8rem; /* Even more bottom padding for larger screens */
             }
         }
@@ -314,9 +314,7 @@
 </head>
 <body>
 
-    <div class="fixed top-0 left-0 right-0 bg-[#fdf6e3]/80 backdrop-blur-md p-3 flex justify-between items-center shadow-lg z-50">
-        <h1 class="text-xl font-bold text-[#268bd2]">Matemáticas Discretas</h1>
-    </div>
+    <!-- Removed the fixed header div -->
 
     <div id="slides-container">
         <!-- Slide 1: Título -->
