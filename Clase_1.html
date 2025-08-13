@@ -28,8 +28,8 @@
             },
             startup: {
                 ready: () => {
-                    // MathJax.startup.defaultReady(); // No longer needed if typeset() is called manually
-                    // MathJax.typesetPromise(); // Initial typesetting - handled by showSlide now
+                    MathJax.startup.defaultReady(); // Ensure default startup is called
+                    // Initial typesetting is handled by showSlide()
                 }
             }
         };
@@ -55,15 +55,16 @@
     Library/Method: Vanilla JS for slide navigation, the interactive truth table generator, and the quiz logic. Tailwind CSS for all styling and layout. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; padding: 0; height: 100%;}
+        body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; padding: 0; height: 100%; padding-top: 4rem; /* Global padding for fixed header */ }
         .slide {
             display: none;
             width: 100vw;
             height: 100vh;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start; /* Align content to the top */
             align-items: center;
             padding: 2rem; /* Reduced padding for more content space */
+            padding-top: 1rem; /* Adjusted top padding for content below header */
             padding-bottom: 6rem; /* Increased bottom padding to prevent overlap with nav buttons */
             text-align: center;
             background-color: #fdf6e3; /* Light background */
@@ -77,6 +78,7 @@
         @media (min-width: 768px) {
             .slide {
                 padding: 4rem;
+                padding-top: 2rem; /* Adjusted top padding for content below header on larger screens */
                 padding-bottom: 8rem; /* Even more bottom padding for larger screens */
             }
         }
@@ -85,7 +87,7 @@
             display: flex;
             opacity: 1; /* Fully visible when active */
         }
-        .slide h2 { color: #268bd2; margin-bottom: 1.5rem; }
+        .slide h2 { color: #268bd2; margin-bottom: 1.5rem; margin-top: 0; /* Ensure no extra top margin pushes it up */ }
         .slide h3 { color: #cb4b16; margin-bottom: 1rem; }
         .slide p { margin-bottom: 1rem; line-height: 1.6; }
         .slide ul { list-style: none; padding: 0; margin-bottom: 1rem; }
@@ -311,6 +313,10 @@
     </style>
 </head>
 <body>
+
+    <div class="fixed top-0 left-0 right-0 bg-[#fdf6e3]/80 backdrop-blur-md p-3 flex justify-between items-center shadow-lg z-50">
+        <h1 class="text-xl font-bold text-[#268bd2]">Matemáticas Discretas</h1>
+    </div>
 
     <div id="slides-container">
         <!-- Slide 1: Título -->
@@ -732,12 +738,12 @@
             <p class="text-2xl max-w-3xl">
                 La <strong>bicondicional</strong> es verdadera si y solo si ambas proposiciones tienen el mismo valor de verdad.
             </p>
-            <p class="text-xl font-bold mt-4">Símbolo: ↔ (o <=>)</p>
-            <p class="text-xl italic">Si P es "Puedes votar" y Q es "Tienes 18 años", entonces P ↔ Q es "Puedes votar si y solo si tienes 18 años".</p>
+            <p class="text-xl font-bold mt-4">Símbolo: $\leftrightarrow$ (o <=>)</p>
+            <p class="text-xl italic">Si P es "Puedes votar" y Q es "Tienes 18 años", entonces P $\leftrightarrow$ Q es "Puedes votar si y solo si tienes 18 años".</p>
 
             <table class="mt-8 text-xl">
                 <thead>
-                    <tr><th>P</th><th>Q</th><th>P ↔ Q</th></tr>
+                    <tr><th>P</th><th>Q</th><th>$P \leftrightarrow Q$</th></tr>
                 </thead>
                 <tbody>
                     <tr><td>V</td><td>V</td><td>V</td></tr>
@@ -1586,7 +1592,7 @@
             quiz3OptionsElem.innerHTML = '';
             quiz3FeedbackElem.textContent = '';
 
-            quiz3ScoreDisplay.textContent = `Tu puntuación: ${score3} de ${quiz3Data.length}`; // Corrected typo here
+            quiz3ScoreDisplay.textContent = `Tu puntuación: ${score3} de ${quiz3Data.length}`;
             quiz3ScoreDisplay.classList.remove('hidden');
             submitQuiz3Btn.classList.add('hidden');
             restartQuiz3Btn.classList.remove('hidden');
