@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase 1: Lógica Proposicional Interactiva</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax CDN -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                // Define inline math delimiters
+                inlineMath: [['$', '$'], ['\\(', '\\)']], // Using single $ for inline equations
+                processEscapes: true, // Allow \to escape special characters
+                packages: {'[+]': ['noerrors']}, // Load noerrors package for better error handling
+                displayConfiguration: {
+                    linebreak: {
+                        automatic: true,
+                        width: "container"
+                    }
+                }
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore', // Class to ignore for MathJax processing
+                processHtmlClass: 'tex2jax_process' // Class to process (or by default all non-ignored)
+            },
+            startup: {
+                ready: () => {
+                    // MathJax.startup.defaultReady(); // No longer needed if typeset() is called manually
+                    // MathJax.typesetPromise(); // Initial typesetting - handled by showSlide now
+                }
+            }
+        };
+    </script>
+
+
+    <!-- Chosen Palette: Serene Peach and Sage -->
+    <!-- Application Structure Plan: This is a simple, linear slide deck. Each slide is a full-screen div. Navigation is controlled by "Next" and "Previous" buttons. This linear structure is chosen because it's a presentation, designed for sequential consumption of information. Key interactions are limited to slide progression. -->
+    <!-- Visualization & Content Choices:
+    - Textual Content: All definitions, explanations, and examples are presented as clear text.
+    - Truth Tables: Implemented using HTML tables for structured, easy-to-read presentation of logical connectives.
+    - Interactive Truth Table Generator: A new feature on Slide 13 allows users to input logical expressions and dynamically generate their truth tables, enhancing practical understanding. The error handling for invalid expressions has been improved.
+    - Interactive Quiz: A new slide (Slide 14) includes a multiple-choice quiz with immediate feedback, making the learning more engaging and allowing for formative assessment. The selection mechanism and visual feedback have been significantly improved for reliability, and now includes navigation between questions and a final score display.
+    - Second Interactive Quiz: A new slide (Slide 17) has been added specifically for a separate quiz on Tautology, Contradiction, and Contingency, reinforcing these concepts after their introduction.
+    - Third Interactive Quiz: A new slide (Slide 7) has been added for identifying statements/propositions, including an image-based question.
+    - Embedded Video: A new slide (Slide 16) includes an embedded YouTube video to provide a multimedia resource on the relevance of logic.
+    - New Introduction Slide: A new slide (Slide 3) introduces the unique nature and challenge of Discrete Mathematics with an interactive puzzle.
+    - Expanded Propositions Slide: Slide 6 (data-slide="5") has been significantly expanded to include a deeper definition of mathematical statements and an interactive "Test Yourself" section.
+    - Revamped Conditional/Biconditional/Exercises Slides: The original slide 8 (data-slide="7") has been split into three new slides (Slides 8, 9, 10, data-slide="7", "8", "9") to improve didactic distribution. Slide 8 covers atomic/molecular and basic connectives with an interactive element. Slide 9 focuses on Conditional propositions. Slide 10 focuses on Biconditional propositions. Slide 11 (data-slide="10") is now dedicated to the practice exercises.
+    - Icons/Symbols: Unicode characters are used for logical symbols (¬, ∧, ∨, →, ↔) to avoid external assets.
+    - Visual Hierarchy: Tailwind CSS classes (font sizes, weights, colors) are used to create visual hierarchy and emphasize key terms.
+    - No Charts/Complex Visualizations: The content for this first class is foundational and best served by clear textual explanations, structured tables, and the new interactive elements.
+    Library/Method: Vanilla JS for slide navigation, the interactive truth table generator, and the quiz logic. Tailwind CSS for all styling and layout. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; padding: 0; height: 100%;}
+        .slide {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem; /* Reduced padding for more content space */
+            padding-bottom: 6rem; /* Increased bottom padding to prevent overlap with nav buttons */
+            text-align: center;
+            background-color: #fdf6e3; /* Light background */
+            color: #586e75; /* Dark text */
+            box-sizing: border-box; /* Ensure padding is included in height/width */
+            overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+            opacity: 0; /* Start hidden for transition */
+            transition: opacity 0.5s ease-in-out; /* Smooth fade transition */
+        }
+        /* Responsive padding for larger screens */
+        @media (min-width: 768px) {
+            .slide {
+                padding: 4rem;
+                padding-bottom: 8rem; /* Even more bottom padding for larger screens */
+            }
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1; /* Fully visible when active */
+        }
+        .slide h2 { color: #268bd2; margin-bottom: 1.5rem; }
+        .slide h3 { color: #cb4b16; margin-bottom: 1rem; }
+        .slide p { margin-bottom: 1rem; line-height: 1.6; }
+        .slide ul { list-style: none; padding: 0; margin-bottom: 1rem; }
+        .slide ul li { margin-bottom: 0.5rem; }
+        .slide table {
+            margin-top: 1.5rem;
+            margin-left: auto;
+            margin-right: auto;
+            border-collapse: collapse;
+            width: auto;
+            max-width: 80%;
+        }
+        .slide th, .slide td {
+            border: 1px solid #93a1a1;
+            padding: 0.75rem 1.5rem;
+            text-align: center;
+        }
+        .slide th {
+            background-color: #eee8d5;
+            color: #268bd2;
+            font-weight: 600;
+        }
+        .slide td {
+            background-color: #fdf6e3;
+            font-size: 0.9rem; /* Slightly smaller font for table content */
+        }
+        .nav-button {
+            background-color: #268bd2;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px; /* rounded-full */
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Added transform transition */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .nav-button:hover {
+            background-color: #2aa198;
+            transform: translateY(-2px) scale(1.05); /* Added scale on hover */
+        }
+        .nav-button:disabled {
+            background-color: #93a1a1;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none; /* No transform when disabled */
+        }
+        .youtube-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 800px; /* Limit max width for large screens */
+            margin: 2rem auto;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .youtube-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .interactive-container {
+            background-color: #eee8d5;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 700px;
+            margin-top: 2rem;
+        }
+        .interactive-container textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #93a1a1;
+            background-color: #fdf6e3;
+            color: #586e75;
+            resize: vertical;
+            min-height: 80px;
+        }
+        .interactive-container button {
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background-color: #2aa198;
+            color: white;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .interactive-container button:hover {
+            background-color: #268bd2;
+        }
+        .truth-table-output {
+            margin-top: 1.5rem;
+            overflow-x: auto; /* Allow horizontal scrolling for wide tables */
+        }
+        .truth-table-output table {
+            min-width: 100%; /* Ensure table takes full width of its container */
+        }
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            border: 2px solid transparent; /* Increased border width for better visibility */
+        }
+        .quiz-option:hover {
+            background-color: #fdf6e3;
+        }
+        .quiz-option input[type="radio"] {
+            margin-right: 0.75rem;
+            min-width: 1.25rem; /* Ensure a minimum clickable area */
+            min-height: 1.25rem; /* Ensure a minimum clickable area */
+        }
+        .quiz-option.selected {
+            background-color: #dbe7e7; /* A subtle highlight */
+            border-color: #268bd2; /* A border to show selection */
+        }
+        .feedback-message {
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+        .feedback-correct {
+            color: #2aa198;
+        }
+        .feedback-incorrect {
+            color: #cb4b16;
+        }
+        .quiz-score-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #268bd2;
+            margin-top: 2rem;
+        }
+        .video-chapters {
+            margin-top: 1.5rem;
+            text-align: left;
+            max-width: 800px;
+            width: 100%;
+            font-size: 1rem;
+            color: #657b83;
+            background-color: #eee8d5;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .video-chapters h3 {
+            color: #268bd2;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        .video-chapters ul {
+            list-style: none;
+            padding: 0;
+        }
+        .video-chapters li {
+            margin-bottom: 0.4rem;
+        }
+        .video-chapters a {
+            color: #2aa198;
+            text-decoration: none;
+            transition: color 0.2s ease-in-out;
+        }
+        .video-chapters a:hover {
+            color: #268bd2;
+            text-decoration: underline;
+        }
+        .interactive-statement-test li {
+            border: 1px solid #dbe7e7;
+            margin-bottom: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+        .interactive-statement-test li:hover {
+            background-color: #fdf6e3;
+            border-color: #a7b7c2;
+        }
+        .interactive-statement-test li.correct {
+            background-color: #e0f2f1; /* Light green */
+            border-color: #2aa198; /* Green border */
+        }
+        .interactive-statement-test li.incorrect {
+            background-color: #fbe4e4; /* Light red */
+            border-color: #cb4b16; /* Red border */
+        }
+        .conditional-example-box {
+            background-color: #eee8d5;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-top: 1.5rem;
+            width: 100%;
+            max-width: 600px;
+        }
+        .conditional-example-box button {
+            background-color: #268bd2;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            margin-top: 0.75rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .conditional-example-box button:hover {
+            background-color: #2aa198;
+        }
+        .conditional-example-box .result {
+            font-weight: bold;
+            margin-top: 0.75rem;
+        }
+        .conditional-example-box .result.true-val {
+            color: #2aa198;
+        }
+        .conditional-example-box .result.false-val {
+            color: #cb4b16;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="slides-container">
+        <!-- Slide 1: Título -->
+        <div class="slide active" data-slide="0">
+            <h1 class="text-5xl font-bold text-[#268bd2] mb-6">Matemáticas Discretas</h1>
+            <h2 class="text-3xl font-semibold text-[#cb4b16] mb-4">Clase 1: Introducción a la Lógica Proposicional</h2>
+            <p class="text-xl text-[#657b83]">Profesor/a: Dudbil Olvasada Pabon Riaño</p>
+            <p class="text-lg text-[#93a1a1]">Primer Semestre - Programa de Ciencia de Datos</p>
+        </div>
+
+        <!-- Slide 2: Agenda -->
+        <div class="slide" data-slide="1">
+            <h2 class="text-4xl font-bold mb-8">Agenda de Hoy 🗓️</h2>
+            <ul class="text-2xl text-left space-y-4">
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">&#10003;</span> ¿Qué son las Matemáticas Discretas?</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">&#10003;</span> El Desafío Único de las Matemáticas Discretas</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">&#10003;</span> ¿Qué es la Lógica?</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">&#10003;</span> Proposiciones y Declaraciones Matemáticas</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">&#10003;</span> Quiz: ¿Es una Declaración?</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">&#10003;</span> Proposiciones Condicionales y Equivalencia Lógica</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">&#10003;</span> Conectivos Lógicos Fundamentales (Repaso)</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">&#10003;</span> Construcción de Tablas de Verdad (¡Interactiva!)</li>
+                <li class="flex items-center"><span class="text-[#2aa199] mr-3">&#10003;</span> Quiz: Conectivos Lógicos Básicos</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">&#10003;</span> Tautologías, Contradicciones y Contingencias</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">&#10003;</span> Lógica Proposicional (Video)</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">&#10003;</span> Quiz Adicional: Clasificación de Proposiciones</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">&#10003;</span> Relevancia en Ciencia de Datos</li>
+            </ul>
+        </div>
+
+        <!-- Slide 3: Bienvenido a las Matemáticas Discretas: ¿Qué son? -->
+        <div class="slide" data-slide="2">
+            <h2 class="text-4xl font-bold mb-8">Bienvenido a las Matemáticas Discretas: ¿Qué son? 🤔</h2>
+            <p class="text-2xl max-w-3xl">
+                Descubre un tipo de matemáticas diferente, fundamental para la informática y la ciencia de datos.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 text-xl w-full max-w-5xl">
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md text-left">
+                    <h3 class="font-semibold text-[#2aa198] mb-3">Matemáticas Continuas (No Discretas) 🌊</h3>
+                    <p>Tratan con cantidades que pueden variar <strong>suavemente</strong> y sin interrupciones.</p>
+                    <p class="italic mt-2 text-sm text-[#93a1a1]">Ej: Todos los números entre 1 y 5 (1.7, 2.5, etc.). Hay <strong>infinitos</strong> y <strong>no hay espacios</strong>.</p>
+                    <p class="italic mt-1 text-sm text-[#93a1a1]">Piensa en el Cálculo o la recta numérica.</p>
+                </div>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md text-left">
+                    <h3 class="font-semibold text-[#cb4b16] mb-3">Matemáticas Discretas (Separadas) 🧩</h3>
+                    <p>Se ocupan de objetos que son <strong>individualmente separados o distintos</strong>.</p>
+                    <p class="italic mt-2 text-sm text-[#93a1a1]">Ej: Los números enteros entre 1 y 5 (1, 2, 3, 4, 5). Hay un <strong>número finito</strong> y están <strong>separados</strong>.</p>
+                    <p class="italic mt-1 text-sm text-[#93a1a1]">Piensa en rompecabezas, acertijos o problemas de informática.</p>
+                </div>
+            </div>
+            <p class="text-2xl max-w-3xl mt-8">
+                Este curso te ayudará a abordar problemas con una <strong>mentalidad crítica</strong> y a aplicar las matemáticas en tu <strong>vida diaria</strong>.
+            </p>
+            <p class="text-xl mt-4 max-w-3xl text-[#93a1a1]">
+                Estudiaremos temas como: <strong>Combinatoria</strong>, <strong>Lógica Simbólica</strong> y <strong>Teoría de Grafos</strong>.
+            </p>
+        </div>
+
+        <!-- Slide 4: El Desafío Único de las Matemáticas Discretas -->
+        <div class="slide" data-slide="3">
+            <h2 class="text-4xl font-bold mb-8">El Desafío Único de las Matemáticas Discretas 🤯</h2>
+            <p class="text-2xl max-w-3xl">
+                Las <strong>matemáticas discretas</strong> son diferentes a cualquier otra materia que hayas tomado. Se centran en <strong>resolver acertijos y problemas complejos</strong> donde el álgebra y el cálculo no son suficientes.
+            </p>
+            <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md mt-8 w-full max-w-xl">
+                <h3 class="font-semibold text-[#2aa198] mb-3">¡Pon a prueba tu pensamiento discreto!</h3>
+                <p class="text-xl mb-4">
+                    Imagina una fiesta con 10 personas. Si cada persona se da la mano con todas las demás <strong>exactamente una vez</strong>, ¿cuántos apretones de mano ocurren en total?
+                </p>
+                <button id="show-handshake-hint" class="bg-[#cb4b16] text-white px-4 py-2 rounded-full hover:bg-[#d33682] transition">Mostrar Pista</button>
+                <p id="handshake-hint" class="text-lg mt-4 hidden text-[#586e75]">
+                    Piensa en cada persona como un punto (vértice) y cada apretón de manos como una conexión (arista). ¿Qué estructura matemática representa esto?
+                </p>
+            </div>
+            <p class="text-xl mt-8 max-w-3xl">
+                Este curso te equipará con las <strong>habilidades de pensamiento crítico</strong> necesarias para abordar estos problemas de la vida real.
+            </p>
+            <p class="text-lg mt-4 max-w-3xl text-[#93a1a1]">
+                Abarca temas amplios como <strong>Combinatoria</strong>, <strong>Lógica Simbólica</strong>, <strong>Teoría de Grafos</strong>, <strong>Informática</strong>, <strong>Álgebra Abstracta</strong>, <strong>Teoría de Números</strong> y <strong>Teoría de Juegos</strong>.
+            </p>
+        </div>
+
+        <!-- Slide 5: ¿Qué es la Lógica? -->
+        <div class="slide" data-slide="4">
+            <h2 class="text-4xl font-bold mb-8">¿Qué es la Lógica? 🤔</h2>
+            <p class="text-2xl max-w-3xl">
+                La lógica es el estudio de los principios del razonamiento válido y la inferencia. Nos permite determinar si un argumento es correcto o incorrecto, basándonos en su estructura y no en su contenido.
+            </p>
+            <p class="text-xl mt-4 max-w-3xl text-[#93a1a1]">
+                Es el lenguaje fundamental para el <strong>pensamiento matemático</strong> y <strong>computacional</strong>.
+            </p>
+        </div>
+
+        <!-- Slide 6: Proposiciones y Declaraciones Matemáticas -->
+        <div class="slide" data-slide="5">
+            <h2 class="text-4xl font-bold mb-8">Proposiciones y Declaraciones Matemáticas 💬</h2>
+            <p class="text-2xl max-w-3xl">
+                Para hacer y comunicar matemáticas con precisión, necesitamos entender los bloques básicos: las <strong>declaraciones matemáticas</strong>.
+            </p>
+            <p class="text-xl max-w-3xl mt-4">
+                Una <strong>declaración</strong> (o proposición) es cualquier oración enunciativa que es <strong>verdadera</strong> o <strong>falsa</strong>, pero no ambas a la vez.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 text-xl w-full max-w-4xl">
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md">
+                    <h3 class="font-semibold text-[#2aa198] mb-3">Ejemplos de Declaraciones ✅</h3>
+                    <ul class="text-left space-y-2">
+                        <li>"El sol sale por el este." (<strong>Verdadera</strong>)</li>
+                        <li>"2 + 2 = 5." (<strong>Falsa</strong>)</li>
+                        <li>"Tengo el cabello azul." (<strong>Falsa</strong>, pero es una declaración)</li>
+                        <li>"Python es un lenguaje de programación." (<strong>Verdadera</strong>)</li>
+                    </ul>
+                </div>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md">
+                    <h3 class="font-semibold text-[#cb4b16] mb-3">No son Declaraciones ❌</h3>
+                    <ul class="text-left space-y-2">
+                        <li>"¿Qué hora es?" (Pregunta)</li>
+                        <li>"¡Cierra la puerta!" (Orden)</li>
+                        <li>"¡Wow!" (Exclamación)</li>
+                        <li>"x + 3 = 7." (Depende del valor de X)</li>
+                        <li>"Esta oración es falsa." (Paradoja, ni <strong>verdadera</strong> ni <strong>falsa</strong>)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="interactive-statement-test bg-[#eee8d5] p-6 rounded-lg shadow-md mt-8 w-full max-w-xl text-left">
+                <h3 class="font-semibold text-[#2aa198] mb-4">¡Ponte a prueba! ¿Es una proposición? 🤔</h3>
+                <ul id="statement-test-list" class="space-y-3">
+                    <li class="cursor-pointer p-2 rounded hover:bg-[#fdf6e3] transition" data-type="statement" data-feedback="¡Correcto! Es una afirmación que puede ser verdadera o falsa.">
+                        "El agua hierve a 100°C."
+                    </li>
+                    <li class="cursor-pointer p-2 rounded hover:bg-[#fdf6e3] transition" data-type="not-statement" data-feedback="Incorrecto. Es una pregunta, no una afirmación que pueda ser verdadera o falsa.">
+                        "¿Estás aprendiendo mucho?"
+                    </li>
+                    <li class="cursor-pointer p-2 rounded hover:bg-[#fdf6e3] transition" data-type="not-statement" data-feedback="Incorrecto. Es una exclamación, no una afirmación.">
+                        "¡Qué día tan hermoso!"
+                    </li>
+                    <li class="cursor-pointer p-2 rounded hover:bg-[#fdf6e3] transition" data-type="statement" data-feedback="¡Correcto! Es una declaración que puede ser verdadera o falsa (en este caso, falsa).">
+                        "Los perros pueden volar."
+                    </li>
+                    <li class="cursor-pointer p-2 rounded hover:bg-[#fdf6e3] transition" data-type="not-statement-paradox" data-feedback="Incorrecto. Esta es una paradoja. Si fuera verdadera, sería falsa, y si fuera falsa, sería verdadera. Por eso, no es una proposición.">
+                        "Esta frase contiene cinco palabras."
+                    </li>
+                    <li class="cursor-pointer p-2 rounded hover:bg-[#fdf6e3] transition" data-type="statement" data-feedback="¡Correcto! Es una declaración que puede ser verdadera o falsa.">
+                        "Todos los unicornios son rosados."
+                    </li>
+                </ul>
+                <p id="statement-test-feedback" class="feedback-message mt-4 text-sm"></p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Quiz: ¿Es una Declaración? -->
+        <div class="slide" data-slide="6">
+            <h2 class="text-4xl font-bold mb-8">Quiz: ¿Es una Declaración? 🤔</h2>
+            <div class="interactive-container">
+                <p id="quiz3-question" class="text-2xl font-semibold mb-6"></p>
+                <div id="quiz3-options" class="flex flex-col items-start w-full">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+                <button id="submit-quiz3-btn" class="mt-6">Verificar Respuesta</button>
+                <p id="quiz3-feedback" class="feedback-message mt-4"></p>
+                <p id="quiz3-score-display" class="quiz-score-display hidden"></p>
+                <button id="restart-quiz3-btn" class="nav-button hidden mt-4">Reiniciar Quiz</button>
+            </div>
+        </div>
+
+        <!-- Slide 8: Estructura de Proposiciones (NEW SLIDE) -->
+        <div class="slide" data-slide="7">
+            <h2 class="text-4xl font-bold mb-8">Estructura de Proposiciones: Atómicas y Moleculares ⚛️</h2>
+            <p class="text-2xl max-w-3xl">
+                Las declaraciones pueden ser <strong>atómicas</strong> (indivisibles) o <strong>moleculares</strong> (compuestas por declaraciones más pequeñas).
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 text-xl w-full max-w-4xl">
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md text-left">
+                    <h3 class="font-semibold text-[#2aa198] mb-3">Declaraciones Atómicas ✅</h3>
+                    <p>No pueden dividirse en declaraciones más pequeñas.</p>
+                    <ul class="text-left space-y-2 mt-2">
+                        <li>"Los números de teléfono en EE. UU. tienen diez dígitos."</li>
+                        <li>"La luna está hecha de queso."</li>
+                        <li>"Cuarenta y dos es un cuadrado perfecto."</li>
+                    </ul>
+                </div>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md text-left">
+                    <h3 class="font-semibold text-[#cb4b16] mb-3">Declaraciones Moleculares 🧩</h3>
+                    <p>Construidas a partir de declaraciones más simples usando <strong>conectivos lógicos</strong>.</p>
+                    <ul class="text-left space-y-2 mt-2">
+                        <li>"Tres más siete es igual a doce <strong>y</strong> tres más siete es igual a once."</li>
+                        <li>"<strong>Si</strong> Sam es hombre, <strong>entonces</strong> Chris es mujer."</li>
+                        <li>"Sam <strong>no</strong> es hombre."</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="bg-[#fdf6e3] p-6 rounded-lg shadow-md mt-8 w-full max-w-xl text-left">
+                <h3 class="font-semibold text-[#268bd2] mb-4">Conectivos Lógicos Fundamentales</h3>
+                <ul class="space-y-2 text-lg">
+                    <li><strong>Y</strong> ($\land$): Conjunción (Binario)</li>
+                    <li><strong>O</strong> ($\lor$): Disyunción (Binario)</li>
+                    <li><strong>Si... entonces</strong> ($\to$): Implicación (Binario)</li>
+                    <li><strong>Si y solo si</strong> ($\leftrightarrow$): Bicondicional (Binario)</li>
+                    <li><strong>No</strong> ($\neg$): Negación (Unitario)</li>
+                </ul>
+                <p class="text-sm italic mt-2 text-[#93a1a1]">
+                    El valor de verdad de una declaración molecular se determina por el tipo de conectivo y los valores de verdad de sus partes atómicas.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 9: Proposición Condicional: La Implicación Lógica ($p \to q$) (NEW SLIDE) -->
+        <div class="slide" data-slide="8">
+            <h2 class="text-4xl font-bold mb-8">Proposición Condicional: La Implicación Lógica ($p \to q$) ➡️</h2>
+            <p class="text-2xl max-w-3xl">
+                Se lee: "<strong>Si p entonces q</strong>". Es fundamental para expresar reglas y consecuencias.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 text-xl w-full max-w-5xl">
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md text-left">
+                    <h3 class="font-semibold text-[#2aa198] mb-3">Componentes y Connotaciones</h3>
+                    <ul class="list-disc list-inside space-y-1 text-base">
+                        <li><strong>p</strong>: <strong>Antecedente</strong> (la condición)</li>
+                        <li><strong>q</strong>: <strong>Consecuente</strong> (la consecuencia lógica)</li>
+                    </ul>
+                    <p class="text-sm italic mt-2 text-[#93a1a1]">
+                        Otras formas de decir $p \to q$: "siempre que...", "con tal que...", "puesto que...", "ya que...", "porque...", "cuando...", "a menos que...", etc.
+                    </p>
+                    <p class="text-base mt-2">
+                        <strong>Ejemplo:</strong> "Si pagué por el pan entonces lo puedo llevar a casa."
+                    </p>
+                </div>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md text-left">
+                    <h3 class="font-semibold text-[#cb4b16] mb-3">Tabla de Verdad de la Implicación</h3>
+                    <table class="mt-4 text-sm w-full">
+                        <thead><tr><th>p</th><th>q</th><th>$p \to q$</th></tr></thead>
+                        <tbody>
+                            <tr><td>V</td><td>V</td><td>V</td></tr>
+                            <tr><td>V</td><td>F</td><td>F</td></tr>
+                            <tr><td>F</td><td>V</td><td>V</td></tr>
+                            <tr><td>F</td><td>F</td><td>V</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="text-sm mt-2 text-[#93a1a1]">
+                        ¡Atención! $p \to q$ es <strong>falsa solo cuando el antecedente (p) es verdadero y el consecuente (q) es falso</strong>. En cualquier otro caso, es verdadera.
+                    </p>
+                </div>
+            </div>
+            <div class="conditional-example-box mt-8">
+                <p class="font-semibold mb-2">Ejemplo para reflexionar sobre la lógica formal vs. sentido común:</p>
+                <p class="italic">"Si la Tierra gira alrededor del sol entonces Calkiní es un municipio de Campeche."</p>
+                <button id="eval-example-btn">Evaluar Verdad</button>
+                <p id="eval-example-result" class="result hidden"></p>
+            </div>
+        </div>
+
+        <!-- Slide 10: Proposición Bicondicional: Equivalencia Lógica ($p \leftrightarrow q$) (NEW SLIDE) -->
+        <div class="slide" data-slide="9">
+            <h2 class="text-4xl font-bold mb-8">Proposición Bicondicional: Equivalencia Lógica ($p \leftrightarrow q$) ↔️</h2>
+            <p class="text-2xl max-w-3xl">
+                Se lee: "<strong>p si y solo si q</strong>". Establece que dos proposiciones tienen el mismo valor de verdad.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 text-xl w-full max-w-5xl">
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md text-left">
+                    <h3 class="font-semibold text-[#2aa198] mb-3">Significado y Connotaciones</h3>
+                    <p class="text-sm italic mt-2 text-[#93a1a1]">
+                        "p" es verdadera si y solo si "q" es verdadera, o "p" es falsa si y solo si "q" es falsa.
+                    </p>
+                    <p class="text-base mt-2">
+                        <strong>Ejemplo:</strong> "Juan va al antro el fin de semana si y solo si Juan saca 10 en su examen semanal."
+                    </p>
+                    <ul class="list-disc list-inside space-y-1 text-base mt-2">
+                        <li><strong>Condición necesaria y suficiente:</strong> Ambas partes son interdependientes.</li>
+                    </ul>
+                </div>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md text-left">
+                    <h3 class="font-semibold text-[#cb4b16] mb-3">Tabla de Verdad de la Bicondicional</h3>
+                    <table class="mt-4 text-sm w-full">
+                        <thead><tr><th>p</th><th>q</th><th>$p \leftrightarrow q$</th></tr></thead>
+                        <tbody>
+                            <tr><td>V</td><td>V</td><td>V</td></tr>
+                            <tr><td>V</td><td>F</td><td>F</td></tr>
+                            <tr><td>F</td><td>V</td><td>F</td></tr>
+                            <tr><td>F</td><td>F</td><td>V</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="text-sm mt-2 text-[#93a1a1]">
+                        $p \leftrightarrow q$ es <strong>verdadera cuando p y q tienen el mismo valor de verdad</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Desafío: Ejercicios de Lógica y Formalización (NEW SLIDE) -->
+        <div class="slide" data-slide="10">
+            <h2 class="text-4xl font-bold mb-8">Desafío: Ejercicios de Lógica y Formalización 🧠</h2>
+            <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md w-full max-w-4xl text-left">
+                <h3 class="font-semibold text-[#268bd2] mb-4">a) Usando las tablas de verdad demuestre:</h3>
+                <ul class="list-disc list-inside text-base mb-4">
+                    <li>$\neg(\neg p) \leftrightarrow p$</li>
+                    <li>$p \land (p \lor q) \leftrightarrow p$</li>
+                    <li>$p \lor (p \land q) \leftrightarrow p$</li>
+                    <li>$\neg (p \land q) \leftrightarrow \neg p \lor \neg q$ (Ley de De Morgan)</li>
+                    <li>$\neg (p \lor q) \leftrightarrow \neg p \land \neg q$ (Ley de De Morgan)</li>
+                    <li>$(p \land q) \land r \leftrightarrow p \land (q \land r)$</li>
+                    <li>$(p \lor q) \lor r \leftrightarrow p \lor (q \lor r)$</li>
+                    <li>$(p \to q ) \to r \leftrightarrow p \to (q \to r)$</li>
+                </ul>
+                <h3 class="font-semibold text-[#268bd2] mb-4">b) Crea las w.f.f (well-formed formulas) correctas para las siguientes proposiciones:</h3>
+                <ul class="list-decimal list-inside text-base mb-4">
+                    <li>Aunque lo he intentado, no he llegado a tiempo.</li>
+                    <li>Ni come ni deja comer.</li>
+                    <li>Entrena todos los días pero no le vale de nada.</li>
+                    <li>No encontrarás sitio en el comedor si no bajas temprano.</li>
+                    <li>Sólo tendrás éxito si prestas atención.</li>
+                    <li>Ese lapso, corto quizá si se le mide por el calendario, es interminablemente largo cuando, como yo, se ha galopado a través de él.</li>
+                    <li>No aprobarás a menos que hagas los ejercicios.</li>
+                    <li>Reprobarás a menos que hagas los ejercicios.</li>
+                </ul>
+                <h3 class="font-semibold text-[#268bd2] mb-4">c) Formaliza las siguientes proposiciones, usando las letras de proposición siguientes: p: Bebes/Bebas, q: Puedes/Puedas/Poder conducir</h3>
+                <ul class="list-decimal list-inside text-base">
+                    <li>Si bebes entonces no puedes conducir.</li>
+                    <li>Bebes solo si no puedes conducir.</li>
+                    <li>No puedes conducir si bebes.</li>
+                    <li>No poder conducir es necesario para beber.</li>
+                    <li>No bebes a menos que no puedas conducir.</li>
+                    <li>No puedes conducir aunque bebes.</li>
+                    <li>A pesar de que no bebes no puedes conducir.</li>
+                    <li>Beber es suficiente para no poder conducir.</li>
+                    <li>A menos que bebas, puedes conducir.</li>
+                    <li>Es necesario que no bebas para poder conducir.</li>
+                    <li>En caso de que bebas, puedes no conducir.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 12: Conectivos - Negación (Previously Slide 7, now 12) -->
+        <div class="slide" data-slide="11">
+            <h2 class="text-4xl font-bold mb-8">Conectivos Lógicos: Negación (NO) 🚫</h2>
+            <p class="text-2xl max-w-3xl">
+                La <strong>negación</strong> de una proposición invierte su valor de verdad.
+            </p>
+            <p class="text-xl font-bold mt-4">Símbolo: ¬ (o ~)</p>
+            <p class="text-xl italic">Si P es "Hoy es lunes", entonces ¬P es "Hoy no es lunes".</p>
+
+            <table class="mt-8 text-xl">
+                <thead>
+                    <tr><th>P</th><th>¬P</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>V</td><td>F</td></td></tr>
+                    <tr><td>F</td><td>V</td></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 13: Conectivos - Conjunción (Previously Slide 8, now 13) -->
+        <div class="slide" data-slide="12">
+            <h2 class="text-4xl font-bold mb-8">Conectivos Lógicos: Conjunción (Y) 🤝</h2>
+            <p class="text-2xl max-w-3xl">
+                La <strong>conjunción</strong> de dos proposiciones es verdadera solo si ambas proposiciones son verdaderas.
+            </p>
+            <p class="text-xl font-bold mt-4">Símbolo: ∧ (o &)</p>
+            <p class="text-xl italic">Si P es "Está lloviendo" y Q es "Hace frío", entonces P ∧ Q es "Está lloviendo y hace frío".</p>
+
+            <table class="mt-8 text-xl">
+                <thead>
+                    <tr><th>P</th><th>Q</th><th>P ∧ Q</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>V</td><td>V</td><td>V</td></tr>
+                    <tr><td>V</td><td>F</td><td>F</td></tr>
+                    <tr><td>F</td><td>V</td><td>F</td></tr>
+                    <tr><td>F</td><td>F</td><td>F</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 14: Conectivos - Disyunción (Previously Slide 9, now 14) -->
+        <div class="slide" data-slide="13">
+            <h2 class="text-4xl font-bold mb-8">Conectivos Lógicos: Disyunción (O) 🧩</h2>
+            <p class="text-2xl max-w-3xl">
+                La <strong>disyunción</strong> de dos proposiciones es verdadera si al menos una de las proposiciones es verdadera.
+            </p>
+            <p class="text-xl font-bold mt-4">Símbolo: ∨ (o |)</p>
+            <p class="text-xl italic">Si P es "Estudio" y Q es "Trabajo", entonces P ∨ Q es "Estudio o trabajo".</p>
+
+            <table class="mt-8 text-xl">
+                <thead>
+                    <tr><th>P</th><th>Q</th><th>P ∨ Q</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>V</td><td>V</td><td>V</td></tr>
+                    <tr><td>V</td><td>F</td><td>V</td></tr>
+                    <tr><td>F</td><td>V</td><td>V</td></tr>
+                    <tr><td>F</td><td>F</td><td>F</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 15: Conectivos - Condicional (Previously Slide 10, now 15) -->
+        <div class="slide" data-slide="14">
+            <h2 class="text-4xl font-bold mb-8">Conectivos Lógicos: Condicional (SI... ENTONCES) ➡️</h2>
+            <p class="text-2xl max-w-3xl">
+                La <strong>condicional</strong> es falsa solo si el antecedente (P) es verdadero y el consecuente (Q) es falso.
+            </p>
+            <p class="text-xl font-bold mt-4">Símbolo: → (o =>)</p>
+            <p class="text-xl italic">Si P es "Apruebas el examen" y Q es "Te doy un dulce", entonces P → Q es "Si apruebas el examen, entonces te doy un dulce".</p>
+
+            <table class="mt-8 text-xl">
+                <thead>
+                    <tr><th>P</th><th>Q</th><th>P → Q</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>V</td><td>V</td><td>V</td></tr>
+                    <tr><td>V</td><td>F</td><td>F</td></tr>
+                    <tr><td>F</td><td>V</td><td>V</td></tr>
+                    <tr><td>F</td><td>F</td><td>V</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 16: Conectivos - Bicondicional (Previously Slide 11, now 16) -->
+        <div class="slide" data-slide="15">
+            <h2 class="text-4xl font-bold mb-8">Conectivos Lógicos: Bicondicional (SI Y SOLO SI) ↔️</h2>
+            <p class="text-2xl max-w-3xl">
+                La <strong>bicondicional</strong> es verdadera si y solo si ambas proposiciones tienen el mismo valor de verdad.
+            </p>
+            <p class="text-xl font-bold mt-4">Símbolo: ↔ (o <=>)</p>
+            <p class="text-xl italic">Si P es "Puedes votar" y Q es "Tienes 18 años", entonces P ↔ Q es "Puedes votar si y solo si tienes 18 años".</p>
+
+            <table class="mt-8 text-xl">
+                <thead>
+                    <tr><th>P</th><th>Q</th><th>P ↔ Q</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>V</td><td>V</td><td>V</td></tr>
+                    <tr><td>V</td><td>F</td><td>F</td></tr>
+                    <tr><td>F</td><td>V</td><td>F</td></tr>
+                    <tr><td>F</td><td>F</td><td>V</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 17: Tablas de Verdad (INTERACTIVA) (Previously Slide 12, now 17) -->
+        <div class="slide" data-slide="16">
+            <h2 class="text-4xl font-bold mb-8">Construcción de Tablas de Verdad 📊 (¡Interactiva!)</h2>
+            <p class="text-2xl max-w-3xl">
+                Ingresa una expresión lógica (ej. `P and (not Q or R)`) y genera su tabla de verdad.
+            </p>
+            <div class="interactive-container">
+                <textarea id="logic-expression" placeholder="Ej: P and Q, not P or R, (P -> Q) <-> R"></textarea>
+                <button id="generate-table-btn">Generar Tabla de Verdad</button>
+                <div id="truth-table-output" class="truth-table-output"></div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Quiz Interactivo (Conectivos Básicos) (Previously Slide 13, now 18) -->
+        <div class="slide" data-slide="17">
+            <h2 class="text-4xl font-bold mb-8">Quiz: Conectivos Lógicos Básicos 🤔</h2>
+            <div class="interactive-container">
+                <p id="quiz-question" class="text-2xl font-semibold mb-6"></p>
+                <div id="quiz-options" class="flex flex-col items-start w-full">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+                <button id="submit-quiz-btn" class="mt-6">Verificar Respuesta</button>
+                <p id="quiz-feedback" class="feedback-message mt-4"></p>
+                <p id="quiz-score-display" class="quiz-score-display hidden"></p>
+                <button id="restart-quiz-btn" class="nav-button hidden mt-4">Reiniciar Quiz</button>
+            </div>
+        </div>
+
+        <!-- Slide 19: Tautología, Contradicción, Contingencia (Previously Slide 14, now 19) -->
+        <div class="slide" data-slide="18">
+            <h2 class="text-4xl font-bold mb-8">Clasificación de Proposiciones Compuestas ⚖️</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 text-xl w-full max-w-5xl">
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md">
+                    <h3 class="font-semibold text-[#2aa198] mb-3">Tautología</h3>
+                    <p>Una proposición que es <strong>siempre verdadera</strong>, independientemente de los valores de verdad de sus componentes.</p>
+                    <p class="italic mt-2 text-sm text-[#93a1a1]">Ej: P ∨ ¬P (Principio del Tercero Excluido)</p>
+                    <p class="italic mt-1 text-sm text-[#93a1a1]">Ej: (P ∧ Q) → P (Simplificación)</p>
+                    <p class="italic mt-1 text-sm text-[#93a1a1]">Ej: (P → Q) ∨ (Q → P) (Ley de Peirce)</p>
+                </div>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md">
+                    <h3 class="font-semibold text-[#cb4b16] mb-3">Contradicción</h3>
+                    <p>Una proposición que es <strong>siempre falsa</strong>, independientemente de los valores de verdad de sus componentes.</p>
+                    <p class="italic mt-2 text-sm text-[#93a1a1]">Ej: P ∧ ¬P (Principio de No Contradicción)</p>
+                    <p class="italic mt-1 text-sm text-[#93a1a1]">Ej: ¬(P ∨ ¬P)</p>
+                    <p class="italic mt-1 text-sm text-[#93a1a1]">Ej: (P ∧ Q) ∧ ¬P</p>
+                </div>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-md">
+                    <h3 class="font-semibold text-[#6c71c4] mb-3">Contingencia</h3>
+                    <p>Una proposición que no es ni una tautología ni una contradicción; puede ser verdadera o falsa.</p>
+                    <p class="italic mt-2 text-sm text-[#93a1a1]">Ej: P ∧ Q</p>
+                    <p class="italic mt-1 text-sm text-[#93a1a1]">Ej: P → Q</p>
+                    <p class="italic mt-1 text-sm text-[#93a1a1]">Ej: (P ∨ Q) ∧ ¬P</p>
+                </div>
+            </div>
+            <p class="text-base mt-6 max-w-3xl text-[#586e75]">
+                Para más detalles y ejemplos, puedes consultar la página de LibreTexts: <a href="https://espanol.libretexts.org/Bookshelves/Humanidades/Filosofia/Razonamiento_critico%3A_Un_manual_del_usuario_(Southworth_y_Swoyer)/33%3A_Tablas_de_la_Verdad/33.02%3A_Tautolog%C3%ADa%2C_Contradicci%C3%B3n_y_Contingencias" target="_blank" class="text-[#2aa198] hover:underline">Tautología, Contradicción y Contingencias</a>.
+            </p>
+        </div>
+
+        <!-- Slide 20: Video sobre Lógica Proposicional con Capítulos (Previously Slide 15, now 20) -->
+        <div class="slide" data-slide="19">
+            <h2 class="text-4xl font-bold mb-8">Video: Lógica Proposicional 🎬</h2>
+            <p class="text-2xl max-w-3xl mb-6">
+                Explora los fundamentos de la lógica proposicional con este video.
+            </p>
+            <div class="youtube-container">
+                <iframe src="https://www.youtube.com/embed/ddpTQMNQsnc" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+            <div class="video-chapters">
+                <h3>Capítulos del video:</h3>
+                <ul>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=0s" target="_blank">0:00 Introducción</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=1m10s" target="_blank">1:10 Concepto de proposición</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=2m9s" target="_blank">2:09 Valor de verdad</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=2m56s" target="_blank">2:56 Proposiciones simples</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=4m6s" target="_blank">4:06 Proposiciones compuestas</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=4m55s" target="_blank">4:55 Conectivas lógicas</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=5m19s" target="_blank">5:19 Negación</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=5m58s" target="_blank">5:58 Conjunción</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=7m3s" target="_blank">7:03 Disyunción</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=8m9s" target="_blank">8:09 Disyunción exclusiva</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=9m33s" target="_blank">9:33 Implicación</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=10m34s" target="_blank">10:34 Doble implicación</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=ddpTQMNQsnc&t=11m56s" target="_blank">11:56 Bibliografía</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 21: Segundo Quiz Interactivo (Tautología, Contradicción, Contingencia) (Previously Slide 16, now 21) -->
+        <div class="slide" data-slide="20">
+            <h2 class="text-4xl font-bold mb-8">Quiz: Clasificación de Proposiciones 🧐</h2>
+            <div class="interactive-container">
+                <p id="quiz2-question" class="text-2xl font-semibold mb-6"></p>
+                <div id="quiz2-options" class="flex flex-col items-start w-full">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+                <button id="submit-quiz2-btn" class="mt-6">Verificar Respuesta</button>
+                <p id="quiz2-feedback" class="feedback-message mt-4"></p>
+                <p id="quiz2-score-display" class="quiz-score-display hidden"></p>
+                <button id="restart-quiz2-btn" class="nav-button hidden mt-4">Reiniciar Quiz</button>
+            </div>
+        </div>
+
+        <!-- Slide 22: Relevancia en Ciencia de Datos (Previously Slide 17, now 22) -->
+        <div class="slide" data-slide="21">
+            <h2 class="text-4xl font-bold mb-8">Lógica Proposicional en Ciencia de Datos 💻</h2>
+            <p class="text-2xl max-w-3xl">
+                La lógica es fundamental para el manejo y análisis de datos:
+            </p>
+            <ul class="text-xl mt-6 text-left space-y-3">
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">✔</span> <strong class="text-[#268bd2]">Condicionales en Programación:</strong> Lógica `if-else` para flujos de control en scripts de Python.</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">✔</span> <strong class="text-[#268bd2]">Filtrado de Datos:</strong> Seleccionar filas en Pandas DataFrames usando condiciones booleanas (`df[df['col'] > 5] & (df['col2'] == 'A')`).</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">✔</span> <strong class="text-[#268bd2]">Consultas SQL:</strong> Uso de `AND`, `OR`, `NOT` en cláusulas `WHERE` para extraer datos específicos.</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">✔</span> <strong class="text-[#268bd2]">Validación de Datos:</strong> Definir reglas lógicas para asegurar la calidad y consistencia de los datos.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 23: Próximos Pasos (Previously Slide 18, now 23) -->
+        <div class="slide" data-slide="22">
+            <h2 class="text-4xl font-bold mb-8">Próximos Pasos y Tarea 🚀</h2>
+            <p class="text-2xl max-w-3xl">
+                Para la próxima sesión, por favor:
+            </p>
+            <ul class="text-xl mt-6 text-left space-y-3">
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">📝</span> Revisa los conceptos de proposiciones y conectivos.</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">💻</span> Completa el <strong>Notebook 1.1: Introducción a Booleans en Python</strong> en Google Colab.</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">🧠</span> Intenta el <strong>Notebook 1.2: Generación de Tablas de Verdad</strong>.</li>
+                <li class="flex items-center"><span class="text-[#2aa198] mr-3">❓</span> Prepara cualquier pregunta para la próxima clase.</li>
+            </ul>
+            <p class="text-lg mt-8 text-[#93a1a1]">¡Nos vemos en la próxima sesión!</p>
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-[#fdf6e3]/80 backdrop-blur-md p-4 flex justify-between items-center shadow-lg">
+        <span id="slide-counter" class="text-lg font-semibold text-[#586e75] ml-4"></span>
+        <div class="flex space-x-4 mr-4">
+            <button id="prev-slide" class="nav-button">Anterior</button>
+            <button id="next-slide" class="nav-button">Siguiente</button>
+        </div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        const prevButton = document.getElementById('prev-slide');
+        const nextButton = document.getElementById('next-slide');
+        const slideCounter = document.getElementById('slide-counter');
+
+        // Global variable to track if the quiz has been loaded for the current question index
+        let quiz1RenderedForQuestion = -1; // Initialize with an invalid index for quiz 1
+        let quiz2RenderedForQuestion = -1; // Initialize with an invalid index for quiz 2
+        let quiz3RenderedForQuestion = -1; // Initialize with an invalid index for quiz 3
+
+        // Function to shuffle an array (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
+        }
+
+        function showSlide(index) {
+            // Hide all slides first
+            slides.forEach((slide) => {
+                slide.classList.remove('active');
+            });
+
+            // Show the target slide after a small delay to allow opacity transition
+            setTimeout(() => {
+                slides[index].classList.add('active');
+                // After showing the slide, typeset MathJax content
+                if (window.MathJax && typeof MathJax.typeset === 'function') { // Check for typeset function
+                    MathJax.typeset([slides[index]]); // Use typeset()
+                }
+            }, 10); // Small delay for transition to start from opacity 0
+
+            // If it's the quiz slide (index 14) AND the quiz for this question hasn't been rendered yet
+            if (index === 14 && quiz1RenderedForQuestion !== currentQuiz1QuestionIndex) {
+                loadQuiz1Question();
+                quiz1RenderedForQuestion = currentQuiz1QuestionIndex; // Mark as rendered
+            } else if (index === 17 && quiz2RenderedForQuestion !== currentQuiz2QuestionIndex) { // If it's the second quiz slide (index 17)
+                loadQuiz2Question();
+                quiz2RenderedForQuestion = currentQuiz2QuestionIndex; // Mark as rendered
+            } else if (index === 6 && quiz3RenderedForQuestion !== currentQuiz3QuestionIndex) { // If it's the third quiz slide (index 6)
+                loadQuiz3Question();
+                quiz3RenderedForQuestion = currentQuiz3QuestionIndex; // Mark as rendered
+            }
+
+            updateButtons();
+            updateSlideCounter();
+        }
+
+        function updateButtons() {
+            prevButton.disabled = currentSlide === 0;
+            nextButton.disabled = currentSlide === slides.length - 1;
+        }
+
+        function updateSlideCounter() {
+            slideCounter.textContent = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        });
+
+        // Interactive Truth Table Generator Logic
+        const generateTableBtn = document.getElementById('generate-table-btn');
+        const logicExpressionInput = document.getElementById('logic-expression');
+        const truthTableOutput = document.getElementById('truth-table-output');
+
+        // Helper to safely evaluate logical expressions
+        function safeEval(expression, p, q, r) {
+            // Standardize operators for JS evaluation
+            // Use word boundaries (\b) to ensure we only replace full words like 'AND' and not part of 'RANDOM'
+            let jsExpression = expression
+                .replace(/\bAND\b/g, '&&')
+                .replace(/\bOR\b/g, '||')
+                .replace(/\bNOT\b/g, '!')
+                .replace(/->/g, 'IMPLIES') // Use a temporary placeholder to avoid issues with P, Q, R
+                .replace(/<->/g, 'BICONDITIONAL'); // Use a temporary placeholder
+
+            // Handle implication (P -> Q is equivalent to !P || Q)
+            // Ensure we only match P, Q, R as standalone variables for these operations
+            jsExpression = jsExpression.replace(/\b([PQR])\b\s*IMPLIES\s*\b([PQR])\b/g, (match, p1, p2) => {
+                return `(!${p1} || ${p2})`;
+            });
+
+            // Handle biconditional (P <-> Q is equivalent to (P && Q) || (!P && !Q))
+            jsExpression = jsExpression.replace(/\b([PQR])\b\s*BICONDITIONAL\s*\b([PQR])\b/g, (match, p1, p2) => {
+                return `((${p1} && ${p2}) || (!${p1} && !${p2}))`;
+            });
+
+            // Replace logical constants (TRUE/FALSE) if the user tries to use them
+            jsExpression = jsExpression.replace(/\bTRUE\b/g, 'true');
+            jsExpression = jsExpression.replace(/\bFALSE\b/g, 'false');
+
+            // Replace variables with their boolean values, using word boundaries
+            jsExpression = jsExpression.replace(/\bP\b/g, p);
+            jsExpression = jsExpression.replace(/\bQ\b/g, q);
+            jsExpression = jsExpression.replace(/\bR\b/g, r);
+
+            try {
+                // Use Function constructor for safer evaluation than direct eval()
+                // It creates a new function with access only to the global scope and its own arguments.
+                const result = new Function(`return ${jsExpression}`)();
+                return result ? 'V' : 'F';
+            } catch (e) {
+                console.error("Error evaluating expression:", e);
+                // Return a specific error message for the user to understand the problem
+                return 'ERROR_SINTAXIS';
+            }
+        }
+
+        generateTableBtn.addEventListener('click', () => {
+            const expression = logicExpressionInput.value.trim().toUpperCase();
+            if (!expression) {
+                truthTableOutput.innerHTML = '<p class="text-red-500 mt-4">Por favor, introduce una expresión lógica.</p>';
+                return;
+            }
+
+            // Determine variables present in the expression
+            const hasP = expression.includes('P');
+            const hasQ = expression.includes('Q');
+            const hasR = expression.includes('R');
+
+            let variables = [];
+            if (hasP) variables.push('P');
+            if (hasQ) variables.push('Q');
+            if (hasR) variables.push('R');
+
+            if (variables.length === 0) {
+                 truthTableOutput.innerHTML = '<p class="text-red-500 mt-4">La expresión debe contener al menos una variable (P, Q, R).</p>';
+                 return;
+            }
+
+            let tableHtml = '<table class="w-full text-lg">';
+            tableHtml += '<thead><tr>';
+            variables.forEach(v => tableHtml += `<th>${v}</th>`);
+            tableHtml += `<th>${expression.replace(/->/g, '→').replace(/<->/g, '↔')}</th></tr></thead><tbody>`;
+
+            const numRows = Math.pow(2, variables.length);
+            let hasSyntaxError = false;
+
+            for (let i = 0; i < numRows; i++) {
+                let pVal = false, qVal = false, rVal = false;
+                if (variables.length === 1) { // Only P
+                    pVal = (i === 0);
+                } else if (variables.length === 2) { // P, Q
+                    pVal = (Math.floor(i / 2) % 2 === 0);
+                    qVal = (i % 2 === 0);
+                } else if (variables.length === 3) { // P, Q, R
+                    pVal = (Math.floor(i / 4) % 2 === 0);
+                    qVal = (Math.floor(i / 2) % 2 === 0);
+                    rVal = (i % 2 === 0);
+                }
+
+                tableHtml += '<tr>';
+                if (hasP) tableHtml += `<td>${pVal ? 'V' : 'F'}</td>`;
+                if (hasQ) tableHtml += `<td>${qVal ? 'V' : 'F'}</td>`;
+                if (hasR) tableHtml += `<td>${rVal ? 'V' : 'F'}</td>`;
+
+                const result = safeEval(expression, pVal, qVal, rVal);
+                if (result === 'ERROR_SINTAXIS') {
+                    hasSyntaxError = true;
+                    break; // Stop generating table if syntax error
+                }
+                tableHtml += `<td>${result}</td>`;
+                tableHtml += '</tr>';
+            }
+
+            tableHtml += '</tbody></table>';
+
+            // Check if any error occurred during evaluation
+            if (hasSyntaxError) {
+                truthTableOutput.innerHTML = '<p class="text-red-500 mt-4">Error de sintaxis en la expresión lógica. Por favor, verifica el formato (ej. P AND Q, NOT P OR R, (P -> Q) <-> R).</p>';
+            } else {
+                truthTableOutput.innerHTML = tableHtml;
+            }
+            if (window.MathJax && typeof MathJax.typeset === 'function') {
+                MathJax.typeset([truthTableOutput]); // Typeset new content
+            }
+        });
+
+        // Quiz 1 Logic (Basic Connectives)
+        const quizQuestionElem = document.getElementById('quiz-question');
+        const quizOptionsElem = document.getElementById('quiz-options');
+        const submitQuizBtn = document.getElementById('submit-quiz-btn');
+        const quizFeedbackElem = document.getElementById('quiz-feedback');
+        const quizScoreDisplay = document.getElementById('quiz-score-display');
+        const restartQuizBtn = document.getElementById('restart-quiz-btn');
+
+        const quiz1Data = [
+            {
+                question: "¿Cuál de las siguientes es una proposición?",
+                options: [
+                    "¿Qué hora es?",
+                    "¡Cierra la puerta!",
+                    "El cielo es azul.",
+                    "x + y = 10"
+                ],
+                correctAnswer: "El cielo es azul."
+            },
+            {
+                question: "Si P es 'Está lloviendo' y Q es 'Hace frío', ¿cuál es la proposición 'Está lloviendo y no hace frío'?",
+                options: [
+                    "P AND Q",
+                    "P OR NOT Q",
+                    "P AND NOT Q",
+                    "NOT P AND Q"
+                ],
+                correctAnswer: "P AND NOT Q"
+            },
+            {
+                question: "La negación de 'Todos los gatos son negros' es:",
+                options: [
+                    "Ningún gato es negro.",
+                    "Todos los gatos no son negros.",
+                    "Algunos gatos no son negros.",
+                    "Algunos gatos son negros."
+                ],
+                correctAnswer: "Algunos gatos no son negros."
+            }
+        ];
+
+        let currentQuiz1QuestionIndex = 0;
+        let score1 = 0;
+        let quiz1InProgress = false; // Flag to manage quiz state
+
+        function loadQuiz1Question() {
+            quiz1InProgress = true;
+            quizScoreDisplay.classList.add('hidden');
+            restartQuizBtn.classList.add('hidden');
+
+            if (currentQuiz1QuestionIndex < quiz1Data.length) {
+                const question = quiz1Data[currentQuiz1QuestionIndex];
+                quizQuestionElem.textContent = question.question;
+                quizOptionsElem.innerHTML = ''; // Clear previous options
+                quizFeedbackElem.textContent = ''; // Clear feedback
+
+                // Shuffle options before displaying
+                const shuffledOptions = shuffleArray([...question.options]);
+
+                shuffledOptions.forEach((option, index) => {
+                    const optionId = `quiz1-option-${currentQuiz1QuestionIndex}-${index}`; // Unique ID for the radio button
+                    const optionLabel = document.createElement('label');
+                    optionLabel.className = 'quiz-option';
+                    optionLabel.setAttribute('for', optionId);
+                    optionLabel.innerHTML = `
+                        <input type="radio" name="quiz1-option" value="${option}" id="${optionId}">
+                        <span>${option}</span>
+                    `;
+                    quizOptionsElem.appendChild(optionLabel);
+
+                    // Add a change listener to the radio button directly
+                    const radioButton = optionLabel.querySelector(`#${optionId}`);
+                    radioButton.addEventListener('change', () => {
+                        // Remove 'selected' class from all options
+                        document.querySelectorAll('#quiz-options .quiz-option').forEach(label => {
+                            label.classList.remove('selected');
+                        });
+                        // Add 'selected' class to the parent label of the checked radio button
+                        optionLabel.classList.add('selected'); // Use optionLabel directly since we are in its scope
+                        quizFeedbackElem.textContent = ''; // Clear feedback when a new option is selected
+                    });
+                });
+                submitQuizBtn.textContent = 'Verificar Respuesta';
+                submitQuizBtn.disabled = false;
+                enableQuiz1Options(true);
+            } else {
+                // Quiz finished, show score
+                finishQuiz1();
+            }
+            if (window.MathJax && typeof MathJax.typeset === 'function') {
+                MathJax.typeset([quizOptionsElem]); // Typeset new content
+            }
+        }
+
+        function enableQuiz1Options(enable) {
+            const radioButtons = quizOptionsElem.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach(radio => {
+                radio.disabled = !enable;
+            });
+            // Also update cursor for labels
+            const labels = quizOptionsElem.querySelectorAll('.quiz-option');
+            labels.forEach(label => {
+                if (enable) {
+                    label.classList.remove('cursor-not-allowed');
+                } else {
+                    label.classList.add('cursor-not-allowed');
+                }
+            });
+        }
+
+        submitQuizBtn.addEventListener('click', () => {
+            if (submitQuizBtn.textContent === 'Verificar Respuesta') {
+                const selectedOption = document.querySelector('input[name="quiz1-option"]:checked');
+                if (!selectedOption) {
+                    quizFeedbackElem.textContent = 'Por favor, selecciona una opción.';
+                    quizFeedbackElem.className = 'feedback-message text-yellow-600';
+                    return;
+                }
+
+                const userAnswer = selectedOption.value;
+                const correctAnswer = quiz1Data[currentQuiz1QuestionIndex].correctAnswer;
+
+                enableQuiz1Options(false); // Disable options after submission
+
+                if (userAnswer === correctAnswer) {
+                    quizFeedbackElem.textContent = '¡Correcto! 🎉';
+                    quizFeedbackElem.className = 'feedback-message feedback-correct';
+                    score1++;
+                } else {
+                    quizFeedbackElem.textContent = `Incorrecto. La respuesta correcta era: "${correctAnswer}"`;
+                    quizFeedbackElem.className = 'feedback-message feedback-incorrect';
+                }
+
+                if (currentQuiz1QuestionIndex < quiz1Data.length - 1) {
+                    submitQuizBtn.textContent = 'Siguiente Pregunta';
+                } else {
+                    submitQuizBtn.textContent = 'Terminar Prueba';
+                }
+            } else if (submitQuizBtn.textContent === 'Siguiente Pregunta') {
+                currentQuiz1QuestionIndex++;
+                loadQuiz1Question();
+            } else if (submitQuizBtn.textContent === 'Terminar Prueba') {
+                finishQuiz1();
+            }
+        });
+
+        function finishQuiz1() {
+            quiz1InProgress = false;
+            quizQuestionElem.textContent = '¡Quiz Terminado!';
+            quizOptionsElem.innerHTML = ''; // Clear options
+            quizFeedbackElem.textContent = ''; // Clear feedback
+
+            quizScoreDisplay.textContent = `Tu puntuación: ${score1} de ${quiz1Data.length}`;
+            quizScoreDisplay.classList.remove('hidden');
+            submitQuizBtn.classList.add('hidden'); // Hide submit button
+            restartQuizBtn.classList.remove('hidden'); // Show restart button
+        }
+
+        restartQuizBtn.addEventListener('click', () => {
+            currentQuiz1QuestionIndex = 0;
+            score1 = 0;
+            loadQuiz1Question(); // Re-load the first question, which will shuffle options
+            submitQuizBtn.classList.remove('hidden'); // Show submit button again
+        });
+
+
+        // Quiz 2 Logic (Tautology, Contradiction, Contingency)
+        const quiz2QuestionElem = document.getElementById('quiz2-question');
+        const quiz2OptionsElem = document.getElementById('quiz2-options');
+        const submitQuiz2Btn = document.getElementById('submit-quiz2-btn');
+        const quiz2FeedbackElem = document.getElementById('quiz2-feedback');
+        const quiz2ScoreDisplay = document.getElementById('quiz2-score-display');
+        const restartQuiz2Btn = document.getElementById('restart-quiz2-btn');
+
+        const quiz2Data = [
+            {
+                question: "¿Qué tipo de proposición es 'Si hoy es martes, entonces mañana es miércoles'?",
+                options: [
+                    "Tautología",
+                    "Contradicción",
+                    "Contingencia"
+                ],
+                correctAnswer: "Tautología"
+            },
+            {
+                question: "¿Qué tipo de proposición es 'Este enunciado es falso'?",
+                options: [
+                    "Tautología",
+                    "Contradicción",
+                    "Contingencia"
+                ],
+                correctAnswer: "Contradicción"
+            },
+            {
+                question: "¿Qué tipo de proposición es 'Está soleado o está lloviendo'?",
+                options: [
+                    "Tautología",
+                    "Contradicción",
+                    "Contingencia"
+                ],
+                correctAnswer: "Contingencia"
+            },
+            {
+                question: "La expresión 'P ∧ (Q ∨ ¬Q)' es un ejemplo de:",
+                options: [
+                    "Tautología",
+                    "Contradicción",
+                    "Contingencia"
+                ],
+                correctAnswer: "Contingencia"
+            },
+            {
+                question: "La expresión '¬(P ∧ ¬P)' es un ejemplo de:",
+                options: [
+                    "Tautología",
+                    "Contradicción",
+                    "Contingencia"
+                ],
+                correctAnswer: "Tautología"
+            },
+            {
+                question: "Si una proposición compuesta siempre tiene un valor de verdad falso, se clasifica como:",
+                options: [
+                    "Tautología",
+                    "Contradicción",
+                    "Contingencia"
+                ],
+                correctAnswer: "Contradicción"
+            }
+        ];
+
+        let currentQuiz2QuestionIndex = 0;
+        let score2 = 0;
+        let quiz2InProgress = false; // Flag to manage quiz state
+
+        function loadQuiz2Question() {
+            quiz2InProgress = true;
+            quiz2ScoreDisplay.classList.add('hidden');
+            restartQuiz2Btn.classList.add('hidden');
+
+            if (currentQuiz2QuestionIndex < quiz2Data.length) {
+                const question = quiz2Data[currentQuiz2QuestionIndex];
+                quiz2QuestionElem.textContent = question.question;
+                quiz2OptionsElem.innerHTML = ''; // Clear previous options
+                quiz2FeedbackElem.textContent = ''; // Clear feedback
+
+                // Shuffle options before displaying
+                const shuffledOptions = shuffleArray([...question.options]);
+
+                shuffledOptions.forEach((option, index) => {
+                    const optionId = `quiz2-option-${currentQuiz2QuestionIndex}-${index}`; // Unique ID for the radio button
+                    const optionLabel = document.createElement('label');
+                    optionLabel.className = 'quiz-option';
+                    optionLabel.setAttribute('for', optionId);
+                    optionLabel.innerHTML = `
+                        <input type="radio" name="quiz2-option" value="${option}" id="${optionId}">
+                        <span>${option}</span>
+                    `;
+                    quiz2OptionsElem.appendChild(optionLabel);
+
+                    // Add a change listener to the radio button directly
+                    const radioButton = optionLabel.querySelector(`#${optionId}`);
+                    radioButton.addEventListener('change', () => {
+                        document.querySelectorAll('#quiz2-options .quiz-option').forEach(label => {
+                            label.classList.remove('selected');
+                        });
+                        // Add 'selected' class to the parent label of the checked radio button
+                        optionLabel.classList.add('selected'); // Use optionLabel directly since we are in its scope
+                        quiz2FeedbackElem.textContent = ''; // Clear feedback when a new option is selected
+                    });
+                });
+                submitQuiz2Btn.textContent = 'Verificar Respuesta';
+                submitQuiz2Btn.disabled = false;
+                enableQuiz2Options(true);
+            } else {
+                // Quiz finished, show score
+                finishQuiz2();
+            }
+            if (window.MathJax && typeof MathJax.typeset === 'function') {
+                MathJax.typeset([quiz2OptionsElem]); // Typeset new content
+            }
+        }
+
+        function enableQuiz2Options(enable) {
+            const radioButtons = quiz2OptionsElem.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach(radio => {
+                radio.disabled = !enable;
+            });
+            // Also update cursor for labels
+            const labels = quiz2OptionsElem.querySelectorAll('.quiz-option');
+            labels.forEach(label => {
+                if (enable) {
+                    label.classList.remove('cursor-not-allowed');
+                } else {
+                    label.classList.add('cursor-not-allowed');
+                }
+            });
+        }
+
+        submitQuiz2Btn.addEventListener('click', () => {
+            if (submitQuiz2Btn.textContent === 'Verificar Respuesta') {
+                const selectedOption = document.querySelector('input[name="quiz2-option"]:checked');
+                if (!selectedOption) {
+                    quiz2FeedbackElem.textContent = 'Por favor, selecciona una opción.';
+                    quiz2FeedbackElem.className = 'feedback-message text-yellow-600';
+                    return;
+                }
+
+                const userAnswer = selectedOption.value;
+                const correctAnswer = quiz2Data[currentQuiz2QuestionIndex].correctAnswer;
+
+                enableQuiz2Options(false); // Disable options after submission
+
+                if (userAnswer === correctAnswer) {
+                    quiz2FeedbackElem.textContent = '¡Correcto! 🎉';
+                    quiz2FeedbackElem.className = 'feedback-message feedback-correct';
+                    score2++;
+                } else {
+                    quiz2FeedbackElem.textContent = `Incorrecto. La respuesta correcta era: "${correctAnswer}"`;
+                    quiz2FeedbackElem.className = 'feedback-message feedback-incorrect';
+                }
+
+                if (currentQuiz2QuestionIndex < quiz2Data.length - 1) {
+                    submitQuiz2Btn.textContent = 'Siguiente Pregunta';
+                } else {
+                    submitQuiz2Btn.textContent = 'Terminar Prueba';
+                }
+            } else if (submitQuiz2Btn.textContent === 'Siguiente Pregunta') {
+                currentQuiz2QuestionIndex++;
+                loadQuiz2Question();
+            } else if (submitQuiz2Btn.textContent === 'Terminar Prueba') {
+                finishQuiz2();
+            }
+        });
+
+        function finishQuiz2() {
+            quiz2InProgress = false;
+            quiz2QuestionElem.textContent = '¡Quiz Terminado!';
+            quiz2OptionsElem.innerHTML = ''; // Clear options
+            quiz2FeedbackElem.textContent = ''; // Clear feedback
+
+            quiz2ScoreDisplay.textContent = `Tu puntuación: ${score2} de ${quiz2Data.length}`;
+            quiz2ScoreDisplay.classList.remove('hidden');
+            submitQuiz2Btn.classList.add('hidden'); // Hide submit button
+            restartQuiz2Btn.classList.remove('hidden'); // Show restart button
+        }
+
+        restartQuiz2Btn.addEventListener('click', () => {
+            currentQuiz2QuestionIndex = 0;
+            score2 = 0;
+            loadQuiz2Question(); // Re-load the first question, which will shuffle options
+            submitQuiz2Btn.classList.remove('hidden'); // Show submit button again
+        });
+
+
+        // Quiz 3 Logic (Statement Identification - NEW)
+        const quiz3QuestionElem = document.getElementById('quiz3-question');
+        const quiz3OptionsElem = document.getElementById('quiz3-options');
+        const submitQuiz3Btn = document.getElementById('submit-quiz3-btn');
+        const quiz3FeedbackElem = document.getElementById('quiz3-feedback');
+        const quiz3ScoreDisplay = document.getElementById('quiz3-score-display');
+        const restartQuiz3Btn = document.getElementById('restart-quiz3-btn');
+
+        const quiz3Data = [
+            {
+                question: "Which of the following is not a statement?",
+                options: [
+                    "37 is a number.",
+                    "The moon is a telephone.",
+                    "Cheese!",
+                    "Black carrots are actually not quite black, but if they were, they'd be black."
+                ],
+                correctAnswer: "Cheese!"
+            },
+            {
+                question: "¿Cuál de las siguientes oraciones es una declaración?",
+                options: [
+                    "¿Cuántos años tienes?",
+                    "Por favor, siéntate.",
+                    "2 + 3 = 5.",
+                    "¡Guau!"
+                ],
+                correctAnswer: "2 + 3 = 5."
+            },
+            {
+                question: "Identifica la oración que NO es una proposición.",
+                options: [
+                    "La Tierra es plana.",
+                    "Cierra la puerta.",
+                    "El número 7 es primo.",
+                    "Hoy hace sol."
+                ],
+                correctAnswer: "Cierra la puerta."
+            }
+        ];
+
+        let currentQuiz3QuestionIndex = 0;
+        let score3 = 0;
+        let quiz3InProgress = false;
+
+        function loadQuiz3Question() {
+            quiz3InProgress = true;
+            quiz3ScoreDisplay.classList.add('hidden');
+            restartQuiz3Btn.classList.add('hidden');
+
+            if (currentQuiz3QuestionIndex < quiz3Data.length) {
+                const question = quiz3Data[currentQuiz3QuestionIndex];
+                quiz3QuestionElem.textContent = question.question;
+                quiz3OptionsElem.innerHTML = '';
+                quiz3FeedbackElem.textContent = '';
+
+                const shuffledOptions = shuffleArray([...question.options]);
+
+                shuffledOptions.forEach((option, index) => {
+                    const optionId = `quiz3-option-${currentQuiz3QuestionIndex}-${index}`;
+                    const optionLabel = document.createElement('label');
+                    optionLabel.className = 'quiz-option';
+                    optionLabel.setAttribute('for', optionId);
+                    optionLabel.innerHTML = `
+                        <input type="radio" name="quiz3-option" value="${option}" id="${optionId}">
+                        <span>${option}</span>
+                    `;
+                    quiz3OptionsElem.appendChild(optionLabel);
+
+                    const radioButton = optionLabel.querySelector(`#${optionId}`);
+                    radioButton.addEventListener('change', () => {
+                        document.querySelectorAll('#quiz3-options .quiz-option').forEach(label => {
+                            label.classList.remove('selected');
+                        });
+                        optionLabel.classList.add('selected');
+                        quiz3FeedbackElem.textContent = '';
+                    });
+                });
+                submitQuiz3Btn.textContent = 'Verificar Respuesta';
+                submitQuiz3Btn.disabled = false;
+                enableQuiz3Options(true);
+            } else {
+                finishQuiz3();
+            }
+            if (window.MathJax && typeof MathJax.typeset === 'function') {
+                MathJax.typeset([quiz3OptionsElem]); // Typeset new content
+            }
+        }
+
+        function enableQuiz3Options(enable) {
+            const radioButtons = quiz3OptionsElem.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach(radio => {
+                radio.disabled = !enable;
+            });
+            const labels = quiz3OptionsElem.querySelectorAll('.quiz-option');
+            labels.forEach(label => {
+                if (enable) {
+                    label.classList.remove('cursor-not-allowed');
+                } else {
+                    label.classList.add('cursor-not-allowed');
+                }
+            });
+        }
+
+        submitQuiz3Btn.addEventListener('click', () => {
+            if (submitQuiz3Btn.textContent === 'Verificar Respuesta') {
+                const selectedOption = document.querySelector('input[name="quiz3-option"]:checked');
+                if (!selectedOption) {
+                    quiz3FeedbackElem.textContent = 'Por favor, selecciona una opción.';
+                    quiz3FeedbackElem.className = 'feedback-message text-yellow-600';
+                    return;
+                }
+
+                const userAnswer = selectedOption.value;
+                const correctAnswer = quiz3Data[currentQuiz3QuestionIndex].correctAnswer;
+
+                enableQuiz3Options(false);
+
+                if (userAnswer === correctAnswer) {
+                    quiz3FeedbackElem.textContent = '¡Correcto! 🎉';
+                    quiz3FeedbackElem.className = 'feedback-message feedback-correct';
+                    score3++;
+                } else {
+                    quiz3FeedbackElem.textContent = `Incorrecto. La respuesta correcta era: "${correctAnswer}"`;
+                    quiz3FeedbackElem.className = 'feedback-message feedback-incorrect';
+                }
+
+                if (currentQuiz3QuestionIndex < quiz3Data.length - 1) {
+                    submitQuiz3Btn.textContent = 'Siguiente Pregunta';
+                } else {
+                    submitQuiz3Btn.textContent = 'Terminar Prueba';
+                }
+            } else if (submitQuiz3Btn.textContent === 'Siguiente Pregunta') {
+                currentQuiz3QuestionIndex++;
+                loadQuiz3Question();
+            } else if (submitQuiz3Btn.textContent === 'Terminar Prueba') {
+                finishQuiz3();
+            }
+        });
+
+        function finishQuiz3() {
+            quiz3InProgress = false;
+            quiz3QuestionElem.textContent = '¡Quiz Terminado!';
+            quiz3OptionsElem.innerHTML = '';
+            quiz3FeedbackElem.textContent = '';
+
+            quiz3ScoreDisplay.textContent = `Tu puntuación: ${score3} de ${quiz3Data.length}`; // Corrected typo here
+            quiz3ScoreDisplay.classList.remove('hidden');
+            submitQuiz3Btn.classList.add('hidden');
+            restartQuiz3Btn.classList.remove('hidden');
+        }
+
+        restartQuiz3Btn.addEventListener('click', () => {
+            currentQuiz3QuestionIndex = 0;
+            score3 = 0;
+            loadQuiz3Question();
+            submitQuiz3Btn.classList.remove('hidden');
+        });
+
+
+        // Handshake puzzle logic
+        const showHandshakeHintButton = document.getElementById('show-handshake-hint');
+        const handshakeHintText = document.getElementById('handshake-hint');
+
+        if (showHandshakeHintButton) {
+            showHandshakeHintButton.addEventListener('click', () => {
+                handshakeHintText.classList.toggle('hidden');
+            });
+        }
+
+        // Interactive Statement Test Logic
+        const statementTestList = document.getElementById('statement-test-list');
+        const statementTestFeedback = document.getElementById('statement-test-feedback');
+
+        if (statementTestList) {
+            statementTestList.addEventListener('click', (event) => {
+                const clickedItem = event.target.closest('li');
+                if (clickedItem) {
+                    // Clear previous feedback and selection styles
+                    document.querySelectorAll('#statement-test-list li').forEach(item => {
+                        item.classList.remove('correct', 'incorrect');
+                    });
+                    statementTestFeedback.textContent = '';
+
+                    const feedback = clickedItem.dataset.feedback;
+                    const type = clickedItem.dataset.type;
+
+                    statementTestFeedback.textContent = feedback;
+                    if (type === 'statement') {
+                        statementTestFeedback.className = 'feedback-message feedback-correct mt-4 text-sm';
+                        clickedItem.classList.add('correct');
+                    } else if (type === 'not-statement' || type === 'not-statement-paradox') {
+                        statementTestFeedback.className = 'feedback-message feedback-incorrect mt-4 text-sm';
+                        clickedItem.classList.add('incorrect');
+                    }
+                }
+            });
+        }
+
+        // Conditional Example Evaluation Logic
+        const evalExampleBtn = document.getElementById('eval-example-btn');
+        const evalExampleResult = document.getElementById('eval-example-result');
+
+        if (evalExampleBtn) {
+            evalExampleBtn.addEventListener('click', () => {
+                const p = true; // "La Tierra gira alrededor del sol" es VERDADERA
+                const q = true; // "Calkiní es un municipio de Campeche" es VERDADERA
+
+                // p -> q (V -> V) es VERDADERO
+                const result = p ? q : true; // Equivalent to !p || q
+
+                if (result) {
+                    evalExampleResult.textContent = `Resultado: VERDADERO. (Aunque no haya relación causal, en lógica V → V es V)`;
+                    evalExampleResult.className = 'result true-val';
+                } else {
+                    evalExampleResult.textContent = `Resultado: FALSO.`;
+                    evalExampleResult.className = 'result false-val';
+                }
+                evalExampleResult.classList.remove('hidden');
+            });
+        }
+
+        // Initialize the first slide
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>
