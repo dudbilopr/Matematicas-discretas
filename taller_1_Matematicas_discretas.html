@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller Avanzado de Lógica Proposicional</title>
+    
+    <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Roboto+Slab:wght@700&display=swap');
+
+        :root {
+            --primary-color: #005f73;
+            --secondary-color: #0a9396;
+            --background-color: #e9d8a6;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --heading-font: 'Roboto Slab', serif;
+            --body-font: 'Lato', sans-serif;
+            --correct-bg: #d1fae5;
+            --incorrect-bg: #fee2e2;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 20px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: var(--body-font);
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: auto;
+            background: transparent;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        header h1 {
+            font-family: var(--heading-font);
+            color: var(--primary-color);
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .definitions {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .definition {
+            text-align: left;
+            padding: 1rem;
+            flex-basis: 30%;
+        }
+
+        .definition strong {
+            color: var(--secondary-color);
+            font-family: var(--heading-font);
+        }
+
+        .exercise {
+            background-color: var(--card-background);
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .exercise-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .exercise-header h2 {
+            font-family: var(--heading-font);
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.6rem;
+        }
+
+        .exercise-header .toggle-icon {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .exercise.open .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .exercise-content {
+            display: none;
+            margin-top: 1.5rem;
+            border-top: 2px solid #eee;
+            padding-top: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            display: block;
+        }
+
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 0.8rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-family: var(--heading-font);
+        }
+
+        .solution {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: #f7f9fc;
+            border: 1px solid #e1e8f0;
+            border-radius: 8px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .activity input {
+            width: 50px;
+            padding: 5px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .activity input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+        
+        .classification {
+            font-weight: bold;
+            font-family: var(--heading-font);
+            font-size: 1.3em;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .explanation, .activity {
+            margin-bottom: 1.5rem;
+        }
+        
+        .explanation p, .activity p {
+            margin-top: 0;
+        }
+
+        .correct {
+            background-color: var(--correct-bg);
+            border-color: #6ee7b7 !important;
+        }
+
+        .incorrect {
+            background-color: var(--incorrect-bg);
+            border-color: #fda4af !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Taller Avanzado de Lógica Proposicional</h1>
+            <p>Explora la construcción de tablas de verdad y clasifica oraciones lógicas. Haz clic en cada ejercicio para revelar su explicación y la actividad interactiva.</p>
+            <div class="definitions">
+                <div class="definition"><strong>Tautología:</strong> Una proposición que es siempre verdadera.</div>
+                <div class="definition"><strong>Contradicción:</strong> Una proposición que es siempre falsa.</div>
+                <div class="definition"><strong>Contingencia:</strong> Una proposición que puede ser verdadera o falsa.</div>
+            </div>
+        </header>
+
+        <div class="exercise" id="ex1">
+            <div class="exercise-header"><h2>Ejercicio 1: $P \rightarrow Q$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Esta es una implicación o condicional. La proposición $P \rightarrow Q$ solo es falsa cuando el antecedente (P) es verdadero y el consecuente (Q) es falso.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$P \rightarrow Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex1_1"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex1_2"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex1_3"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex1_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(1, ['V', 'F', 'V', 'V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution1')">Mostrar Solución</button>
+                </div>
+                <div id="solution1" class="solution"><p class="classification">Clasificación: Contingencia</p><table><thead><tr><th>P</th><th>Q</th><th>$P \rightarrow Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>F</td></tr><tr><td>F</td><td>V</td><td>V</td></tr><tr><td>F</td><td>F</td><td>V</td></tr></tbody></table><p>La columna final tiene valores tanto verdaderos como falsos.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex2">
+            <div class="exercise-header"><h2>Ejercicio 2: $(P \lor \neg P) \land (Q \land \neg Q)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Esta proposición es una conjunción de una tautología $(P \lor \neg P)$ y una contradicción $(Q \land \neg Q)$. Como la conjunción requiere que ambas partes sean verdaderas, y una de ellas es siempre falsa, el resultado es siempre falso.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$P \lor \neg P$</th><th>$Q \land \neg Q$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex2_1"></td></tr><tr><td>V</td><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex2_2"></td></tr><tr><td>F</td><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex2_3"></td></tr><tr><td>F</td><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex2_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(2, ['F', 'F', 'F', 'F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution2')">Mostrar Solución</button>
+                </div>
+                <div id="solution2" class="solution"><p class="classification">Clasificación: Contradicción</p><table><thead><tr><th>P</th><th>Q</th><th>$\neg P$</th><th>$P \lor \neg P$</th><th>$\neg Q$</th><th>$Q \land \neg Q$</th><th>$(P \lor \neg P) \land (Q \land \neg Q)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>F</td><td>V</td><td>F</td><td>F</td><td>F</td></tr><tr><td>V</td><td>F</td><td>F</td><td>V</td><td>V</td><td>F</td><td>F</td></tr><tr><td>F</td><td>V</td><td>V</td><td>V</td><td>F</td><td>F</td><td>F</td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td><td>F</td><td>F</td></tr></tbody></table><p>La columna final es siempre falsa.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex3">
+            <div class="exercise-header"><h2>Ejercicio 3: $P \leftrightarrow Q$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Esta es una bicondicional. La proposición $P \leftrightarrow Q$ es verdadera únicamente cuando P y Q tienen el mismo valor de verdad.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$P \leftrightarrow Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex3_1"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex3_2"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex3_3"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex3_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(3, ['V', 'F', 'F', 'V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution3')">Mostrar Solución</button>
+                </div>
+                <div id="solution3" class="solution"><p class="classification">Clasificación: Contingencia</p><table><thead><tr><th>P</th><th>Q</th><th>$P \leftrightarrow Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>F</td></tr><tr><td>F</td><td>V</td><td>F</td></tr><tr><td>F</td><td>F</td><td>V</td></tr></tbody></table><p>La columna final tiene valores tanto verdaderos como falsos.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex4">
+            <div class="exercise-header"><h2>Ejercicio 4: $\neg (P \land \neg P)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Esta es la negación de una contradicción (Principio de no contradicción). Al negar algo que es siempre falso, obtenemos algo que es siempre verdadero.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>$\neg P$</th><th>$P \land \neg P$</th><th>$\neg(P \land \neg P)$</th></tr></thead><tbody><tr><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex4_1"></td></tr><tr><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex4_2"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(4, ['V', 'V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution4')">Mostrar Solución</button>
+                </div>
+                <div id="solution4" class="solution"><p class="classification">Clasificación: Tautología</p><table><thead><tr><th>P</th><th>$\neg P$</th><th>$P \land \neg P$</th><th>$\neg (P \land \neg P)$</th></tr></thead><tbody><tr><td>V</td><td>F</td><td>F</td><td>V</td></tr><tr><td>F</td><td>V</td><td>F</td><td>V</td></tr></tbody></table><p>La columna final es siempre verdadera.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex5">
+            <div class="exercise-header"><h2>Ejercicio 5: $\neg (P \lor \neg P)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Esta es la negación de una tautología (Principio del tercero excluido). Al negar algo que es siempre verdadero, obtenemos algo que es siempre falso.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>$\neg P$</th><th>$P \lor \neg P$</th><th>$\neg(P \lor \neg P)$</th></tr></thead><tbody><tr><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex5_1"></td></tr><tr><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex5_2"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(5, ['F', 'F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution5')">Mostrar Solución</button>
+                </div>
+                <div id="solution5" class="solution"><p class="classification">Clasificación: Contradicción</p><table><thead><tr><th>P</th><th>$\neg P$</th><th>$P \lor \neg P$</th><th>$\neg (P \lor \neg P)$</th></tr></thead><tbody><tr><td>V</td><td>F</td><td>V</td><td>F</td></tr><tr><td>F</td><td>V</td><td>V</td><td>F</td></tr></tbody></table><p>La columna final es siempre falsa.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex6">
+            <div class="exercise-header"><h2>Ejercicio 6: $\neg (P \lor P)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Por la ley de idempotencia, $(P \lor P)$ es equivalente a P. Por lo tanto, $\neg(P \lor P)$ es simplemente $\neg P$. El resultado depende del valor de P.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>$P \lor P$</th><th>$\neg (P \lor P)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex6_1"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex6_2"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(6, ['F', 'V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution6')">Mostrar Solución</button>
+                </div>
+                <div id="solution6" class="solution"><p class="classification">Clasificación: Contingencia</p><table><thead><tr><th>P</th><th>$P \lor P$</th><th>$\neg (P \lor P)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>F</td></tr><tr><td>F</td><td>F</td><td>V</td></tr></tbody></table><p>El resultado es idéntico a $\neg P$.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex7">
+            <div class="exercise-header"><h2>Ejercicio 7: $(P \land \neg P) \lor (Q \land \neg Q)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Esta es una disyunción de dos contradicciones. Como $(P \land \neg P)$ es siempre falso y $(Q \land \neg Q)$ es siempre falso, la disyunción (o) de dos falsedades es siempre falsa.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$P \land \neg P$</th><th>$Q \land \neg Q$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex7_1"></td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex7_2"></td></tr><tr><td>F</td><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex7_3"></td></tr><tr><td>F</td><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex7_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(7, ['F', 'F', 'F', 'F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution7')">Mostrar Solución</button>
+                </div>
+                <div id="solution7" class="solution"><p class="classification">Clasificación: Contradicción</p><table><thead><tr><th>P</th><th>Q</th><th>$P \land \neg P$</th><th>$Q \land \neg Q$</th><th>$(P \land \neg P) \lor (Q \land \neg Q)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>F</td><td>F</td><td>F</td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td><td>F</td></tr><tr><td>F</td><td>V</td><td>F</td><td>F</td><td>F</td></tr><tr><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td></tr></tbody></table><p>La columna final es siempre falsa.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex8">
+            <div class="exercise-header"><h2>Ejercicio 8: $\neg (P \lor \neg\neg Q) \land (P \land \neg Q)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> $\neg\neg Q$ es Q. La expresión es $\neg (P \lor Q) \land (P \land \neg Q)$. Por De Morgan, $\neg (P \lor Q)$ es $(\neg P \land \neg Q)$. La fórmula completa es $(\neg P \land \neg Q) \land (P \land \neg Q)$. Esto requiere que P y $\neg P$ sean verdaderos a la vez, lo cual es imposible.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$\neg(P \lor Q)$</th><th>$P \land \neg Q$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex8_1"></td></tr><tr><td>V</td><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex8_2"></td></tr><tr><td>F</td><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex8_3"></td></tr><tr><td>F</td><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex8_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(8, ['F', 'F', 'F', 'F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution8')">Mostrar Solución</button>
+                </div>
+                <div id="solution8" class="solution"><p class="classification">Clasificación: Contradicción</p><table><thead><tr><th>P</th><th>Q</th><th>$\neg Q$</th><th>$P \land \neg Q$</th><th>$\neg(P \lor Q)$</th><th>$\neg (P \lor \neg\neg Q) \land (P \land \neg Q)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>F</td><td>F</td><td>F</td><td>F</td></tr><tr><td>V</td><td>F</td><td>V</td><td>V</td><td>F</td><td>F</td></tr><tr><td>F</td><td>V</td><td>F</td><td>F</td><td>F</td><td>F</td></tr><tr><td>F</td><td>F</td><td>V</td><td>F</td><td>V</td><td>F</td></tr></tbody></table><p>La columna final es siempre falsa.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex9">
+            <div class="exercise-header"><h2>Ejercicio 9: $(P \leftrightarrow Q) \lor (Q \leftrightarrow P)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> La bicondicional es conmutativa, es decir, $(P \leftrightarrow Q)$ es lógicamente equivalente a $(Q \leftrightarrow P)$. Por idempotencia, $(X \lor X)$ es equivalente a X. Así, la expresión es equivalente a $(P \leftrightarrow Q)$.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$P \leftrightarrow Q$</th><th>$Q \leftrightarrow P$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex9_1"></td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex9_2"></td></tr><tr><td>F</td><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex9_3"></td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex9_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(9, ['V', 'F', 'F', 'V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution9')">Mostrar Solución</button>
+                </div>
+                <div id="solution9" class="solution"><p class="classification">Clasificación: Contingencia</p><table><thead><tr><th>P</th><th>Q</th><th>$P \leftrightarrow Q$</th><th>$(P \leftrightarrow Q) \lor (Q \leftrightarrow P)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td></tr><tr><td>F</td><td>V</td><td>F</td><td>F</td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td></tr></tbody></table><p>El resultado es idéntico a $P \leftrightarrow Q$.</p></div>
+            </div>
+        </div>
+        
+        <div class="exercise" id="ex10">
+            <div class="exercise-header"><h2>Ejercicio 10: $\neg [(P \rightarrow Q) \rightarrow R]$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> La negación de una implicación $\neg(A \rightarrow B)$ es equivalente a $(A \land \neg B)$. En este caso, la expresión es $(P \rightarrow Q) \land \neg R$.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>R</th><th>$P \rightarrow Q$</th><th>$(P \rightarrow Q) \rightarrow R$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex10_1"></td></tr><tr><td>V</td><td>V</td><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex10_2"></td></tr><tr><td>V</td><td>F</td><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex10_3"></td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex10_4"></td></tr><tr><td>F</td><td>V</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex10_5"></td></tr><tr><td>F</td><td>V</td><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex10_6"></td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex10_7"></td></tr><tr><td>F</td><td>F</td><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex10_8"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(10, ['F', 'V', 'F', 'F', 'F', 'V', 'F', 'V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution10')">Mostrar Solución</button>
+                </div>
+                <div id="solution10" class="solution"><p class="classification">Clasificación: Contingencia</p><table><thead><tr><th>P</th><th>Q</th><th>R</th><th>$P \rightarrow Q$</th><th>$(P \rightarrow Q) \rightarrow R$</th><th>$\neg [(P \rightarrow Q) \rightarrow R]$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td><td>F</td></tr><tr><td>V</td><td>V</td><td>F</td><td>V</td><td>F</td><td>V</td></tr><tr><td>V</td><td>F</td><td>V</td><td>F</td><td>V</td><td>F</td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td><td>V</td><td>F</td></tr><tr><td>F</td><td>V</td><td>V</td><td>V</td><td>V</td><td>F</td></tr><tr><td>F</td><td>V</td><td>F</td><td>V</td><td>F</td><td>V</td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td><td>F</td></tr><tr><td>F</td><td>F</td><td>F</td><td>V</td><td>F</td><td>V</td></tr></tbody></table><p>La columna final tiene valores tanto verdaderos como falsos.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex11">
+            <div class="exercise-header"><h2>Ejercicio 11: $[P \rightarrow (Q \rightarrow R)] \land (P \rightarrow R)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Esta proposición es una conjunción de dos implicaciones. Su valor de verdad depende de las combinaciones de P, Q y R.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>R</th><th>$P \rightarrow (Q \rightarrow R)$</th><th>$P \rightarrow R$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex11_1"></td></tr><tr><td>V</td><td>V</td><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex11_2"></td></tr><tr><td>V</td><td>F</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex11_3"></td></tr><tr><td>V</td><td>F</td><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex11_4"></td></tr><tr><td>F</td><td>V</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex11_5"></td></tr><tr><td>F</td><td>V</td><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex11_6"></td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex11_7"></td></tr><tr><td>F</td><td>F</td><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex11_8"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(11, ['V', 'F', 'V', 'F', 'V', 'V', 'V', 'V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution11')">Mostrar Solución</button>
+                </div>
+                <div id="solution11" class="solution"><p class="classification">Clasificación: Contingencia</p><table><thead><tr><th>P</th><th>Q</th><th>R</th><th>$Q \rightarrow R$</th><th>$P \rightarrow (Q \rightarrow R)$</th><th>$P \rightarrow R$</th><th>$[P \rightarrow (Q \rightarrow R)] \land (P \rightarrow R)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>V</td><td>F</td><td>F</td><td>F</td><td>F</td><td>F</td></tr><tr><td>V</td><td>F</td><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>F</td><td>V</td><td>V</td><td>F</td><td>F</td></tr><tr><td>F</td><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>F</td><td>V</td><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>F</td><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td><td>V</td></tr></tbody></table><p>La columna final tiene valores tanto verdaderos como falsos.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex12">
+            <div class="exercise-header"><h2>Ejercicio 12: $(P \land Q) \rightarrow (P \rightarrow Q)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Para que esta implicación sea falsa, el antecedente $(P \land Q)$ debe ser verdadero y el consecuente $(P \rightarrow Q)$ debe ser falso. Si $(P \land Q)$ es verdadero, P y Q son verdaderos. Pero si P y Q son verdaderos, $(P \rightarrow Q)$ es verdadero, no falso. Por lo tanto, es imposible que la implicación sea falsa.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$P \land Q$</th><th>$P \rightarrow Q$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex12_1"></td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex12_2"></td></tr><tr><td>F</td><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex12_3"></td></tr><tr><td>F</td><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex12_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(12, ['V', 'V', 'V', 'V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution12')">Mostrar Solución</button>
+                </div>
+                <div id="solution12" class="solution"><p class="classification">Clasificación: Tautología</p><table><thead><tr><th>P</th><th>Q</th><th>$P \land Q$</th><th>$P \rightarrow Q$</th><th>$(P \land Q) \rightarrow (P \rightarrow Q)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td><td>V</td></tr><tr><td>F</td><td>V</td><td>F</td><td>V</td><td>V</td></tr><tr><td>F</td><td>F</td><td>F</td><td>V</td><td>V</td></tr></tbody></table><p>La columna final es siempre verdadera.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex13">
+            <div class="exercise-header"><h2>Ejercicio 13: $\neg P \rightarrow P$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Esta implicación es lógicamente equivalente a $\neg \neg P \lor P$, que se simplifica a $P \lor P$, y finalmente a P. El valor de verdad es el mismo que el de P.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>$\neg P$</th><th>$\neg P \rightarrow P$</th></tr></thead><tbody><tr><td>V</td><td>F</td><td><input type="text" id="ex13_1"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex13_2"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(13, ['V', 'F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution13')">Mostrar Solución</button>
+                </div>
+                <div id="solution13" class="solution"><p class="classification">Clasificación: Contingencia</p><table><thead><tr><th>P</th><th>$\neg P$</th><th>$\neg P \rightarrow P$</th></tr></thead><tbody><tr><td>V</td><td>F</td><td>V</td></tr><tr><td>F</td><td>V</td><td>F</td></tr></tbody></table><p>El resultado es idéntico a P.</p></div>
+            </div>
+        </div>
+        
+        <div class="exercise" id="ex14">
+            <div class="exercise-header"><h2>Ejercicio 14: $\neg P \rightarrow (Q \lor P)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> La implicación es falsa solo si el antecedente ($\neg P$) es verdadero y el consecuente ($Q \lor P$) es falso. Esto ocurre solo cuando P es falso y ($Q \lor F$) es falso, lo que significa que Q también debe ser falso. Por lo tanto, la expresión solo es falsa cuando P y Q son falsos.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$\neg P$</th><th>$Q \lor P$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex14_1"></td></tr><tr><td>V</td><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex14_2"></td></tr><tr><td>F</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex14_3"></td></tr><tr><td>F</td><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex14_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(14, ['V', 'V', 'V', 'F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution14')">Mostrar Solución</button>
+                </div>
+                <div id="solution14" class="solution"><p class="classification">Clasificación: Contingencia</p><table><thead><tr><th>P</th><th>Q</th><th>$\neg P$</th><th>$Q \lor P$</th><th>$\neg P \rightarrow (Q \lor P)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>F</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>F</td><td>V</td><td>V</td></tr><tr><td>F</td><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>F</td><td>F</td><td>V</td><td>F</td><td>F</td></tr></tbody></table><p>La columna final tiene valores tanto verdaderos como falsos.</p></div>
+            </div>
+        </div>
+        
+        <div class="exercise" id="ex15">
+            <div class="exercise-header"><h2>Ejercicio 15: $\neg P \land \neg (\neg P \lor \neg Q)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Por De Morgan, $\neg(\neg P \lor \neg Q)$ es equivalente a $(P \land Q)$. La proposición completa se convierte en $\neg P \land (P \land Q)$. Esto requiere que $\neg P$ y P sean verdaderos al mismo tiempo, lo cual es imposible.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$\neg P$</th><th>$\neg(\neg P \lor \neg Q)$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex15_1"></td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex15_2"></td></tr><tr><td>F</td><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex15_3"></td></tr><tr><td>F</td><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex15_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(15, ['F', 'F', 'F', 'F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution15')">Mostrar Solución</button>
+                </div>
+                <div id="solution15" class="solution"><p class="classification">Clasificación: Contradicción</p><table><thead><tr><th>P</th><th>Q</th><th>$\neg P$</th><th>$\neg Q$</th><th>$\neg P \lor \neg Q$</th><th>$\neg(\neg P \lor \neg Q)$</th><th>$\neg P \land \neg(\neg P \lor \neg Q)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>F</td><td>F</td><td>F</td><td>V</td><td>F</td></tr><tr><td>V</td><td>F</td><td>F</td><td>V</td><td>V</td><td>F</td><td>F</td></tr><tr><td>F</td><td>V</td><td>V</td><td>F</td><td>V</td><td>F</td><td>F</td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td><td>F</td><td>F</td></tr></tbody></table><p>La columna final es siempre falsa.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex16">
+            <div class="exercise-header"><h2>Ejercicio 16: $P \lor (Q \rightarrow P)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Si P es verdadero, la disyunción es verdadera. Si P es falso, la expresión se convierte en $F \lor (Q \rightarrow F)$. Para que esto sea verdadero, $(Q \rightarrow F)$ debe ser verdadero, lo cual ocurre si Q es falso. Sin embargo, la implicación $(Q \rightarrow P)$ es equivalente a $(\neg Q \lor P)$. La expresión completa es $P \lor (\neg Q \lor P)$, que por idempotencia es $P \lor \neg Q$. Esto es siempre verdadero, es una ley conocida como "Ley de Peirce".</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$Q \rightarrow P$</th><th>$P \lor (Q \rightarrow P)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex16_1"></td></tr><tr><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex16_2"></td></tr><tr><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex16_3"></td></tr><tr><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex16_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(16, ['V', 'V', 'F', 'V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution16')">Mostrar Solución</button>
+                </div>
+                <div id="solution16" class="solution"><p class="classification">Clasificación: Tautología</p><table><thead><tr><th>P</th><th>Q</th><th>$Q \rightarrow P$</th><th>$P \lor (Q \rightarrow P)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>V</td><td>V</td></tr><tr><td>F</td><td>V</td><td>F</td><td>V</td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td></tr></tbody></table><p>La columna final es siempre verdadera.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex17">
+            <div class="exercise-header"><h2>Ejercicio 17: $(P \leftrightarrow Q) \land [(\neg P \lor \neg Q) \land P]$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> La segunda parte, $[(\neg P \lor \neg Q) \land P]$, se simplifica a $(P \land \neg Q)$. La expresión completa es $(P \leftrightarrow Q) \land (P \land \neg Q)$. Para que sea verdadera, $(P \land \neg Q)$ debe serlo, lo que implica P=V y Q=F. Pero si P=V y Q=F, $(P \leftrightarrow Q)$ es falso. Por lo tanto, la conjunción nunca es verdadera.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$P \leftrightarrow Q$</th><th>$(\neg P \lor \neg Q) \land P$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex17_1"></td></tr><tr><td>V</td><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex17_2"></td></tr><tr><td>F</td><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex17_3"></td></tr><tr><td>F</td><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex17_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(17, ['F', 'F', 'F', 'F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution17')">Mostrar Solución</button>
+                </div>
+                <div id="solution17" class="solution"><p class="classification">Clasificación: Contradicción</p><table><thead><tr><th>P</th><th>Q</th><th>$P \leftrightarrow Q$</th><th>$(\neg P \lor \neg Q) \land P$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>F</td><td>F</td></tr><tr><td>V</td><td>F</td><td>F</td><td>V</td><td>F</td></tr><tr><td>F</td><td>V</td><td>F</td><td>F</td><td>F</td></tr><tr><td>F</td><td>F</td><td>V</td><td>F</td><td>F</td></tr></tbody></table><p>La columna final es siempre falsa.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex18">
+            <div class="exercise-header"><h2>Ejercicio 18: $(P \leftrightarrow Q) \land (P \rightarrow Q)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> La bicondicional $(P \leftrightarrow Q)$ es equivalente a $(P \rightarrow Q) \land (Q \rightarrow P)$. La expresión completa es $(P \rightarrow Q) \land (Q \rightarrow P) \land (P \rightarrow Q)$, que se simplifica a $(P \leftrightarrow Q)$.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$P \leftrightarrow Q$</th><th>$P \rightarrow Q$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex18_1"></td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex18_2"></td></tr><tr><td>F</td><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex18_3"></td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex18_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(18, ['V', 'F', 'F', 'V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution18')">Mostrar Solución</button>
+                </div>
+                <div id="solution18" class="solution"><p class="classification">Clasificación: Contingencia</p><table><thead><tr><th>P</th><th>Q</th><th>$P \leftrightarrow Q$</th><th>$P \rightarrow Q$</th><th>$(P \leftrightarrow Q) \land (P \rightarrow Q)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td><td>F</td></tr><tr><td>F</td><td>V</td><td>F</td><td>V</td><td>F</td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td></tr></tbody></table><p>El resultado es idéntico a $P \leftrightarrow Q$.</p></div>
+            </div>
+        </div>
+        
+        <div class="exercise" id="ex19">
+            <div class="exercise-header"><h2>Ejercicio 19: $[P \rightarrow (Q \rightarrow R)] \land (R \rightarrow P)$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> Es una conjunción de dos implicaciones complejas que involucran tres variables. Se requiere una tabla de 8 filas para evaluar todas las combinaciones posibles.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>R</th><th>$P \rightarrow (Q \rightarrow R)$</th><th>$R \rightarrow P$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex19_1"></td></tr><tr><td>V</td><td>V</td><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex19_2"></td></tr><tr><td>V</td><td>F</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex19_3"></td></tr><tr><td>V</td><td>F</td><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex19_4"></td></tr><tr><td>F</td><td>V</td><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex19_5"></td></tr><tr><td>F</td><td>V</td><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex19_6"></td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex19_7"></td></tr><tr><td>F</td><td>F</td><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex19_8"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(19, ['V', 'F', 'V', 'V', 'F', 'V', 'F', 'V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution19')">Mostrar Solución</button>
+                </div>
+                <div id="solution19" class="solution"><p class="classification">Clasificación: Contingencia</p><table><thead><tr><th>P</th><th>Q</th><th>R</th><th>$Q \rightarrow R$</th><th>$P \rightarrow (Q \rightarrow R)$</th><th>$R \rightarrow P$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>V</td><td>F</td><td>F</td><td>F</td><td>V</td><td>F</td></tr><tr><td>V</td><td>F</td><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>F</td><td>V</td><td>V</td><td>V</td><td>V</td><td>F</td><td>F</td></tr><tr><td>F</td><td>V</td><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td><td>F</td><td>F</td></tr><tr><td>F</td><td>F</td><td>F</td><td>V</td><td>V</td><td>V</td><td>V</td></tr></tbody></table><p>La columna final tiene valores tanto verdaderos como falsos.</p></div>
+            </div>
+        </div>
+
+        <div class="exercise" id="ex20">
+            <div class="exercise-header"><h2>Ejercicio 20: $(P \leftrightarrow Q) \lor \neg [(\neg P \land Q) \lor (P \land \neg Q)]$</h2><div class="toggle-icon">&#x2304;</div></div>
+            <div class="exercise-content">
+                <div class="explanation"><p><strong>Explicación:</strong> La expresión $[(\neg P \land Q) \lor (P \land \neg Q)]$ define el "o exclusivo" (XOR). La negación de XOR es lógicamente equivalente a la bicondicional $(P \leftrightarrow Q)$. Por lo tanto, la expresión completa es $(P \leftrightarrow Q) \lor (P \leftrightarrow Q)$, que se simplifica a $(P \leftrightarrow Q)$.</p></div>
+                <div class="activity">
+                    <p><strong>Actividad:</strong> Completa la tabla de verdad.</p>
+                    <table><thead><tr><th>P</th><th>Q</th><th>$P \leftrightarrow Q$</th><th>$\neg [(\neg P \land Q) \lor (P \land \neg Q)]$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex20_1"></td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex20_2"></td></tr><tr><td>F</td><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex20_3"></td></tr><tr><td>F</td><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex20_4"></td></tr></tbody></table>
+                    <button class="btn" onclick="checkActivity(20, ['V', 'F', 'F', 'V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution20')">Mostrar Solución</button>
+                </div>
+                <div id="solution20" class="solution"><p class="classification">Clasificación: Contingencia</p><table><thead><tr><th>P</th><th>Q</th><th>$P \leftrightarrow Q$</th><th>$(\neg P \land Q) \lor (P \land \neg Q)$</th><th>$\neg [(\neg P \land Q) \lor (P \land \neg Q)]$</th><th>Resultado Final</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td>F</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>F</td><td>V</td><td>F</td><td>F</td></tr><tr><td>F</td><td>V</td><td>F</td><td>V</td><td>F</td><td>F</td></tr><tr><td>F</td><td>F</td><td>V</td><td>F</td><td>V</td><td>V</td></tr></tbody></table><p>El resultado es idéntico a $P \leftrightarrow Q$.</p></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.exercise-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const exercise = header.parentElement;
+                const content = header.nextElementSibling;
+                exercise.classList.toggle('open');
+                
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    content.style.display = "block";
+                }
+            });
+        });
+
+        function toggleSolution(id) {
+            var x = document.getElementById(id);
+            if (x.style.display === "none" || x.style.display === "") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+
+        function checkActivity(exerciseNum, correctAnswers) {
+            for (let i = 0; i < correctAnswers.length; i++) {
+                const inputId = `ex${exerciseNum}_${i + 1}`;
+                const userInput = document.getElementById(inputId);
+                if (userInput.value.trim().toUpperCase() === correctAnswers[i]) {
+                    userInput.classList.add('correct');
+                    userInput.classList.remove('incorrect');
+                } else {
+                    userInput.classList.add('incorrect');
+                    userInput.classList.remove('correct');
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

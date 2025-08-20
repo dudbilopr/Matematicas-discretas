@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller de Comparación de Sentencias Lógicas (Versión Final)</title>
+    
+    <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Roboto+Slab:wght@700&display=swap');
+
+        :root {
+            --primary-color: #4a044e;
+            --secondary-color: #9d174d;
+            --background-color: #fdf4ff;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --heading-font: 'Roboto Slab', serif;
+            --body-font: 'Lato', sans-serif;
+            --correct-bg: #dcfce7;
+            --incorrect-bg: #fee2e2;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 20px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: var(--body-font);
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: transparent;
+        }
+
+        header {
+            text-align: left;
+            margin-bottom: 3rem;
+            padding: 2.5rem;
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border-left: 8px solid var(--primary-color);
+        }
+
+        header h1 {
+            font-family: var(--heading-font);
+            color: var(--primary-color);
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+        }
+
+        header h3 {
+            font-family: var(--heading-font);
+            color: var(--secondary-color);
+            margin-top: 2rem;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .exercise {
+            background-color: var(--card-background);
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .exercise-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .exercise-header h2 {
+            font-family: var(--heading-font);
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.6rem;
+        }
+
+        .exercise-header .toggle-icon {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .exercise.open .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .exercise-content {
+            display: none;
+            margin-top: 1.5rem;
+            border-top: 2px solid #eee;
+            padding-top: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            display: block;
+        }
+
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 0.8rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-family: var(--heading-font);
+        }
+        
+        .result-col {
+            background-color: rgba(157, 23, 77, 0.1);
+            font-weight: bold;
+        }
+        
+        .correct {
+            background-color: var(--correct-bg) !important;
+            border-color: #6ee7b7 !important;
+        }
+
+        .incorrect {
+            background-color: var(--incorrect-bg) !important;
+            border-color: #fda4af !important;
+        }
+
+        .solution {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: #f7f9fc;
+            border: 1px solid #e1e8f0;
+            border-radius: 8px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .activity input {
+            width: 50px;
+            padding: 5px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        
+        .classification {
+            font-weight: bold;
+            font-family: var(--heading-font);
+            font-size: 1.3em;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .classification span {
+            font-weight: normal;
+            font-family: var(--body-font);
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Taller: Consistencia y Equivalencia Lógica</h1>
+            <p>Cuando tenemos más de una afirmación, podemos usar tablas de verdad para compararlas y determinar relaciones más complejas.</p>
+            <h3>Consistencia</h3>
+            <p>Dos o más afirmaciones son <strong>consistentes</strong> si es posible que sean ciertas al mismo tiempo. Para probarlo, buscamos si existe <strong>al menos una fila</strong> en su tabla de verdad conjunta donde todas las afirmaciones sean verdaderas (V).</p>
+            <p>Si no existe ninguna fila donde todas sean verdaderas simultáneamente, las afirmaciones son <strong>inconsistentes</strong>.</p>
+            <h3>Equivalencia</h3>
+            <p>Dos afirmaciones son <strong>lógicamente equivalentes</strong> si contienen exactamente la misma información lógica. Para probarlo, las columnas de resultados de ambas afirmaciones en la tabla de verdad deben ser <strong>idénticas en todas las filas</strong>.</p>
+        </header>
+
+        <div class="exercise" id="ex1"><div class="exercise-header"><h2>Ejercicio 1: $P \lor \neg Q$; $P \rightarrow Q$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1: P \lor \neg Q$</th><th class="result-col">$S_2: P \rightarrow Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex1_1"></td><td><input type="text" id="ex1_2"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex1_3"></td><td><input type="text" id="ex1_4"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex1_5"></td><td><input type="text" id="ex1_6"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex1_7"></td><td><input type="text" id="ex1_8"></td></tr></tbody></table><button class="btn" onclick="checkActivity(1, ['V','V','V','F','F','V','V','V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution1')">Mostrar Solución</button></div><div id="solution1" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>No Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th>$\neg Q$</th><th class="result-col">$P \lor \neg Q$</th><th class="result-col">$P \rightarrow Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes (fila 1 y 4). No son equivalentes (difieren en filas 2 y 3).</p></div></div></div>
+        <div class="exercise" id="ex2"><div class="exercise-header"><h2>Ejercicio 2: $\neg (P \lor \neg P)$; $P \land \neg P$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th class="result-col">$S_1: \neg(P \lor \neg P)$</th><th class="result-col">$S_2: P \land \neg P$</th></tr></thead><tbody><tr><td>V</td><td><input type="text" id="ex2_1"></td><td><input type="text" id="ex2_2"></td></tr><tr><td>F</td><td><input type="text" id="ex2_3"></td><td><input type="text" id="ex2_4"></td></tr></tbody></table><button class="btn" onclick="checkActivity(2, ['F','F','F','F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution2')">Mostrar Solución</button></div><div id="solution2" class="solution"><div class="classification">Consistencia: <span>Inconsistentes</span></div><div class="classification">Equivalencia: <span>Equivalentes</span></div><table><thead><tr><th>P</th><th class="result-col">$\neg(P \lor \neg P)$</th><th class="result-col">$P \land \neg P$</th></tr></thead><tbody><tr><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr></tbody></table><p><strong>Razón:</strong> Son inconsistentes (ninguna fila con V en ambas). Son equivalentes (ambas son contradicciones).</p></div></div></div>
+        <div class="exercise" id="ex3"><div class="exercise-header"><h2>Ejercicio 3: $\neg (Q \lor P) \rightarrow P$; $\neg Q$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1$</th><th class="result-col">$S_2: \neg Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex3_1"></td><td><input type="text" id="ex3_2"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex3_3"></td><td><input type="text" id="ex3_4"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex3_5"></td><td><input type="text" id="ex3_6"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex3_7"></td><td><input type="text" id="ex3_8"></td></tr></tbody></table><button class="btn" onclick="checkActivity(3, ['V','F','V','V','V','F','F','V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution3')">Mostrar Solución</button></div><div id="solution3" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>No Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$\neg(Q \lor P) \rightarrow P$</th><th class="result-col">$\neg Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">F</td></tr><tr><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">F</td></tr><tr><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">V</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes (fila 2). No son equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex4"><div class="exercise-header"><h2>Ejercicio 4: $P \lor [P \land (Q \rightarrow R)]$; $P \lor (Q \lor R)$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>$S_1$ es un caso de la ley de absorción: $A \lor (A \land B) \equiv A$. Por lo tanto $S_1$ es equivalente a $P$.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$S_1$</th><th class="result-col">$S_2$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex4_1"></td><td><input type="text" id="ex4_2"></td></tr><tr><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex4_3"></td><td><input type="text" id="ex4_4"></td></tr><tr><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex4_5"></td><td><input type="text" id="ex4_6"></td></tr><tr><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex4_7"></td><td><input type="text" id="ex4_8"></td></tr><tr><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex4_9"></td><td><input type="text" id="ex4_10"></td></tr><tr><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex4_11"></td><td><input type="text" id="ex4_12"></td></tr><tr><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex4_13"></td><td><input type="text" id="ex4_14"></td></tr><tr><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex4_15"></td><td><input type="text" id="ex4_16"></td></tr></tbody></table><button class="btn" onclick="checkActivity(4, ['V','V','V','V','V','V','V','V','F','V','F','V','F','V','F','F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution4')">Mostrar Solución</button></div><div id="solution4" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>No Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$P \lor [P \land (Q \rightarrow R)] \equiv P$</th><th class="result-col">$P \lor (Q \lor R)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td>V</td><td class="result-col">F</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td>V</td><td class="result-col">F</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes. No son equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex5"><div class="exercise-header"><h2>Ejercicio 5: $(P \rightarrow Q) \land (Q \rightarrow P)$; $P \leftrightarrow Q$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>Esta es la definición fundamental de la bicondicional.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1$</th><th class="result-col">$S_2: P \leftrightarrow Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex5_1"></td><td><input type="text" id="ex5_2"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex5_3"></td><td><input type="text" id="ex5_4"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex5_5"></td><td><input type="text" id="ex5_6"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex5_7"></td><td><input type="text" id="ex5_8"></td></tr></tbody></table><button class="btn" onclick="checkActivity(5, ['V','V','F','F','F','F','V','V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution5')">Mostrar Solución</button></div><div id="solution5" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$(P \rightarrow Q) \land (Q \rightarrow P)$</th><th class="result-col">$P \leftrightarrow Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes y equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex6"><div class="exercise-header"><h2>Ejercicio 6: $P \lor \neg P$; $P \lor Q$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>$S_1$ es una tautología (siempre verdadera).</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1: P \lor \neg P$</th><th class="result-col">$S_2: P \lor Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex6_1"></td><td><input type="text" id="ex6_2"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex6_3"></td><td><input type="text" id="ex6_4"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex6_5"></td><td><input type="text" id="ex6_6"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex6_7"></td><td><input type="text" id="ex6_8"></td></tr></tbody></table><button class="btn" onclick="checkActivity(6, ['V','V','V','V','V','V','V','F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution6')">Mostrar Solución</button></div><div id="solution6" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>No Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$P \lor \neg P$</th><th class="result-col">$P \lor Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td class="result-col">V</td><td class="result-col">F</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes. No son equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex7"><div class="exercise-header"><h2>Ejercicio 7: $P \leftrightarrow (Q \leftrightarrow R)$; $P \leftrightarrow R$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$S_1$</th><th class="result-col">$S_2$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex7_1"></td><td><input type="text" id="ex7_2"></td></tr><tr><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex7_3"></td><td><input type="text" id="ex7_4"></td></tr><tr><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex7_5"></td><td><input type="text" id="ex7_6"></td></tr><tr><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex7_7"></td><td><input type="text" id="ex7_8"></td></tr><tr><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex7_9"></td><td><input type="text" id="ex7_10"></td></tr><tr><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex7_11"></td><td><input type="text" id="ex7_12"></td></tr><tr><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex7_13"></td><td><input type="text" id="ex7_14"></td></tr><tr><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex7_15"></td><td><input type="text" id="ex7_16"></td></tr></tbody></table><button class="btn" onclick="checkActivity(7, ['V','V','F','F','F','V','V','F','F','F','V','V','V','F','F','V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution7')">Mostrar Solución</button></div><div id="solution7" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>No Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$P \leftrightarrow (Q \leftrightarrow R)$</th><th class="result-col">$P \leftrightarrow R$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>V</td><td>F</td><td>V</td><td class="result-col">F</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td>F</td><td class="result-col">V</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">F</td></tr><tr><td>F</td><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">V</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes. No son equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex8"><div class="exercise-header"><h2>Ejercicio 8: $P \leftrightarrow Q$; $Q \leftrightarrow P$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>Esta es la ley conmutativa de la bicondicional.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1: P \leftrightarrow Q$</th><th class="result-col">$S_2: Q \leftrightarrow P$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex8_1"></td><td><input type="text" id="ex8_2"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex8_3"></td><td><input type="text" id="ex8_4"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex8_5"></td><td><input type="text" id="ex8_6"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex8_7"></td><td><input type="text" id="ex8_8"></td></tr></tbody></table><button class="btn" onclick="checkActivity(8, ['V','V','F','F','F','F','V','V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution8')">Mostrar Solución</button></div><div id="solution8" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$P \leftrightarrow Q$</th><th class="result-col">$Q \leftrightarrow P$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes y equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex9"><div class="exercise-header"><h2>Ejercicio 9: $\neg (P \lor \neg Q)$; $P \rightarrow Q$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>Aplicando De Morgan a $S_1$ obtenemos $\neg P \land \neg\neg Q$, que es $\neg P \land Q$.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1: \neg (P \lor \neg Q)$</th><th class="result-col">$S_2: P \rightarrow Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex9_1"></td><td><input type="text" id="ex9_2"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex9_3"></td><td><input type="text" id="ex9_4"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex9_5"></td><td><input type="text" id="ex9_6"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex9_7"></td><td><input type="text" id="ex9_8"></td></tr></tbody></table><button class="btn" onclick="checkActivity(9, ['F','V','F','F','V','V','F','V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution9')">Mostrar Solución</button></div><div id="solution9" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>No Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$\neg (P \lor \neg Q)$</th><th class="result-col">$P \rightarrow Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td class="result-col">F</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">V</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes (fila 3). No son equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex10"><div class="exercise-header"><h2>Ejercicio 10: $P \lor \neg (P \leftrightarrow Q)$; $(P \land \neg Q) \lor (\neg P \land Q)$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>$S_2$ es la definición del 'o exclusivo' (XOR), que es lógicamente equivalente a $\neg(P \leftrightarrow Q)$.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1$</th><th class="result-col">$S_2$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex10_1"></td><td><input type="text" id="ex10_2"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex10_3"></td><td><input type="text" id="ex10_4"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex10_5"></td><td><input type="text" id="ex10_6"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex10_7"></td><td><input type="text" id="ex10_8"></td></tr></tbody></table><button class="btn" onclick="checkActivity(10, ['V','F','V','V','V','V','F','F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution10')">Mostrar Solución</button></div><div id="solution10" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>No Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$P \lor \neg (P \leftrightarrow Q)$</th><th class="result-col">$(P \land \neg Q) \lor (\neg P \land Q)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">F</td></tr><tr><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes. No son equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex11"><div class="exercise-header"><h2>Ejercicio 11: $P \rightarrow Q$; $Q \rightarrow P$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>Se compara una sentencia con su conversa.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1: P \rightarrow Q$</th><th class="result-col">$S_2: Q \rightarrow P$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex11_1"></td><td><input type="text" id="ex11_2"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex11_3"></td><td><input type="text" id="ex11_4"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex11_5"></td><td><input type="text" id="ex11_6"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex11_7"></td><td><input type="text" id="ex11_8"></td></tr></tbody></table><button class="btn" onclick="checkActivity(11, ['V','V','F','V','V','F','V','V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution11')">Mostrar Solución</button></div><div id="solution11" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>No Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$P \rightarrow Q$</th><th class="result-col">$Q \rightarrow P$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">F</td></tr><tr><td>F</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes. No son equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex12"><div class="exercise-header"><h2>Ejercicio 12: $P \rightarrow Q$; $\neg (Q \rightarrow P)$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>$S_2$ es equivalente a $Q \land \neg P$.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1: P \rightarrow Q$</th><th class="result-col">$S_2: \neg(Q \rightarrow P)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex12_1"></td><td><input type="text" id="ex12_2"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex12_3"></td><td><input type="text" id="ex12_4"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex12_5"></td><td><input type="text" id="ex12_6"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex12_7"></td><td><input type="text" id="ex12_8"></td></tr></tbody></table><button class="btn" onclick="checkActivity(12, ['V','F','F','F','V','V','V','F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution12')">Mostrar Solución</button></div><div id="solution12" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>No Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$P \rightarrow Q$</th><th class="result-col">$\neg (Q \rightarrow P)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">F</td></tr><tr><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td class="result-col">V</td><td class="result-col">F</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes (fila 3). No son equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex13"><div class="exercise-header"><h2>Ejercicio 13: $\neg (P \leftrightarrow Q)$; $(\neg P \land Q) \lor (P \land \neg Q)$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>$S_2$ es la definición de 'o exclusivo' (XOR), que es la negación de la bicondicional.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1$</th><th class="result-col">$S_2$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex13_1"></td><td><input type="text" id="ex13_2"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex13_3"></td><td><input type="text" id="ex13_4"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex13_5"></td><td><input type="text" id="ex13_6"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex13_7"></td><td><input type="text" id="ex13_8"></td></tr></tbody></table><button class="btn" onclick="checkActivity(13, ['F','F','V','V','V','V','F','F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution13')">Mostrar Solución</button></div><div id="solution13" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$\neg (P \leftrightarrow Q)$</th><th class="result-col">$(\neg P \land Q) \lor (P \land \neg Q)$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes y equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex14"><div class="exercise-header"><h2>Ejercicio 14: $\neg (\neg P \lor \neg\neg Q)$; $P \land \neg Q$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>$S_1$ se simplifica usando De Morgan y la doble negación.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1$</th><th class="result-col">$S_2: P \land \neg Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex14_1"></td><td><input type="text" id="ex14_2"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex14_3"></td><td><input type="text" id="ex14_4"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex14_5"></td><td><input type="text" id="ex14_6"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex14_7"></td><td><input type="text" id="ex14_8"></td></tr></tbody></table><button class="btn" onclick="checkActivity(14, ['F','F','V','V','F','F','F','F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution14')">Mostrar Solución</button></div><div id="solution14" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$\neg (\neg P \lor Q)$</th><th class="result-col">$P \land \neg Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr></tbody></table><p><strong>Razón:</strong> $S_1$ se simplifica a $P \land \neg Q$. Son consistentes y equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex15"><div class="exercise-header"><h2>Ejercicio 15: $P \leftrightarrow (Q \rightarrow \neg R)$; $\neg P \lor \neg Q$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$S_1$</th><th class="result-col">$S_2$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex15_1"></td><td><input type="text" id="ex15_2"></td></tr><tr><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex15_3"></td><td><input type="text" id="ex15_4"></td></tr><tr><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex15_5"></td><td><input type="text" id="ex15_6"></td></tr><tr><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex15_7"></td><td><input type="text" id="ex15_8"></td></tr><tr><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex15_9"></td><td><input type="text" id="ex15_10"></td></tr><tr><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex15_11"></td><td><input type="text" id="ex15_12"></td></tr><tr><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex15_13"></td><td><input type="text" id="ex15_14"></td></tr><tr><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex15_15"></td><td><input type="text" id="ex15_16"></td></tr></tbody></table><button class="btn" onclick="checkActivity(15, ['F','F','V','F','V','V','V','V','V','V','F','V','F','V','F','V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution15')">Mostrar Solución</button></div><div id="solution15" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>No Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$P \leftrightarrow (Q \rightarrow \neg R)$</th><th class="result-col">$\neg P \lor \neg Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>V</td><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">F</td></tr><tr><td>V</td><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td>V</td><td class="result-col">F</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">V</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes. No son equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex16"><div class="exercise-header"><h2>Ejercicio 16: $P \lor (Q \lor R)$; $(P \lor Q) \lor R$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>Este ejercicio prueba la ley asociativa de la disyunción.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$S_1$</th><th class="result-col">$S_2$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex16_1"></td><td><input type="text" id="ex16_2"></td></tr><tr><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex16_3"></td><td><input type="text" id="ex16_4"></td></tr><tr><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex16_5"></td><td><input type="text" id="ex16_6"></td></tr><tr><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex16_7"></td><td><input type="text" id="ex16_8"></td></tr><tr><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex16_9"></td><td><input type="text" id="ex16_10"></td></tr><tr><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex16_11"></td><td><input type="text" id="ex16_12"></td></tr><tr><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex16_13"></td><td><input type="text" id="ex16_14"></td></tr><tr><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex16_15"></td><td><input type="text" id="ex16_16"></td></tr></tbody></table><button class="btn" onclick="checkActivity(16, ['V','V','V','V','V','V','V','V','V','V','V','V','V','V','F','F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution16')">Mostrar Solución</button></div><div id="solution16" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$P \lor (Q \lor R)$</th><th class="result-col">$(P \lor Q) \lor R$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes y equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex17"><div class="exercise-header"><h2>Ejercicio 17: $P \land (Q \land R)$; $(P \land R) \land Q$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>Este ejercicio prueba las leyes asociativa y conmutativa de la conjunción.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$S_1$</th><th class="result-col">$S_2$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex17_1"></td><td><input type="text" id="ex17_2"></td></tr><tr><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex17_3"></td><td><input type="text" id="ex17_4"></td></tr><tr><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex17_5"></td><td><input type="text" id="ex17_6"></td></tr><tr><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex17_7"></td><td><input type="text" id="ex17_8"></td></tr><tr><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex17_9"></td><td><input type="text" id="ex17_10"></td></tr><tr><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex17_11"></td><td><input type="text" id="ex17_12"></td></tr><tr><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex17_13"></td><td><input type="text" id="ex17_14"></td></tr><tr><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex17_15"></td><td><input type="text" id="ex17_16"></td></tr></tbody></table><button class="btn" onclick="checkActivity(17, ['V','V','F','F','F','F','F','F','F','F','F','F','F','F','F','F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution17')">Mostrar Solución</button></div><div id="solution17" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$P \land (Q \land R)$</th><th class="result-col">$(P \land R) \land Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>V</td><td>F</td><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>V</td><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>F</td><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes y equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex18"><div class="exercise-header"><h2>Ejercicio 18: $P \land (Q \lor R)$; $(P \land Q) \lor R$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>Cuidado: esta no es la ley distributiva. Compara los resultados.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$S_1$</th><th class="result-col">$S_2$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex18_1"></td><td><input type="text" id="ex18_2"></td></tr><tr><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex18_3"></td><td><input type="text" id="ex18_4"></td></tr><tr><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex18_5"></td><td><input type="text" id="ex18_6"></td></tr><tr><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex18_7"></td><td><input type="text" id="ex18_8"></td></tr><tr><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex18_9"></td><td><input type="text" id="ex18_10"></td></tr><tr><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex18_11"></td><td><input type="text" id="ex18_12"></td></tr><tr><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex18_13"></td><td><input type="text" id="ex18_14"></td></tr><tr><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex18_15"></td><td><input type="text" id="ex18_16"></td></tr></tbody></table><button class="btn" onclick="checkActivity(18, ['V','V','V','V','V','V','F','F','F','V','F','F','F','V','F','F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution18')">Mostrar Solución</button></div><div id="solution18" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>No Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$P \land (Q \lor R)$</th><th class="result-col">$(P \land Q) \lor R$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td>V</td><td class="result-col">F</td><td class="result-col">V</td></tr><tr><td>F</td><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>F</td><td>V</td><td class="result-col">F</td><td class="result-col">V</td></tr><tr><td>F</td><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes. No son equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex19"><div class="exercise-header"><h2>Ejercicio 19: $P \land (Q \lor R)$; $(Q \lor R) \land P$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>Esta es la ley conmutativa de la conjunción.</p></div><div class="activity"><p><strong>Actividad:</strong> Completa las columnas de resultados.</p><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$S_1$</th><th class="result-col">$S_2$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td><input type="text" id="ex19_1"></td><td><input type="text" id="ex19_2"></td></tr><tr><td>V</td><td>V</td><td>F</td><td><input type="text" id="ex19_3"></td><td><input type="text" id="ex19_4"></td></tr><tr><td>V</td><td>F</td><td>V</td><td><input type="text" id="ex19_5"></td><td><input type="text" id="ex19_6"></td></tr><tr><td>V</td><td>F</td><td>F</td><td><input type="text" id="ex19_7"></td><td><input type="text" id="ex19_8"></td></tr><tr><td>F</td><td>V</td><td>V</td><td><input type="text" id="ex19_9"></td><td><input type="text" id="ex19_10"></td></tr><tr><td>F</td><td>V</td><td>F</td><td><input type="text" id="ex19_11"></td><td><input type="text" id="ex19_12"></td></tr><tr><td>F</td><td>F</td><td>V</td><td><input type="text" id="ex19_13"></td><td><input type="text" id="ex19_14"></td></tr><tr><td>F</td><td>F</td><td>F</td><td><input type="text" id="ex19_15"></td><td><input type="text" id="ex19_16"></td></tr></tbody></table><button class="btn" onclick="checkActivity(19, ['V','V','V','V','V','V','F','F','F','F','F','F','F','F','F','F'])">Verificar</button><button class="btn" onclick="toggleSolution('solution19')">Mostrar Solución</button></div><div id="solution19" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th>R</th><th class="result-col">$P \land (Q \lor R)$</th><th class="result-col">$(Q \lor R) \land P$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>F</td><td>V</td><td class="result-col">F</td><td class="result-col">F</td></tr><tr><td>F</td><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">F</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes y equivalentes.</p></div></div></div>
+        <div class="exercise" id="ex20"><div class="exercise-header"><h2>Ejercicio 20: $\neg (P \rightarrow Q) \lor [P \lor (\neg Q \rightarrow P)]$; $(P \leftrightarrow Q) \lor [(P \lor \neg P) \land (Q \lor \neg Q)]$</h2><div class="toggle-icon">&#x2304;</div></div><div class="exercise-content"><div class="explanation"><p>Ambas sentencias se pueden simplificar. $S_1 \equiv P \lor Q$. $S_2 \equiv P \leftrightarrow Q$.</p></div><div class="activity"><p><strong>Actividad:</strong> Compara $P \lor Q$ con $P \leftrightarrow Q$.</p><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1 \equiv P \lor Q$</th><th class="result-col">$S_2 \equiv P \leftrightarrow Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td><input type="text" id="ex20_1"></td><td><input type="text" id="ex20_2"></td></tr><tr><td>V</td><td>F</td><td><input type="text" id="ex20_3"></td><td><input type="text" id="ex20_4"></td></tr><tr><td>F</td><td>V</td><td><input type="text" id="ex20_5"></td><td><input type="text" id="ex20_6"></td></tr><tr><td>F</td><td>F</td><td><input type="text" id="ex20_7"></td><td><input type="text" id="ex20_8"></td></tr></tbody></table><button class="btn" onclick="checkActivity(20, ['V','V','V','F','V','F','F','V'])">Verificar</button><button class="btn" onclick="toggleSolution('solution20')">Mostrar Solución</button></div><div id="solution20" class="solution"><div class="classification">Consistencia: <span>Consistentes</span></div><div class="classification">Equivalencia: <span>No Equivalentes</span></div><table><thead><tr><th>P</th><th>Q</th><th class="result-col">$S_1 \equiv P \lor Q$</th><th class="result-col">$S_2 \equiv P \leftrightarrow Q$</th></tr></thead><tbody><tr><td>V</td><td>V</td><td class="result-col">V</td><td class="result-col">V</td></tr><tr><td>V</td><td>F</td><td class="result-col">V</td><td class="result-col">F</td></tr><tr><td>F</td><td>V</td><td class="result-col">V</td><td class="result-col">F</td></tr><tr><td>F</td><td>F</td><td class="result-col">F</td><td class="result-col">V</td></tr></tbody></table><p><strong>Razón:</strong> Son consistentes (fila 1). No son equivalentes.</p></div></div></div>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.exercise-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const exercise = header.parentElement;
+                const content = header.nextElementSibling;
+                exercise.classList.toggle('open');
+                
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    content.style.display = "block";
+                }
+            });
+        });
+
+        function toggleSolution(id) {
+            var x = document.getElementById(id);
+            if (x.style.display === "none" || x.style.display === "") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+
+        // VERSIÓN ORIGINAL Y FUNCIONAL DEL SCRIPT
+        function checkActivity(exerciseNum, correctAnswers) {
+            for (let i = 0; i < correctAnswers.length; i++) {
+                const inputId = `ex${exerciseNum}_${i + 1}`;
+                const userInput = document.getElementById(inputId);
+                if (userInput) { // Verifica que el elemento exista
+                    if (userInput.value.trim().toUpperCase() === correctAnswers[i]) {
+                        userInput.classList.add('correct');
+                        userInput.classList.remove('incorrect');
+                    } else {
+                        userInput.classList.add('incorrect');
+                        userInput.classList.remove('correct');
+                    }
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

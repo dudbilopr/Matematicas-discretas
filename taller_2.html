@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller Completo de Lógica Proposicional</title>
+    
+    <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Roboto+Slab:wght@700&display=swap');
+
+        :root {
+            --primary-color: #0d47a1;
+            --secondary-color: #1976d2;
+            --background-color: #e3f2fd;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --heading-font: 'Roboto Slab', serif;
+            --body-font: 'Lato', sans-serif;
+            --correct-bg: #dcfce7;
+            --incorrect-bg: #fee2e2;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 20px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: var(--body-font);
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: transparent;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2.5rem;
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        header h1 {
+            font-family: var(--heading-font);
+            color: var(--primary-color);
+            font-size: 2.8rem;
+        }
+
+        .section-title {
+            font-family: var(--heading-font);
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+            margin-top: 3rem;
+        }
+
+        .exercise {
+            background-color: var(--card-background);
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .exercise h4, .exercise h5 {
+            font-family: var(--heading-font);
+            color: #333;
+            margin-top:0;
+        }
+
+        .instruction {
+            background-color: #fffde7;
+            border-left: 5px solid #fbc02d;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 1rem;
+        }
+
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 0.8rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-family: var(--heading-font);
+        }
+        
+        .correct {
+            background-color: var(--correct-bg) !important;
+            border-color: #6ee7b7 !important;
+        }
+
+        .incorrect {
+            background-color: var(--incorrect-bg) !important;
+            border-color: #fda4af !important;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .activity-input {
+            width: 90%;
+            padding: 8px;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .matching-input {
+            width: 40px;
+            text-align: center;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .truth-table-input {
+             width: 40px;
+            text-align: center;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        .solution {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f1f8e9;
+            border: 1px solid #c5e1a5;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Taller de Lógica Proposicional Completo</h1>
+            <p>Ejercicios interactivos basados en el documento "Filosofía y Ciudadanía - Lógica proposicional".</p>
+        </header>
+
+        <h2 class="section-title">1. Simbolización de Proposiciones</h2>
+        <div class="instruction">
+            <strong>Instrucciones:</strong> Escribe la formalización de cada frase en el campo de texto. Usa los siguientes símbolos:
+            <ul>
+                <li>Negación (No): <strong>~</strong></li>
+                <li>Conjunción (y): <strong>&</strong></li>
+                <li>Disyunción (o): <strong>v</strong></li>
+                <li>Condicional (Si... entonces): <strong>-&gt;</strong></li>
+                <li>Bicondicional (si y solo si): <strong>&lt;-&gt;</strong></li>
+            </ul>
+            Ejemplo: "No vi la película, pero leí la novela" se escribe como <strong>~p & q</strong>.
+        </div>
+
+        <div class="exercise">
+            <h4>1a. No vi la película, pero leí la novela.</h4>
+            <input type="text" id="ex1a_input" class="activity-input" placeholder="p: vi la película, q: leí la novela">
+            <button class="btn" onclick="checkSymbolization('ex1a_input', '~p&q')">Verificar</button>
+        </div>
+        <div class="exercise">
+            <h4>1b. Ni vi la película ni leí la novela.</h4>
+            <input type="text" id="ex1b_input" class="activity-input" placeholder="p: vi la película, q: leí la novela">
+            <button class="btn" onclick="checkSymbolization('ex1b_input', '~p&~q')">Verificar</button>
+        </div>
+        <div class="exercise">
+            <h4>1c. No es cierto que viese la película y leyese la novela.</h4>
+            <input type="text" id="ex1c_input" class="activity-input" placeholder="p: vi la película, q: leí la novela">
+            <button class="btn" onclick="checkSymbolization('ex1c_input', '~(p&q)')">Verificar</button>
+        </div>
+        <div class="exercise">
+            <h4>1h. Llueve y o bien nieva o sopla el viento.</h4>
+            <input type="text" id="ex1h_input" class="activity-input" placeholder="p: llueve, q: nieva, r: sopla el viento">
+            <button class="btn" onclick="checkSymbolization('ex1h_input', 'p&(qvr)')">Verificar</button>
+        </div>
+        <div class="exercise">
+            <h4>1j. Si hay verdadera democracia, entonces no hay detenciones arbitrarias ni otras violaciones de los derechos civiles.</h4>
+            <input type="text" id="ex1j_input" class="activity-input" placeholder="p: hay democracia, q: hay detenciones, r: hay violaciones">
+            <button class="btn" onclick="checkSymbolization('ex1j_input', 'p->(~q&~r)')">Verificar</button>
+        </div>
+        <div class="exercise">
+            <h4>3c. Si los gatos de mi hermana no soltaran tanto pelo me gustaría acariciarlos.</h4>
+            <input type="text" id="ex3c_input" class="activity-input" placeholder="p: los gatos sueltan pelo, q: me gusta acariciarlos">
+            <button class="btn" onclick="checkSymbolization('ex3c_input', '~p->q')">Verificar</button>
+        </div>
+        <div class="exercise">
+            <h4>3f. Si los elefantes volaran o supieran tocar el acordeón, pensaría que estoy como una regadera y dejaría que me internaran en un psiquiátrico.</h4>
+            <input type="text" id="ex3f_input" class="activity-input" placeholder="p: elefantes vuelan, q: tocan acordeón, r: estoy loco, s: me internan">
+            <button class="btn" onclick="checkSymbolization('ex3f_input', '(pvq)->(r&s)')">Verificar</button>
+        </div>
+
+        <h2 class="section-title">2. Tablas de Verdad y Clasificación</h2>
+        <div class="instruction">
+            <strong>Instrucciones:</strong> Completa los valores de verdad (V o F) en las casillas vacías de la tabla y determina la clasificación de la fórmula.
+        </div>
+        
+        <div class="exercise">
+            <h4>Ejercicio 13b: $(p \land q) \rightarrow p$</h4>
+            <table>
+                <thead><tr><th>p</th><th>q</th><th>$p \land q$</th><th>$(p \land q) \rightarrow p$</th></tr></thead>
+                <tbody>
+                    <tr><td>V</td><td>V</td><td><input type="text" id="exT1_1" class="truth-table-input"></td><td><input type="text" id="exT1_2" class="truth-table-input"></td></tr>
+                    <tr><td>V</td><td>F</td><td><input type="text" id="exT1_3" class="truth-table-input"></td><td><input type="text" id="exT1_4" class="truth-table-input"></td></tr>
+                    <tr><td>F</td><td>V</td><td><input type="text" id="exT1_5" class="truth-table-input"></td><td><input type="text" id="exT1_6" class="truth-table-input"></td></tr>
+                    <tr><td>F</td><td>F</td><td><input type="text" id="exT1_7" class="truth-table-input"></td><td><input type="text" id="exT1_8" class="truth-table-input"></td></tr>
+                </tbody>
+            </table>
+            <button class="btn" onclick="checkTruthTable(['exT1_1','exT1_2','exT1_3','exT1_4','exT1_5','exT1_6','exT1_7','exT1_8'], ['V','V','F','V','F','V','F','V'])">Verificar</button>
+             <p>Clasificación: <strong>Tautología</strong></p>
+        </div>
+
+        <div class="exercise">
+            <h4>Ejercicio 13f: $(\neg p \lor q) \leftrightarrow (p \rightarrow q)$</h4>
+            <table>
+                <thead><tr><th>p</th><th>q</th><th>$\neg p \lor q$</th><th>$p \rightarrow q$</th><th>$(\neg p \lor q) \leftrightarrow (p \rightarrow q)$</th></tr></thead>
+                <tbody>
+                    <tr><td>V</td><td>V</td><td><input type="text" id="exT2_1" class="truth-table-input"></td><td><input type="text" id="exT2_2" class="truth-table-input"></td><td><input type="text" id="exT2_3" class="truth-table-input"></td></tr>
+                    <tr><td>V</td><td>F</td><td><input type="text" id="exT2_4" class="truth-table-input"></td><td><input type="text" id="exT2_5" class="truth-table-input"></td><td><input type="text" id="exT2_6" class="truth-table-input"></td></tr>
+                    <tr><td>F</td><td>V</td><td><input type="text" id="exT2_7" class="truth-table-input"></td><td><input type="text" id="exT2_8" class="truth-table-input"></td><td><input type="text" id="exT2_9" class="truth-table-input"></td></tr>
+                    <tr><td>F</td><td>F</td><td><input type="text" id="exT2_10" class="truth-table-input"></td><td><input type="text" id="exT2_11" class="truth-table-input"></td><td><input type="text" id="exT2_12" class="truth-table-input"></td></tr>
+                </tbody>
+            </table>
+            <button class="btn" onclick="checkTruthTable(['exT2_1','exT2_2','exT2_3','exT2_4','exT2_5','exT2_6','exT2_7','exT2_8','exT2_9','exT2_10','exT2_11','exT2_12'], ['V','V','V','F','F','V','V','V','V','V','V','V'])">Verificar</button>
+            <p>Clasificación: <strong>Tautología</strong> (es una equivalencia lógica fundamental).</p>
+        </div>
+        
+        <div class="exercise">
+            <h4>Ejercicio 13d: $(p \leftrightarrow \neg q) \land (p \lor \neg q)$</h4>
+            <table>
+                <thead><tr><th>p</th><th>q</th><th>$p \leftrightarrow \neg q$</th><th>$p \lor \neg q$</th><th>Fórmula Final</th></tr></thead>
+                <tbody>
+                    <tr><td>V</td><td>V</td><td><input type="text" id="exT3_1" class="truth-table-input"></td><td><input type="text" id="exT3_2" class="truth-table-input"></td><td><input type="text" id="exT3_3" class="truth-table-input"></td></tr>
+                    <tr><td>V</td><td>F</td><td><input type="text" id="exT3_4" class="truth-table-input"></td><td><input type="text" id="exT3_5" class="truth-table-input"></td><td><input type="text" id="exT3_6" class="truth-table-input"></td></tr>
+                    <tr><td>F</td><td>V</td><td><input type="text" id="exT3_7" class="truth-table-input"></td><td><input type="text" id="exT3_8" class="truth-table-input"></td><td><input type="text" id="exT3_9" class="truth-table-input"></td></tr>
+                    <tr><td>F</td><td>F</td><td><input type="text" id="exT3_10" class="truth-table-input"></td><td><input type="text" id="exT3_11" class="truth-table-input"></td><td><input type="text" id="exT3_12" class="truth-table-input"></td></tr>
+                </tbody>
+            </table>
+            <button class="btn" onclick="checkTruthTable(['exT3_1','exT3_2','exT3_3','exT3_4','exT3_5','exT3_6','exT3_7','exT3_8','exT3_9','exT3_10','exT3_11','exT3_12'], ['F','F','F','V','V','V','V','F','F','F','V','F'])">Verificar</button>
+            <p>Clasificación: <strong>Indeterminación (Contingencia)</strong></p>
+        </div>
+
+        <h2 class="section-title">3. Ejercicios de Enlace</h2>
+        <div class="instruction">
+            <strong>Instrucciones:</strong> Para cada proposición de la izquierda, escribe la letra de la formalización correcta de la derecha en la casilla de respuesta.
+        </div>
+        
+        <div class="exercise">
+            <h4>Ejercicio 4</h4>
+            <table><thead><tr><th>Respuesta</th><th>Proposición</th><th>Opción</th><th>Formalización</th></tr></thead>
+            <tbody>
+                <tr><td><input type="text" id="match1_1" class="matching-input"></td><td>1. Llueve y hace sol</td><td>A</td><td>$\neg p$</td></tr>
+                <tr><td><input type="text" id="match1_2" class="matching-input"></td><td>2. Llueve y no hace sol</td><td>B</td><td>$p \lor q$</td></tr>
+                <tr><td><input type="text" id="match1_3" class="matching-input"></td><td>3. Llueve o hace sol</td><td>C</td><td>$p \land q$</td></tr>
+                <tr><td><input type="text" id="match1_4" class="matching-input"></td><td>4. Si no llueve, hace sol</td><td>D</td><td>$p \land \neg q$</td></tr>
+                <tr><td><input type="text" id="match1_5" class="matching-input"></td><td>5. No es cierto que llueva</td><td>E</td><td>$\neg\neg p$</td></tr>
+                <tr><td><input type="text" id="match1_6" class="matching-input"></td><td>6. No es cierto que no llueva</td><td>F</td><td>$q \leftrightarrow \neg p$</td></tr>
+                <tr><td><input type="text" id="match1_7" class="matching-input"></td><td>7. Hará sol si y sólo si no llueve</td><td>G</td><td>$\neg p \rightarrow q$</td></tr>
+            </tbody></table>
+            <button class="btn" onclick="checkMatching(['match1_1','match1_2','match1_3','match1_4','match1_5','match1_6','match1_7'], ['C','D','B','G','A','E','F'])">Verificar</button>
+        </div>
+
+        <div class="exercise">
+            <h4>Ejercicio 6</h4>
+             <table><thead><tr><th>Respuesta</th><th>Proposición</th><th>Opción</th><th>Formalización</th></tr></thead>
+            <tbody>
+                <tr><td><input type="text" id="match2_1" class="matching-input"></td><td>1. Si las estrellas emiten luz, entonces los planetas la reflejan y giran alrededor de ellas</td><td>A</td><td>$(p \lor q) \land r$</td></tr>
+                <tr><td><input type="text" id="match2_2" class="matching-input"></td><td>2. Las estrellas emiten luz o los planetas la reflejan y, por otra parte, los planetas giran alrededor de ellas</td><td>B</td><td>$\neg(p \land q) \rightarrow \neg r$</td></tr>
+                <tr><td><input type="text" id="match2_3" class="matching-input"></td><td>3. Los planetas reflejan luz si y sólo si las estrellas la emiten y los planetas giran alrededor de ellas</td><td>C</td><td>$p \rightarrow (q \land r)$</td></tr>
+                <tr><td><input type="text" id="match2_4" class="matching-input"></td><td>4. Si no es cierto que las estrellas emiten luz y que los planetas la reflejan, entonces éstos no giran alrededor de ellas</td><td>D</td><td>$q \leftrightarrow (p \land r)$</td></tr>
+            </tbody></table>
+            <button class="btn" onclick="checkMatching(['match2_1','match2_2','match2_3','match2_4'], ['C','A','D','B'])">Verificar</button>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.exercise-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const exercise = header.parentElement;
+                const content = header.nextElementSibling;
+                exercise.classList.toggle('open');
+                
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    content.style.display = "block";
+                }
+            });
+        });
+
+        function checkSymbolization(inputId, correctAnswer) {
+            const userInput = document.getElementById(inputId);
+            const userAnswer = userInput.value.replace(/\s+/g, '').toLowerCase();
+            const normalizedCorrectAnswer = correctAnswer.replace(/\s+/g, '').toLowerCase();
+
+            if (userAnswer === normalizedCorrectAnswer) {
+                userInput.classList.add('correct');
+                userInput.classList.remove('incorrect');
+            } else {
+                userInput.classList.add('incorrect');
+                userInput.classList.remove('correct');
+            }
+        }
+
+        function checkTruthTable(inputIdArray, correctAnswers) {
+            inputIdArray.forEach((id, index) => {
+                const userInput = document.getElementById(id);
+                if (userInput) {
+                    if (userInput.value.trim().toUpperCase() === correctAnswers[index]) {
+                        userInput.classList.add('correct');
+                        userInput.classList.remove('incorrect');
+                    } else {
+                        userInput.classList.add('incorrect');
+                        userInput.classList.remove('correct');
+                    }
+                }
+            });
+        }
+        
+        function checkMatching(inputIdArray, correctAnswers) {
+             inputIdArray.forEach((id, index) => {
+                const userInput = document.getElementById(id);
+                if (userInput) {
+                    if (userInput.value.trim().toUpperCase() === correctAnswers[index]) {
+                        userInput.classList.add('correct');
+                        userInput.classList.remove('incorrect');
+                    } else {
+                        userInput.classList.add('incorrect');
+                        userInput.classList.remove('correct');
+                    }
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
