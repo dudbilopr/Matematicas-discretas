@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase Interactiva de Matemáticas Discretas</title>
+    
+    <!-- KaTeX para renderizar LaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+
+    <style>
+        /* --- Paleta de Colores y Variables Globales --- */
+        :root {
+            --color-primario: #3b82f6; /* Azul Vibrante */
+            --color-secundario: #1e40af; /* Azul Oscuro */
+            --color-acento: #60a5fa; /* Azul Claro */
+            --color-fondo: #f0f4f8; /* Gris Azulado Claro */
+            --color-texto: #1f2937; /* Gris Oscuro */
+            --color-blanco: #ffffff;
+            --color-verde: #10b981;
+            --color-ambar: #f59e0b;
+            --color-rosa: #ec4899;
+            --color-rojo: #ef4444;
+            --fuente-principal: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --sombra-suave: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --sombra-media: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        /* --- Estilos Generales --- */
+        body {
+            font-family: var(--fuente-principal);
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* --- Contenedor de Diapositivas --- */
+        #contenedor-diapositivas {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+       .diapositiva {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 80px); /* Espacio para la barra de navegación inferior */
+            padding: 40px 60px;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0.5s;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+       .diapositiva-contenido {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+       .diapositiva.activa {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+            z-index: 1;
+        }
+
+        /* --- Estilos de Texto y Contenido --- */
+        h1, h2, h3 {
+            color: var(--color-secundario);
+            border-bottom: 3px solid var(--color-acento);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h1 { font-size: 2.5em; font-weight: 800; }
+        h2 { font-size: 2.0em; font-weight: 700; }
+        h3 { font-size: 1.5em; font-weight: 600; }
+
+        p, li {
+            font-size: 1.1em;
+            line-height: 1.7;
+        }
+
+        strong, b {
+            color: var(--color-primario);
+            font-weight: 600;
+        }
+
+       .definicion,.teorema,.ejemplo,.interactivo {
+            background-color: var(--color-blanco);
+            border-left: 6px solid var(--color-secundario);
+            padding: 20px 25px;
+            margin: 25px 0;
+            border-radius: 0 12px 12px 0;
+            box-shadow: var(--sombra-suave);
+        }
+
+       .definicion { border-color: var(--color-verde); }
+       .teorema { border-color: var(--color-ambar); }
+       .ejemplo { border-color: var(--color-primario); }
+       .interactivo { border-color: var(--color-rosa); }
+       
+       .grid-leyes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+       }
+
+       .katex-display {
+            margin: 1.2em 0;
+            font-size: 1.2em;
+        }
+        
+        /* Tabla de Comparación */
+        .tabla-comparacion {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 1.05em;
+        }
+        .tabla-comparacion th, .tabla-comparacion td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .tabla-comparacion th {
+            background-color: var(--color-secundario);
+            color: var(--color-blanco);
+            text-align: center;
+        }
+        .tabla-comparacion tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .tabla-comparacion td:first-child {
+            font-family: 'Fira Code', monospace;
+        }
+        
+        /* Contenedor Interactivo de Ejemplo (Acordeón) */
+        .ejemplo-acordeon {
+            margin: 20px 0;
+        }
+        .ejemplo-acordeon summary {
+            font-weight: 600;
+            color: var(--color-secundario);
+            background-color: #eef2ff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.3s;
+            list-style: none; /* Ocultar marcador por defecto */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ejemplo-acordeon summary:hover {
+            background-color: #e0e7ff;
+        }
+        .ejemplo-acordeon summary::after {
+            content: '▼';
+            font-size: 0.8em;
+            transition: transform 0.3s ease-in-out;
+        }
+        .ejemplo-acordeon[open] > summary::after {
+            transform: rotate(180deg);
+        }
+        .ejemplo-acordeon .contenido-acordeon {
+            padding: 20px;
+            border: 1px solid #e0e7ff;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            background-color: var(--color-blanco);
+        }
+
+        /* --- Barra de Navegación Moderna --- */
+        #navegacion {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 65px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+            border-radius: 999px; /* Forma de píldora */
+            box-shadow: var(--sombra-media);
+            z-index: 100;
+        }
+
+        #navegacion button {
+            background-color: transparent;
+            color: var(--color-secundario);
+            border: none;
+            width: 45px;
+            height: 45px;
+            font-size: 1.8em;
+            font-weight: bold;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #navegacion button:hover:not(:disabled) {
+            background-color: var(--color-acento);
+            color: var(--color-blanco);
+        }
+        
+        #navegacion button:disabled {
+            color: #bdc3c7; /* Gris claro */
+            cursor: not-allowed;
+        }
+
+        #barra-progreso-contenedor {
+            width: 30vw;
+            max-width: 400px;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin: 0 20px;
+            overflow: hidden;
+        }
+
+        #barra-progreso {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-acento), var(--color-primario));
+            border-radius: 4px;
+            transition: width 0.4s ease-in-out;
+        }
+
+        /* --- Elementos Interactivos Mejorados --- */
+       .input-formula, .input-interactivo {
+            padding: 12px;
+            font-size: 1.1em;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+       .input-formula { width: 100%; }
+       .input-formula:focus, .input-interactivo:focus {
+            outline: none;
+            border-color: var(--color-primario);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+       .btn-generar {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            background: var(--color-primario);
+            color: var(--color-blanco);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+       .btn-generar:hover {
+            background-color: var(--color-secundario);
+            transform: translateY(-2px);
+        }
+
+        #resultado-tabla-verdad table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+
+        #resultado-tabla-verdad th, #resultado-tabla-verdad td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        #resultado-tabla-verdad th {
+            background-color: var(--color-secundario);
+            color: var(--color-blanco);
+        }
+        
+       .columna-principal {
+            background-color: #eef2ff; /* Azul muy claro */
+            font-weight: bold;
+        }
+        
+        #clasificacion-formula {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        /* --- Diagrama de Venn Interactivo --- */
+        #lienzo-venn {
+            position: relative;
+            width: 400px;
+            height: 250px;
+            margin: 20px auto;
+        }
+
+       .circulo-venn {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+
+        #venn-a { width: 200px; height: 200px; background-color: #f44336; top: 25px; left: 50px; }
+        #venn-b { width: 200px; height: 200px; background-color: #2196F3; top: 25px; left: 150px; }
+        
+       .region-venn { position: absolute; padding: 10px; text-align: center; font-weight: bold; transition: background-color 0.3s, transform 0.3s; border-radius: 8px; }
+        #region-a { top: 100px; left: 90px; }
+        #region-interseccion { top: 100px; left: 190px; }
+        #region-b { top: 100px; left: 290px; }
+        
+       .resaltado { background-color: rgba(255, 235, 59, 0.7); transform: scale(1.1); }
+        
+       .controles-venn input, .controles-venn select { padding: 8px; border: 2px solid #ccc; border-radius: 8px; margin: 0 10px; }
+        
+        /* Estilos para demostraciones guiadas */
+       .feedback { font-style: italic; margin-top: 5px; font-weight: bold; }
+       .paso-demo { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="contenedor-diapositivas">
+        <section class="diapositiva activa">
+            <div class="diapositiva-contenido">
+                <h1>Matemáticas Discretas</h1>
+                <h2>Clase 2</h2>
+                <p>Por: Dudbil Pabon <strong>&lt;</strong> y <strong>&gt;</strong> para navegar.</p>
+                <p>V0.1</p>
+            </div>
+        </section>
+
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>Parte I: Fundamentos de Lógica</h2>
+                <h3>1.1 Proposiciones y Operadores Lógicos</h3>
+                <div class="definicion"><p>Una <strong>proposición</strong> es un enunciado que tiene un valor de verdad único: o es <em>verdadero</em> (V) o es <em>falso</em> (F).</p></div>
+                <ul>
+                    <li><strong>Negación ($ \neg p $):</strong> "no p".</li>
+                    <li><strong>Conjunción ($ p \land q $):</strong> "p y q".</li>
+                    <li><strong>Disyunción ($ p \lor q $):</strong> "p o q".</li>
+                    <li><strong>Disyunción Exclusiva ($ p \underline{\lor} q $):</strong> "p o q, pero no ambos".</li>
+                    <li><strong>Implicación ($ p \rightarrow q $):</strong> "si p, entonces q".</li>
+                    <li><strong>Doble Implicación ($ p \leftrightarrow q $):</strong> "p si y solo si q".</li>
+                </ul>
+                 <details class="ejemplo-acordeon">
+                    <summary>Ejemplo de Conjunción ($ \land $)</summary>
+                    <div class="contenido-acordeon">
+                        <p>Sean las proposiciones:</p>
+                        <ul>
+                            <li><b>p:</b> 200 es número natural (Verdadero)</li>
+                            <li><b>r:</b> -150 es número entero (Verdadero)</li>
+                        </ul>
+                        <p>La proposición compuesta <b>p $ \land $ r</b>: "200 es número natural <b>y</b> -150 es número entero" es <strong>verdadera</strong>, porque ambas proposiciones simples son verdaderas.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>1.2 La Calculadora Lógica – Tablas de Verdad</h2>
+                <div class="interactivo">
+                    <h3>Generador Dinámico de Tablas de Verdad</h3>
+                    <p>Introduce una fórmula proposicional usando <b>p, q, r</b> y los operadores: <b>¬, ∧, ∨, →, ↔</b>.</p>
+                    <input type="text" id="input-formula-logica" class="input-formula" placeholder="(p → q) ↔ (¬p ∨ q)">
+                    <button id="btn-generar-tabla" class="btn-generar">Generar Tabla</button>
+                    <div id="resultado-tabla-verdad"></div>
+                    <div id="clasificacion-formula"></div>
+                    <p id="error-formula" style="color: red;"></p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>1.3 Tautologías, Contradicciones y Reglas de Inferencia</h2>
+                <div class="definicion">
+                    <ul>
+                        <li>Una <strong>Tautología</strong> es una proposición siempre verdadera ($p \lor \neg p$).</li>
+                        <li>Una <strong>Contradicción</strong> es una proposición siempre falsa ($p \land \neg p$).</li>
+                        <li>Una <strong>Contingencia</strong> no es ni tautología ni contradicción.</li>
+                    </ul>
+                </div>
+                <h3>Reglas de Inferencia Clave</h3>
+                <div class="teorema">
+                    <p><b>Modus Ponens:</b> $[(p \rightarrow q) \land p] \Rightarrow q$</p>
+                    <p><b>Modus Tollens:</b> $[(p \rightarrow q) \land \neg q] \Rightarrow \neg p$</p>
+                    <p><b>Silogismo Hipotético:</b> $[(p \rightarrow q) \land (q \rightarrow r)] \Rightarrow (p \rightarrow r)$</p>
+                    <p><b>Silogismo Disyuntivo:</b> $[(p \lor q) \land \neg p] \Rightarrow q$</p>
+                </div>
+                 <details class="ejemplo-acordeon">
+                    <summary>Ejemplo de Modus Ponens</summary>
+                    <div class="contenido-acordeon">
+                        <p>Si aceptamos las siguientes dos premisas como verdaderas:</p>
+                        <ol>
+                            <li>"Si llueve, entonces las calles se mojan." ($p \rightarrow q$)</li>
+                            <li>"Está lloviendo." ($p$)</li>
+                        </ol>
+                        <p>Podemos concluir lógicamente que: <strong>"Las calles están mojadas."</strong> ($q$).</p>
+                    </div>
+                </details>
+                <details class="ejemplo-acordeon">
+                    <summary>Ejemplo de Modus Tollens</summary>
+                    <div class="contenido-acordeon">
+                        <p>Si aceptamos las siguientes dos premisas como verdaderas:</p>
+                        <ol>
+                            <li>"Si el servidor está caído, la página no carga." ($p \rightarrow q$)</li>
+                            <li>"La página carga correctamente." ($\neg q$)</li>
+                        </ol>
+                        <p>Podemos concluir lógicamente que: <strong>"El servidor no está caído."</strong> ($\neg p$).</p>
+                    </div>
+                </details>
+                <details class="ejemplo-acordeon">
+                    <summary>Ejemplo de Silogismo Hipotético</summary>
+                    <div class="contenido-acordeon">
+                        <p>Si aceptamos las siguientes dos premisas como verdaderas:</p>
+                        <ol>
+                            <li>"Si estudio para el examen, aprobaré el curso." ($p \rightarrow q$)</li>
+                            <li>"Si apruebo el curso, podré ir de vacaciones." ($q \rightarrow r$)</li>
+                        </ol>
+                        <p>Podemos concluir lógicamente que: <strong>"Si estudio para el examen, podré ir de vacaciones."</strong> ($p \rightarrow r$).</p>
+                    </div>
+                </details>
+                <details class="ejemplo-acordeon">
+                    <summary>Ejemplo de Silogismo Disyuntivo</summary>
+                    <div class="contenido-acordeon">
+                        <p>Si aceptamos las siguientes dos premisas como verdaderas:</p>
+                        <ol>
+                            <li>"El archivo está en la carpeta 'Documentos' o está en la 'Papelera'." ($p \lor q$)</li>
+                            <li>"El archivo no está en la carpeta 'Documentos'." ($\neg p$)</li>
+                        </ol>
+                        <p>Podemos concluir lógicamente que: <strong>"El archivo está en la 'Papelera'."</strong> ($q$).</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+        
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>1.4 Leyes Fundamentales de la Lógica</h2>
+                <p>Estas leyes son equivalencias lógicas (tautologías) que nos permiten manipular y simplificar expresiones de forma segura.</p>
+                <div class="grid-leyes">
+                    <div class="teorema"><h4>Involutiva</h4> $\neg(\neg p) \Leftrightarrow p$</div>
+                    <div class="teorema"><h4>Idempotencia</h4> $p \land p \Leftrightarrow p$ <br> $p \lor p \Leftrightarrow p$</div>
+                    <div class="teorema"><h4>Conmutativa</h4> $p \land q \Leftrightarrow q \land p$ <br> $p \lor q \Leftrightarrow q \lor p$</div>
+                    <div class="teorema"><h4>Asociativa</h4> $(p \land q) \land r \Leftrightarrow p \land (q \land r)$ <br> $(p \lor q) \lor r \Leftrightarrow p \lor (q \lor r)$</div>
+                </div>
+                 <p style="margin-top:20px;"><b>¡Verifícalo!</b> Usa la Calculadora Lógica de la diapositiva anterior para comprobar estas equivalencias.</p>
+            </div>
+        </section>
+        
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>1.5 Leyes Distributivas, de De Morgan y Absorción</h2>
+                <div class="grid-leyes">
+                    <div class="teorema"><h4>Distributiva</h4> $p \land (q \lor r) \Leftrightarrow (p \land q) \lor (p \land r)$ <br> $p \lor (q \land r) \Leftrightarrow (p \lor q) \land (p \lor r)$</div>
+                    <div class="teorema"><h4>Leyes de De Morgan</h4> $\neg(p \land q) \Leftrightarrow \neg p \lor \neg q$ <br> $\neg(p \lor q) \Leftrightarrow \neg p \land \neg q$</div>
+                    <div class="teorema"><h4>Absorción</h4> $p \lor (p \land q) \Leftrightarrow p$ <br> $p \land (p \lor q) \Leftrightarrow p$</div>
+                </div>
+                <details class="ejemplo-acordeon">
+                    <summary>Ejemplo de Ley de De Morgan</summary>
+                    <div class="contenido-acordeon">
+                        <p>La afirmación "<b>No es cierto que</b> hoy es lunes <b>y</b> está lloviendo" ($\neg(p \land q)$) es lógicamente equivalente a decir:</p>
+                        <p>"Hoy <b>no</b> es lunes <b>o no</b> está lloviendo" ($\neg p \lor \neg q$).</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>Parte II: Teoría de Conjuntos</h2>
+                <h3>2.1 Operaciones y Definiciones</h3>
+                <div class="definicion"><p>Un <strong>conjunto</strong> es una colección de objetos distintos. Las operaciones básicas son:</p></div>
+                <ul>
+                    <li><strong>Unión ($ A \cup B $)</strong>, <strong>Intersección ($ A \cap B $)</strong>, <strong>Diferencia ($ A - B $)</strong>, <strong>Complemento ($ A' $)</strong>.</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>2.2 El Taller de Diagramas de Venn</h2>
+                <div class="interactivo">
+                    <h3>Patio de Juegos de Venn</h3>
+                    <p>Introduce elementos (separados por comas) y selecciona una operación.</p>
+                    <div class="controles-venn" style="text-align: center;">
+                        <b>A:</b> { <input type="text" class="input-interactivo" id="input-set-a" value="1, 2, 3, 4"> }
+                        <b>B:</b> { <input type="text" class="input-interactivo" id="input-set-b" value="3, 4, 5, 6"> }
+                        <select id="operacion-venn" class="input-interactivo" style="width: auto;">
+                            <option value="union">Unión (A ∪ B)</option>
+                            <option value="interseccion">Intersección (A ∩ B)</option>
+                            <option value="diferencia_a_b">Diferencia (A - B)</option>
+                            <option value="diferencia_b_a">Diferencia (B - A)</option>
+                        </select>
+                        <button id="btn-venn-actualizar" class="btn-generar">Visualizar</button>
+                    </div>
+                    <div id="lienzo-venn">
+                        <div class="circulo-venn" id="venn-a"></div><div class="circulo-venn" id="venn-b"></div>
+                        <div class="region-venn" id="region-a"></div><div class="region-venn" id="region-interseccion"></div><div class="region-venn" id="region-b"></div>
+                    </div>
+                    <p style="text-align: center; font-size: 1.2em; margin-top: 20px;"><b>Resultado: </b> <span id="resultado-venn"></span></p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>2.3 La Dualidad de la Lógica y los Conjuntos</h2>
+                <p>Existe una correspondencia directa entre los operadores lógicos y las operaciones de conjuntos. No estás aprendiendo dos sistemas de reglas, sino un único sistema con dos lenguajes.</p>
+                <table class="tabla-comparacion">
+                    <thead>
+                        <tr>
+                            <th>Álgebra Proposicional</th>
+                            <th>Teoría de Conjuntos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>$p \lor q$</td><td>$A \cup B$</td></tr>
+                        <tr><td>$p \land q$</td><td>$A \cap B$</td></tr>
+                        <tr><td>$\neg p$</td><td>$A'$</td></tr>
+                        <tr><td>$p \rightarrow q$</td><td>$A \subset B$</td></tr>
+                        <tr><td>$p \leftrightarrow q$</td><td>$A = B$</td></tr>
+                        <tr><td>$p \underline{\lor} q$</td><td>$A \triangle B$</td></tr>
+                        <tr><td>$T$ (Tautología)</td><td>$U$ (Conjunto Universal)</td></tr>
+                        <tr><td>$C$ (Contradicción)</td><td>$\emptyset$ (Conjunto Vacío)</td></tr>
+                        <tr><td>$\neg(p \lor q) \Leftrightarrow \neg p \land \neg q$</td><td>$(A \cup B)' = A' \cap B'$</td></tr>
+                        <tr><td>$\neg(p \land q) \Leftrightarrow \neg p \lor \neg q$</td><td>$(A \cap B)' = A' \cup B'$</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>2.4 Conjunto Potencia</h2>
+                <div class="definicion"><p>El <strong>Conjunto Potencia</strong> de A, $P(A)$, es el conjunto de <em>todos los subconjuntos</em> de A. Si $|A| = n$, entonces $|P(A)| = 2^n$.</p></div>
+                <div class="interactivo">
+                    <h3>Generador de Conjunto Potencia</h3>
+                    <b>A:</b> { <input type="text" class="input-interactivo" id="input-set-potencia" value="a, b, c"> }
+                    <button id="btn-generar-potencia" class="btn-generar">Generar</button>
+                    <p style="font-size: 1.2em; margin-top: 15px;"><b>P(A) = </b><span id="resultado-potencia"></span></p>
+                </div>
+            </div>
+        </section>
+
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>Parte III: El Arte de la Demostración</h2>
+                <h3>3.1 Arquitectura de los Argumentos</h3>
+                <p>Una demostración es un argumento deductivo que establece la veracidad de una proposición matemática a partir de axiomas, definiciones y teoremas previos.</p>
+            </div>
+        </section>
+        
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>3.2 Demostración Directa</h2>
+                <div class="definicion"><p>Para demostrar $ p \rightarrow q $, se asume $p$ y se deduce lógicamente $q$.</p></div>
+                <div class="interactivo">
+                    <h3>Constructor Guiado: Suma de Impares</h3>
+                    <p><strong>Teorema:</strong> La suma de dos enteros impares es un entero par.</p>
+                    <div id="demostracion-guiada-1">
+                        <div class="paso-demo" data-paso="1"><p><b>Paso 1:</b> Expresar dos impares <i>m</i> y <i>n</i>.</p><p>$m = 2a + 1$, $n = $ <input type="text" class="input-interactivo" id="demo1-paso1" placeholder="?">, $a, b \in \mathbb{Z}$.</p><p class="feedback"></p></div>
+                        <div class="paso-demo" data-paso="2" style="display:none;"><p><b>Paso 2:</b> Sumar <i>m</i> y <i>n</i>.</p><p>$m+n = (2a+1) + (2b+1) = $ <input type="text" class="input-interactivo" id="demo1-paso2" placeholder="Simplifica"></p><p class="feedback"></p></div>
+                        <div class="paso-demo" data-paso="3" style="display:none;"><p><b>Paso 3:</b> Factorizar.</p><p>$2a+2b+2 = $ <input type="text" class="input-interactivo" id="demo1-paso3" placeholder="Factoriza el 2"></p><p class="feedback"></p></div>
+                        <div class="paso-demo" data-paso="4" style="display:none;"><p><b>Paso 4:</b> Concluir.</p><p>La suma es de la forma $2k$, por lo tanto es <select class="input-interactivo" id="demo1-paso4"><option value="">...</option><option value="par">par</option><option value="impar">impar</option></select>.</p><p class="feedback"></p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>3.3 Demostración por Contraposición</h2>
+                <div class="teorema"><p>En lugar de probar $ p \rightarrow q $, se prueba su contrapositiva lógicamente equivalente: $ \neg q \rightarrow \neg p $.</p></div>
+                <div class="interactivo">
+                    <h3>Constructor Guiado: Contraposición</h3>
+                    <p><strong>Teorema:</strong> Para $n \in \mathbb{Z}$, si $n^2$ es par, entonces $n$ es par.</p>
+                    <div id="demostracion-guiada-2">
+                        <div class="paso-demo" data-paso="1"><p><b>Paso 1:</b> Enunciar la contrapositiva.</p><p>Debemos probar: "Si <i>n</i> no es par, entonces <input type="text" class="input-interactivo" id="demo2-paso1" placeholder="conclusión...">".</p><p class="feedback"></p></div>
+                        <div class="paso-demo" data-paso="2" style="display:none;"><p><b>Paso 2:</b> Asumir la hipótesis de la contrapositiva.</p><p>Si <i>n</i> no es par, entonces <i>n</i> es impar. Así, $n = $ <input type="text" class="input-interactivo" id="demo2-paso2" placeholder="forma algebraica">, para $k \in \mathbb{Z}$.</p><p class="feedback"></p></div>
+                        <div class="paso-demo" data-paso="3" style="display:none;"><p><b>Paso 3:</b> Calcular $n^2$.</p><p>$n^2 = (2k+1)^2 = 4k^2+4k+1 = $ <input type="text" class="input-interactivo" id="demo2-paso3" placeholder="Factoriza para mostrar que es impar"></p><p class="feedback"></p></div>
+                        <div class="paso-demo" data-paso="4" style="display:none;"><p><b>Paso 4:</b> Concluir.</p><p>$n^2$ es de la forma $2m+1$, por lo tanto es <select class="input-interactivo" id="demo2-paso4"><option value="">...</option><option value="par">par</option><option value="impar">impar</option></select>, lo que completa la prueba.</p><p class="feedback"></p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>3.4 Demostración por Contradicción</h2>
+                <div class="teorema"><p>Se asume que la proposición a demostrar es falsa (es decir, $ p \land \neg q $) y se muestra que esto conduce a una contradicción.</p></div>
+                <div class="interactivo">
+                    <h3>Constructor Guiado: Irracionalidad de $\sqrt{2}$</h3>
+                    <p><strong>Teorema:</strong> $\sqrt{2}$ es un número irracional.</p>
+                    <div id="demostracion-guiada-3">
+                        <div class="paso-demo" data-paso="1"><p><b>Paso 1 (Suposición):</b> Asumimos que $\sqrt{2}$ es racional. Entonces $\sqrt{2} = \frac{a}{b}$ donde la fracción está <select class="input-interactivo" id="demo3-paso1"><option value="">...</option><option value="simplificada">simplificada</option></select>.</p><p class="feedback"></p></div>
+                        <div class="paso-demo" data-paso="2" style="display:none;"><p><b>Paso 2 (Álgebra):</b> $a^2 = 2b^2$. Esto nos dice que $a^2$ es <input class="input-interactivo" type="text" id="demo3-paso2" placeholder="par o impar?">.</p><p class="feedback"></p></div>
+                        <div class="paso-demo" data-paso="3" style="display:none;"><p><b>Paso 3 (Deducción):</b> Si $a^2$ es par, entonces $a$ es par. Así, $a = 2k$. Sustituyendo, $(2k)^2 = 2b^2$, que se simplifica a $b^2 = $ <input class="input-interactivo" type="text" id="demo3-paso3" placeholder="?"></p><p class="feedback"></p></div>
+                        <div class="paso-demo" data-paso="4" style="display:none;"><p><b>Paso 4 (Contradicción):</b> Esto implica que $b$ también es par. Si $a$ y $b$ son pares, la fracción no estaba simplificada. Esto <select class="input-interactivo" id="demo3-paso4"><option value="">...</option><option value="contradice">contradice</option></select> la suposición inicial.</p><p class="feedback"></p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>3.5 El Arte de Refutar: El Contraejemplo</h2>
+                <div class="definicion"><p>Para demostrar que una proposición universal ($\forall x, P(x)$) es <b>falsa</b>, basta con encontrar <b>un solo</b> elemento $c$ para el cual $P(c)$ sea falsa. Este elemento $c$ es un <strong>contraejemplo</strong>.</p></div>
+                <div class="interactivo">
+                    <h3>Buscador de Contraejemplos</h3>
+                    <p><strong>Proposición a refutar:</strong> "Para todo número natural $n$, la expresión $n^2 + 5n$ es múltiplo de 6."</p>
+                    <p>Encuentra un valor de $n$ que demuestre que esta afirmación es falsa.</p>
+                    <b>n = </b> <input type="number" class="input-interactivo" id="input-contraejemplo" min="1" style="width: 100px;">
+                    <button id="btn-verificar-contraejemplo" class="btn-generar">Verificar</button>
+                    <p class="feedback" id="feedback-contraejemplo"></p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>3.6 Demostración por Casos Separados</h2>
+                <div class="definicion"><p>Se utiliza cuando la hipótesis se puede dividir en un número finito de casos. Se demuestra que la conclusión es válida para cada uno de esos casos.</p></div>
+                <div class="interactivo">
+                    <h3>Constructor Guiado por Casos</h3>
+                    <p><strong>Teorema:</strong> Si $r$ es un entero, entonces $r(r+1)$ es par.</p>
+                    <div id="demostracion-guiada-4">
+                        <p><b>Caso 1: <i>r</i> es par.</b></p>
+                        <div class="paso-demo" data-paso="1"><p>Si <i>r</i> es par, $r = 2k$. Entonces $r(r+1) = 2k(2k+1) = 2 \times$ <input type="text" class="input-interactivo" id="demo4-paso1" placeholder="..."></p><p>Esto es de la forma $2h$, por lo tanto es par. <span class="feedback"></span></p></div>
+                        <p><b>Caso 2: <i>r</i> es impar.</b></p>
+                        <div class="paso-demo" data-paso="2"><p>Si <i>r</i> es impar, $r = 2k+1$. Entonces $r+1 = 2k+2$. Luego $r(r+1) = (2k+1)(2k+2) = 2 \times$ <input type="text" class="input-interactivo" id="demo4-paso2" placeholder="..."></p><p>Esto también es de la forma $2h$, por lo tanto es par. <span class="feedback"></span></p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>3.7 Inducción Matemática</h2>
+                <div class="definicion">
+                    <p>Para probar que $P(n)$ es verdadera para todo $n \ge n_0$:</p>
+                    <ol>
+                        <li><strong>Caso Base:</strong> Demostrar que $P(n_0)$ es verdadera.</li>
+                        <li><strong>Paso Inductivo:</strong> Asumir $P(k)$ (hipótesis de inducción) y usarla para demostrar $P(k+1)$.</li>
+                    </ol>
+                </div>
+                <div class="ejemplo">
+                    <p><strong>Teorema:</strong> $ \sum_{i=1}^{n} i = \frac{n(n+1)}{2} $ para todo $ n \ge 1 $.</p>
+                    <p>$$\sum_{i=1}^{k+1} i = \left(\sum_{i=1}^{k} i\right) + (k+1) \stackrel{H.I.}{=} \frac{k(k+1)}{2} + (k+1) = \frac{(k+1)(k+2)}{2}$$</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="diapositiva">
+            <div class="diapositiva-contenido">
+                <h2>Bibliografía y Referencias</h2>
+                <p>El contenido y la estructura de estas diapositivas se basan fundamentalmente en la siguiente obra, recomendada para una exploración más profunda.</p>
+                <div class="ejemplo" style="font-size: 1.1em;">
+                    <p>Portilla O., H. J., & Caicedo Z., S. J. (2021). <i>Introducción a los Métodos de Demostración Matemática</i>. Editorial Universidad de Nariño.</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <nav id="navegacion">
+        <button id="btn-anterior">&lt;</button>
+        <div id="barra-progreso-contenedor"><div id="barra-progreso"></div></div>
+        <button id="btn-siguiente">&gt;</button>
+    </nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Lógica de Navegación de Diapositivas ---
+    const diapositivas = document.querySelectorAll('.diapositiva');
+    const btnAnterior = document.getElementById('btn-anterior');
+    const btnSiguiente = document.getElementById('btn-siguiente');
+    let indiceActual = 0;
+
+    function cambiarDiapositiva(direccion) {
+        const nuevoIndice = indiceActual + direccion;
+        if (nuevoIndice >= 0 && nuevoIndice < diapositivas.length) {
+            indiceActual = nuevoIndice;
+            actualizarNavegacion();
+        }
+    }
+
+    function actualizarNavegacion() {
+        diapositivas.forEach((diapositiva, index) => {
+            diapositiva.classList.toggle('activa', index === indiceActual);
+        });
+
+        btnAnterior.disabled = (indiceActual === 0);
+        btnSiguiente.disabled = (indiceActual === diapositivas.length - 1);
+
+        const progreso = document.getElementById('barra-progreso');
+        const porcentaje = (diapositivas.length > 1) ? (indiceActual / (diapositivas.length - 1)) * 100 : 0;
+        progreso.style.width = porcentaje + '%';
+        
+        // Renderizar KaTeX en la diapositiva activa
+        setTimeout(() => {
+            if (window.renderMathInElement) {
+                try {
+                    renderMathInElement(diapositivas[indiceActual], { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });
+                } catch (error) { console.error("Error rendering KaTeX:", error); }
+            }
+        }, 50);
+    }
+
+    btnAnterior.addEventListener('click', () => cambiarDiapositiva(-1));
+    btnSiguiente.addEventListener('click', () => cambiarDiapositiva(1));
+    
+    // Inicialización
+    actualizarNavegacion();
+
+    // --- Lógica del Generador de Tablas de Verdad ---
+    const btnGenerarTabla = document.getElementById('btn-generar-tabla');
+    if(btnGenerarTabla) {
+        btnGenerarTabla.addEventListener('click', generarTablaDeVerdad);
+    }
+
+    function generarTablaDeVerdad() {
+        const formulaInput = document.getElementById('input-formula-logica').value;
+        const resultadoDiv = document.getElementById('resultado-tabla-verdad');
+        const errorDiv = document.getElementById('error-formula');
+        const clasificacionDiv = document.getElementById('clasificacion-formula');
+        resultadoDiv.innerHTML = '';
+        errorDiv.textContent = '';
+        clasificacionDiv.innerHTML = '';
+
+        try {
+            const formula = formulaInput
+               .replace(/¬/g, '!').replace(/~/g, '!')
+               .replace(/∧/g, '&')
+               .replace(/∨/g, '|')
+               .replace(/↔/g, '==')
+               .replace(/→/g, '>')
+               .replace(/\s+/g, '');
+
+            const variables = [...new Set(formula.match(/[pqr]/g) || [])].sort();
+            if (!variables.length) throw new Error("No se encontraron variables (p, q, r).");
+
+            const subexpresiones = obtenerSubexpresiones(formula);
+            const numRows = 1 << variables.length;
+            const headers = [...variables, ...subexpresiones];
+            
+            let tableHtml = '<table class="tabla-comparacion"><thead><tr>';
+            headers.forEach(h => {
+                const headerDisplay = h.replace(/!/g, '¬').replace(/&/g, '∧').replace(/\|/g, '∨').replace(/==/g, '↔').replace(/>/g, '→');
+                tableHtml += `<th>${headerDisplay}</th>`;
+            });
+            tableHtml += '</tr></thead><tbody>';
+            
+            const resultadosFinales = [];
+
+            for (let i = 0; i < numRows; i++) {
+                const valores = {};
+                let temp = i;
+                for (let j = variables.length - 1; j >= 0; j--) {
+                    valores[variables[j]] = (temp % 2 === 1);
+                    temp = Math.floor(temp / 2);
+                }
+
+                tableHtml += '<tr>';
+                variables.forEach(v => tableHtml += `<td>${valores[v] ? 'V' : 'F'}</td>`);
+                
+                subexpresiones.forEach((sub, index) => {
+                    const esPrincipal = index === subexpresiones.length - 1;
+                    let resultado;
+                    try {
+                        const subEval = sub.replace(/([a-zA-Z0-9\)]+)>([a-zA-Z0-9\(]+)/g, '(!$1 | $2)');
+                        const funcBody = `return ${subEval.replace(/([pqr])/g, 'valores.$1')};`;
+                        const evaluator = new Function('valores', funcBody);
+                        resultado = evaluator(valores);
+                    } catch(evalError) {
+                        throw new Error(`Sintaxis inválida: ${sub}`);
+                    }
+                    if (esPrincipal) resultadosFinales.push(resultado);
+                    tableHtml += `<td class="${esPrincipal ? 'columna-principal' : ''}">${resultado ? 'V' : 'F'}</td>`;
+                });
+                tableHtml += '</tr>';
+            }
+
+            tableHtml += '</tbody></table>';
+            resultadoDiv.innerHTML = tableHtml;
+            
+            const esTautologia = resultadosFinales.every(r => r === true);
+            const esContradiccion = resultadosFinales.every(r => r === false);
+
+            if (esTautologia) {
+                clasificacionDiv.textContent = 'La fórmula es una TAUTOLOGÍA.';
+                clasificacionDiv.style.color = 'var(--color-verde)';
+            } else if (esContradiccion) {
+                clasificacionDiv.textContent = 'La fórmula es una CONTRADICCIÓN.';
+                clasificacionDiv.style.color = 'var(--color-rojo)';
+            } else {
+                clasificacionDiv.textContent = 'La fórmula es una CONTINGENCIA.';
+                clasificacionDiv.style.color = 'var(--color-ambar)';
+            }
+
+        } catch (e) {
+            errorDiv.textContent = 'Error: ' + e.message;
+        }
+    }
+    
+    function obtenerSubexpresiones(formula) {
+        const subs = new Set();
+        const parentesisRegex = /\(([^()]+)\)/g;
+        let match;
+        while ((match = parentesisRegex.exec(formula)) !== null) {
+            subs.add(match[1]);
+        }
+        subs.add(formula);
+        return [...subs].sort((a, b) => a.length - b.length);
+    }
+    
+    // --- Lógica del Diagrama de Venn ---
+    const btnVenn = document.getElementById('btn-venn-actualizar');
+    if(btnVenn) {
+        btnVenn.addEventListener('click', actualizarVenn);
+        actualizarVenn();
+    }
+
+    function actualizarVenn() {
+        const setA_input = document.getElementById('input-set-a').value.split(',').map(s => s.trim()).filter(Boolean);
+        const setB_input = document.getElementById('input-set-b').value.split(',').map(s => s.trim()).filter(Boolean);
+        const operacion = document.getElementById('operacion-venn').value;
+        
+        const setA = new Set(setA_input);
+        const setB = new Set(setB_input);
+
+        const soloA = new Set([...setA].filter(x => !setB.has(x)));
+        const interseccion = new Set([...setA].filter(x => setB.has(x)));
+        const soloB = new Set([...setB].filter(x => !setA.has(x)));
+        const union = new Set([...setA, ...setB]);
+
+        document.getElementById('region-a').textContent = [...soloA].join(', ');
+        document.getElementById('region-interseccion').textContent = [...interseccion].join(', ');
+        document.getElementById('region-b').textContent = [...soloB].join(', ');
+        
+        document.querySelectorAll('.region-venn').forEach(el => el.classList.remove('resaltado'));
+        
+        let resultadoSet;
+        switch(operacion) {
+            case 'union':
+                document.getElementById('region-a').classList.add('resaltado');
+                document.getElementById('region-interseccion').classList.add('resaltado');
+                document.getElementById('region-b').classList.add('resaltado');
+                resultadoSet = union;
+                break;
+            case 'interseccion':
+                document.getElementById('region-interseccion').classList.add('resaltado');
+                resultadoSet = interseccion;
+                break;
+            case 'diferencia_a_b':
+                document.getElementById('region-a').classList.add('resaltado');
+                resultadoSet = soloA;
+                break;
+            case 'diferencia_b_a':
+                document.getElementById('region-b').classList.add('resaltado');
+                resultadoSet = soloB;
+                break;
+        }
+        document.getElementById('resultado-venn').textContent = `{ ${[...resultadoSet].join(', ')} }`;
+    }
+    
+    // --- Lógica del Conjunto Potencia ---
+    const btnPotencia = document.getElementById('btn-generar-potencia');
+    if(btnPotencia) {
+        btnPotencia.addEventListener('click', generarConjuntoPotencia);
+        generarConjuntoPotencia();
+    }
+
+    function generarConjuntoPotencia() {
+        const input = document.getElementById('input-set-potencia').value;
+        const resultadoSpan = document.getElementById('resultado-potencia');
+        const elementos = input.split(',').map(s => s.trim()).filter(Boolean);
+        
+        const subconjuntos = [];
+        const numSubconjuntos = 1 << elementos.length; // 2^n
+
+        for (let i = 0; i < numSubconjuntos; i++) {
+            const subconjunto = [];
+            for (let j = 0; j < elementos.length; j++) {
+                if ((i >> j) & 1) {
+                    subconjunto.push(elementos[j]);
+                }
+            }
+            subconjuntos.push(`{${subconjunto.join(', ')}}`);
+        }
+        
+        resultadoSpan.textContent = `{ ${subconjuntos.join(', ')} }`;
+    }
+
+    // --- Lógica de las Demostraciones Guiadas ---
+    function setupDemostracionGuiada(respuestas, demoId) {
+        Object.keys(respuestas).forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', () => verificarPasoDemo(id, respuestas, demoId));
+            }
+        });
+    }
+
+    function verificarPasoDemo(id, respuestas, demoId) {
+        const input = document.getElementById(id);
+        const valorUsuario = input.value.trim().replace(/\s+/g, '');
+        const valorCorrecto = respuestas[id];
+        const pasoActual = input.closest('.paso-demo');
+        const feedback = pasoActual.querySelector('.feedback');
+        
+        if (valorUsuario.toLowerCase() === valorCorrecto.toLowerCase()) {
+            feedback.textContent = '¡Correcto!';
+            feedback.style.color = 'var(--color-verde)';
+            input.disabled = true;
+            
+            const numPaso = parseInt(pasoActual.dataset.paso, 10);
+            const siguientePaso = document.querySelector(`#${demoId} .paso-demo[data-paso="${numPaso + 1}"]`);
+            if (siguientePaso) {
+                siguientePaso.style.display = 'block';
+            } else {
+                const finalFeedback = document.createElement('p');
+                finalFeedback.textContent = '¡Felicidades! Has completado la demostración.';
+                finalFeedback.style.fontWeight = 'bold';
+                finalFeedback.style.color = 'var(--color-primario)';
+                document.getElementById(demoId).appendChild(finalFeedback);
+            }
+        } else {
+            feedback.textContent = 'Inténtalo de nuevo.';
+            feedback.style.color = 'var(--color-rojo)';
+        }
+    }
+
+    setupDemostracionGuiada({'demo1-paso1': '2b+1', 'demo1-paso2': '2a+2b+2', 'demo1-paso3': '2(a+b+1)', 'demo1-paso4': 'par'}, 'demostracion-guiada-1');
+    setupDemostracionGuiada({'demo2-paso1': 'n²noespar', 'demo2-paso2': '2k+1', 'demo2-paso3': '2(2k²+2k)+1', 'demo2-paso4': 'impar'}, 'demostracion-guiada-2');
+    setupDemostracionGuiada({'demo3-paso1': 'simplificada', 'demo3-paso2': 'par', 'demo3-paso3': '2k²', 'demo3-paso4': 'contradice'}, 'demostracion-guiada-3');
+    
+    // Demostración por casos
+    const respuestasDemo4 = {'demo4-paso1': 'k(2k+1)', 'demo4-paso2': '(2k+1)(k+1)'};
+    Object.keys(respuestasDemo4).forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', () => {
+                const valorUsuario = input.value.trim().replace(/\s+/g, '');
+                const feedback = input.parentElement.querySelector('.feedback');
+                if (valorUsuario.toLowerCase() === respuestasDemo4[id].toLowerCase()) {
+                    feedback.textContent = ' ¡Correcto!';
+                    feedback.style.color = 'var(--color-verde)';
+                    input.disabled = true;
+                } else {
+                    feedback.textContent = ' Inténtalo de nuevo.';
+                    feedback.style.color = 'var(--color-rojo)';
+                }
+            });
+        }
+    });
+
+    // --- Lógica del Contraejemplo ---
+    document.getElementById('btn-verificar-contraejemplo')?.addEventListener('click', () => {
+        const input = document.getElementById('input-contraejemplo');
+        const feedback = document.getElementById('feedback-contraejemplo');
+        const n = parseInt(input.value, 10);
+        
+        if (isNaN(n) || n < 1) {
+            feedback.textContent = 'Por favor, introduce un número natural válido.';
+            feedback.style.color = 'var(--color-rojo)';
+            return;
+        }
+        
+        const resultado = n*n + 5*n;
+        if (resultado % 6 !== 0) {
+            feedback.textContent = `¡Correcto! Para n=${n}, el resultado es ${resultado}, que no es múltiplo de 6.`;
+            feedback.style.color = 'var(--color-verde)';
+        } else {
+            feedback.textContent = `Incorrecto. Para n=${n}, el resultado es ${resultado}, que sí es múltiplo de 6. Intenta con otro valor.`;
+            feedback.style.color = 'var(--color-rojo)';
+        }
+    });
+});
+</script>
+
+</body>
+</html>
