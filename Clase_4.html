@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aritmética Entera y Modular</title>
+    
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOVEMeaPoAbJNdMYGNhZLvCRMnYRs5EEockpiCIACSEwsxHQocVI" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #10b981;
+            --background-color: #f8fafc;
+            --text-color: #1f2937;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --border-radius: 0.75rem;
+        }
+
+        /* Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        /* Main Presentation Container */
+        #presentation-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 90vh;
+            max-height: 700px;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Slide Content Area */
+        #slide-content {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden; /* Ocultar slides que se mueven */
+        }
+
+        /* Slide Styling */
+        .slide {
+            position: absolute; /* Posicionamiento para animación */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 2.5rem 3rem;
+            overflow-y: auto;
+            background-color: var(--card-bg);
+            visibility: hidden; /* Ocultar slides no activas */
+            backface-visibility: hidden;
+        }
+
+        .slide.active {
+            visibility: visible;
+            z-index: 10;
+        }
+
+        /* Keyframes for slide animations */
+        @keyframes slideInFromRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        @keyframes slideOutToLeft {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
+        }
+        @keyframes slideOutToRight {
+            from { transform: translateX(0); }
+            to { transform: translateX(100%); }
+        }
+
+        .slide-in-right { animation: slideInFromRight 0.5s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .slide-in-left { animation: slideInFromLeft 0.5s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .slide-out-left { animation: slideOutToLeft 0.5s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .slide-out-right { animation: slideOutToRight 0.5s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        
+        /* Typography */
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 2rem; border-bottom: 2px solid var(--secondary-color); padding-bottom: 0.5rem; }
+        h3 { font-size: 1.5rem; color: #374151; margin-top: 1.5rem;}
+        p { margin-bottom: 1rem; }
+        ul, ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.5rem; }
+        strong { color: var(--primary-color); font-weight: 600; }
+        em { color: var(--secondary-color); font-style: normal; font-weight: 500;}
+        mark { background-color: #a7f3d0; padding: 0.2em 0.4em; border-radius: 0.25rem; }
+        code {
+            font-family: monospace;
+            background-color: #eef2ff;
+            color: #4338ca;
+            padding: 0.2em 0.4em;
+            border-radius: 0.25rem;
+            font-size: 0.9em;
+        }
+        pre code {
+            display: block;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            white-space: pre-wrap;
+        }
+
+        /* Navigation Controls */
+        #navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-top: 1px solid var(--border-color);
+            background-color: #f9fafb;
+            gap: 1.5rem;
+        }
+        
+        #progress-bar-container {
+            flex-grow: 1;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            margin: 0 1.5rem;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            width: 0;
+            height: 100%;
+            background-color: var(--secondary-color);
+            transition: width 0.3s ease-out;
+        }
+
+        .nav-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px; /* Pill shape */
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            box-shadow: var(--shadow);
+        }
+        .nav-button:hover:not(:disabled) {
+            background-color: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .nav-button:disabled { 
+            background-color: #a5b4fc; 
+            cursor: not-allowed; 
+            opacity: 0.7;
+        }
+        .nav-button i {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Specific Slide Styles */
+        /* Cover Slide */
+        #slide-1 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+            background: linear-gradient(135deg, #6366f1, #3b82f6);
+            color: white;
+            z-index: 10; /* Ensure cover is on top initially */
+        }
+        #slide-1 h1 { color: white; font-size: 3.5rem; }
+        #slide-1 p { font-size: 1.5rem; color: #e0e7ff; }
+
+        /* General Content Layouts */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            align-items: start;
+        }
+        .info-card, .simulator-card, .quiz-card, .glossary-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        /* Interactive elements */
+        .simulator-card input, .simulator-card button {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+        }
+        .simulator-card button {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .simulator-card button:hover { background-color: #059669; }
+        .simulator-output {
+            margin-top: 1rem;
+            background-color: #f0fdf4;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--secondary-color);
+            font-size: 1.1rem;
+            font-weight: 500;
+            min-height: 50px;
+        }
+
+        /* Mental Map */
+        .mental-map { list-style: none; padding: 0; }
+        .mental-map li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+        .mental-map li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 15px;
+            height: 15px;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+            border: 3px solid #d1fae5;
+        }
+        .mental-map ul { margin-top: 10px; padding-left: 20px; border-left: 2px solid var(--border-color); }
+
+        /* Accordion for Exercises */
+        .accordion-item {
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .accordion-header {
+            background-color: #f9fafb;
+            padding: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .accordion-header .feather {
+            transition: transform 0.3s ease-in-out;
+        }
+        .accordion-header.open .feather {
+            transform: rotate(180deg);
+        }
+        .accordion-content {
+            padding: 1rem;
+            display: none;
+            border-top: 1px solid var(--border-color);
+            background-color: white;
+        }
+        .accordion-content p:last-child { margin-bottom: 0; }
+
+        /* Quiz */
+        .quiz-question { margin-bottom: 1.5rem; }
+        .quiz-options { list-style: none; padding: 0; }
+        .quiz-options li { margin-bottom: 0.5rem; }
+        .quiz-feedback { margin-top: 1rem; padding: 1rem; border-radius: 0.5rem; font-weight: 500; }
+        .correct { background-color: #dcfce7; border-left: 4px solid #22c55e; }
+        .incorrect { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+
+        /* Glossary */
+        .glossary-list { list-style: none; padding: 0; }
+        .glossary-term {
+            background-color: #eef2ff;
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .glossary-term:hover { background-color: #e0e7ff; }
+        .glossary-definition {
+            display: none;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            background-color: #f5f3ff;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="presentation-container">
+        <div id="slide-content">
+            
+            <!-- Slide 1: Portada -->
+            <div id="slide-1" class="slide active">
+                <h1>Aritmética Entera y Modular</h1>
+                <p>Fundamentos Clave en Matemáticas Discretas</p>
+                <br>
+                <p style="font-size: 1rem; color: #c7d2fe;">Por: Dudbil Olvasada Pabon Riaño</p>
+            </div>
+
+            <!-- Slide 2: Introducción y Motivación -->
+            <div id="slide-2" class="slide">
+                <h2><i data-feather="book" style="vertical-align: middle;"></i> Introducción General</h2>
+                <p>Los <strong>números enteros</strong> (representados por el símbolo $ \mathbb{Z} $, derivado de la palabra alemana <em>"zahl"</em>) son un concepto fundamental en todas las matemáticas. La teoría de números se ha ampliado para abarcar la totalidad de los enteros, no solo los positivos.</p>
+                <div class="info-card">
+                    <h3>Propiedades Algebraicas de los Enteros</h3>
+                    <ul>
+                        <li><strong>Leyes de cerradura:</strong> La suma y el producto de dos enteros resultan en un entero.</li>
+                        <li><strong>Leyes conmutativas:</strong> $a + b = b + a$; $a \times b = b \times a$.</li>
+                        <li><strong>Leyes asociativas:</strong> $(a + b) + c = a + (b + c)$; $(ab)c = a(bc)$.</li>
+                        <li><strong>Neutro aditivo (0) y multiplicativo (1):</strong> $a + 0 = a$; $a \times 1 = a$.</li>
+                        <li><strong>Inverso aditivo:</strong> Para cada entero $a$, existe un único $-a$ tal que $a + (-a) = 0$.</li>
+                        <li><strong>Ley distributiva:</strong> $a \times (b + c) = (a \times b) + (a \times c)$.</li>
+                         <li><strong>Propiedad del cero:</strong> Si $a \times b = 0$, entonces $a = 0$ o $b = 0$.</li>
+                    </ul>
+                </div>
+                <p style="margin-top: 1rem;">La <strong>aritmética modular</strong>, introducida por Carl Gauss en 1801, es una rama que estudia las <mark>congruencias</mark>. Es compatible con las operaciones de suma y multiplicación, simplificando cálculos de divisibilidad y teniendo aplicaciones clave en criptografía e informática.</p>
+            </div>
+
+            <!-- Slide 3: Objetivos de Aprendizaje -->
+            <div id="slide-3" class="slide">
+                <h2><i data-feather="check-circle" style="vertical-align: middle;"></i> Objetivos de Aprendizaje</h2>
+                <p>Al finalizar esta unidad, serás capaz de:</p>
+                <ul>
+                    <li><strong>Comprender</strong> el concepto de <mark>partición</mark> y su estrecha relación con la divisibilidad y las clases de equivalencia.</li>
+                    <li><strong>Interpretar y utilizar</strong> la notación estándar de <em>pseudocódigo</em> para describir algoritmos de manera clara y precisa.</li>
+                    <li><strong>Aplicar</strong> el <strong>Algoritmo de la División</strong> para encontrar cocientes y residuos de forma sistemática.</li>
+                    <li><strong>Utilizar</strong> el eficiente <strong>Algoritmo de Euclides</strong> para calcular el máximo común divisor (MCD) de dos enteros.</li>
+                    <li><strong>Resolver</strong> problemas y realizar cálculos utilizando el concepto de <strong>congruencias</strong> y las reglas de la aritmética modular.</li>
+                </ul>
+            </div>
+
+            <!-- Slide 4: Mapa Mental -->
+            <div id="slide-4" class="slide">
+                <h2><i data-feather="git-merge" style="vertical-align: middle;"></i> Mapa Mental de la Unidad</h2>
+                <ul class="mental-map">
+                    <li><strong>Aritmética Entera y Modular</strong>
+                        <ul>
+                            <li><strong>Conceptos Fundamentales</strong>
+                                <ul>
+                                    <li>Particiones: División de un conjunto en subconjuntos disjuntos.</li>
+                                    <li>Divisibilidad: Un entero $d$ divide a $a$ si $a = dk$ para algún entero $k$.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Algoritmos Clave</strong>
+                                <ul>
+                                    <li>Notación (Pseudocódigo): Lenguaje estructurado para describir algoritmos.</li>
+                                    <li>Algoritmo de la División: $a = dq + r$.</li>
+                                    <li>Algoritmo de Euclides: Método eficiente para encontrar el MCD.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Aritmética Modular</strong>
+                                <ul>
+                                    <li>Congruencias: $a \equiv b \pmod{m}$.</li>
+                                    <li>Clases de residuos: Conjuntos de enteros con el mismo residuo.</li>
+                                    <li>Aplicaciones: Criptografía, Hashing, etc.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Slide 5: Particiones -->
+            <div id="slide-5" class="slide">
+                <h2><i data-feather="grid" style="vertical-align: middle;"></i> Particiones</h2>
+                <p>El concepto de partición se aplica tanto a conjuntos como a enteros y está estrechamente relacionado con las <strong>relaciones de equivalencia</strong>.</p>
+                <div class="content-grid">
+                    <div class="info-card">
+                        <h3>Particiones de Conjuntos</h3>
+                        <p>Una partición $P$ de un conjunto $S$ es una colección de subconjuntos no vacíos (<em>celdas</em>) que son <strong>mutuamente disjuntos</strong> y cuya <strong>unión es $S$</strong>.</p>
+                        <p>Cada relación de equivalencia sobre un conjunto induce una partición, donde las celdas son las clases de equivalencia.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Particiones de Enteros</h3>
+                        <p>Una partición de un entero positivo $k$ es una colección no ordenada de enteros positivos cuya suma es $k$.</p>
+                        <p>Ejemplo: Las particiones de <strong>5</strong> son:</p>
+                        <ul>
+                           <li>1+1+1+1+1</li>
+                           <li>2+1+1+1</li>
+                           <li>2+2+1</li>
+                           <li>3+1+1</li>
+                           <li>3+2</li>
+                           <li>4+1</li>
+                           <li>5</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Notación para los Algoritmos -->
+            <div id="slide-6" class="slide">
+                <h2><i data-feather="code" style="vertical-align: middle;"></i> Notación para los Algoritmos</h2>
+                <p>Un <strong>algoritmo</strong> es una lista finita y paso a paso de instrucciones bien definidas para resolver un problema. Para representarlos, usamos <strong>seudocódigo</strong> por su precisión y universalidad.</p>
+                <h3>Propiedades de un Algoritmo:</h3>
+                <ol>
+                    <li><strong>Precisión:</strong> Pasos claros y sin ambigüedades.</li>
+                    <li><strong>Unicidad:</strong> Resultados intermedios definidos unívocamente.</li>
+                    <li><strong>Carácter Finito:</strong> Debe detenerse en un número finito de pasos.</li>
+                    <li><strong>Entrada y Salida:</strong> Recibe datos y produce un resultado.</li>
+                    <li><strong>Generalidad:</strong> Aplicable a un conjunto de entradas, no a un caso único.</li>
+                </ol>
+                <h3>Estructura en Seudocódigo:</h3>
+                <pre><code>// Comentario descriptivo
+procedure NOMBRE(parámetros)
+    input: Descripción de la entrada.
+    output: Descripción de la salida.
+
+    // Cuerpo del algoritmo con asignaciones (:=),
+    // condicionales (if-then-else) y bucles (for, while).
+    
+    return valor</code></pre>
+            </div>
+
+            <!-- Slide 7: El Algoritmo de la División -->
+            <div id="slide-7" class="slide">
+                <h2><i data-feather="divide-circle" style="vertical-align: middle;"></i> El Algoritmo de la División</h2>
+                <div class="content-grid">
+                    <div>
+                        <div class="info-card">
+                            <strong>Teorema:</strong> Sean $a$ y $b$ dos enteros, con $b \neq 0$. Existen enteros <strong>únicos</strong> $q$ (cociente) y $r$ (residuo) tales que:
+                            $$ a = b \cdot q + r \quad \text{donde} \quad 0 \leq r < |b| $$
+                        </div>
+                        <h3>Aplicaciones Clave:</h3>
+                        <ul>
+                            <li><strong>Clasificación de enteros:</strong> Demostrar si un número es par ($2k$) o impar ($2k+1$).</li>
+                            <li><strong>Conversión de bases numéricas:</strong> Es la base para pasar de decimal a binario, hexadecimal, etc.</li>
+                            <li><strong>Aritmética modular:</strong> Fundamenta la operación <em>módulo</em> ($a \pmod b$).</li>
+                        </ul>
+                    </div>
+                    <div class="simulator-card">
+                        <h3>Simulador Interactivo</h3>
+                        <p>Calcula $q$ y $r$ para $a = bq+r$.</p>
+                        <input type="number" id="div-a" placeholder="Dividendo (a)">
+                        <input type="number" id="div-d" placeholder="Divisor (b ≠ 0)">
+                        <button onclick="calculateDivision()">Calcular q y r</button>
+                        <div id="division-output" class="simulator-output"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8: El Algoritmo de Euclides -->
+            <div id="slide-8" class="slide">
+                <h2><i data-feather="share-2" style="vertical-align: middle;"></i> El Algoritmo de Euclides</h2>
+                 <div class="content-grid">
+                    <div>
+                        <p>Es un método antiguo y eficiente para encontrar el <strong>Máximo Común Divisor (MCD)</strong> de dos enteros. Se basa en el principio de que $\text{mcd}(a, b) = \text{mcd}(b, r)$, donde $r$ es el residuo de $a$ dividido por $b$.</p>
+                        <h3>Análisis de Complejidad:</h3>
+                        <p>El algoritmo es notablemente rápido. El peor caso ocurre con números de Fibonacci consecutivos, y su complejidad se estima en $O(\log n)$.</p>
+                         <h3>Aplicaciones:</h3>
+                        <ul>
+                            <li>Reducir fracciones a su mínima expresión.</li>
+                            <li>Resolver ecuaciones diofánticas lineales.</li>
+                            <li>Calcular inversos en $Z_m$.</li>
+                            <li>Es una parte esencial del criptosistema <strong>RSA</strong>.</li>
+                        </ul>
+                    </div>
+                    <div class="simulator-card">
+                        <h3>Calculadora de MCD</h3>
+                        <input type="number" id="gcd-a" placeholder="Entero a (≥ 0)">
+                        <input type="number" id="gcd-b" placeholder="Entero b (≥ 0)">
+                        <button onclick="calculateGCD()">Calcular MCD</button>
+                        <div id="gcd-output" class="simulator-output"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 9: Congruencias -->
+            <div id="slide-9" class="slide">
+                 <h2><i data-feather="clock" style="vertical-align: middle;"></i> Congruencias</h2>
+                 <div class="content-grid">
+                    <div>
+                        <p>Dos enteros $a$ y $b$ son <strong>congruentes módulo m</strong> si $m$ divide su diferencia $(a-b)$.</p>
+                        <div class="info-card">
+                            <strong>Definición:</strong> $ a \equiv b \pmod{m} $
+                        </div>
+                         <p>La congruencia es una <strong>relación de equivalencia</strong> (reflexiva, simétrica y transitiva), que particiona $\mathbb{Z}$ en $m$ <strong>clases de residuos</strong> ($Z_m$).</p>
+                         <h3>Aritmética de Congruencias</h3>
+                         <p>Si $a \equiv c \pmod m$ y $b \equiv d \pmod m$, entonces:</p>
+                         <ul>
+                             <li>$a+b \equiv c+d \pmod m$</li>
+                             <li>$a \cdot b \equiv c \cdot d \pmod m$</li>
+                         </ul>
+                         <p><mark>Teorema de Euler:</mark> Si $\text{mcd}(a, m) = 1$, entonces $a^{\phi(m)} \equiv 1 \pmod m$.</p>
+                    </div>
+                    <div class="simulator-card">
+                        <h3>Verificador de Congruencia</h3>
+                        <input type="number" id="cong-a" placeholder="Entero a">
+                        <input type="number" id="cong-b" placeholder="Entero b">
+                        <input type="number" id="cong-m" placeholder="Módulo m (> 0)">
+                        <button onclick="checkCongruence()">Verificar</button>
+                        <div id="congruence-output" class="simulator-output"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 10: Ejercicios Prácticos -->
+            <div id="slide-10" class="slide">
+                <h2><i data-feather="edit-3" style="vertical-align: middle;"></i> Ejercicios Prácticos</h2>
+                <p>Pon a prueba tus conocimientos. Intenta resolver los siguientes problemas y luego haz clic para ver la solución.</p>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>Ejercicio 1: Algoritmo de la División</span>
+                        <i data-feather="chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>Problema:</strong> Encuentra el cociente $q$ y el residuo $r$ para $a = 101$ y $d = 13$.</p>
+                        <p><strong>Solución:</strong> Buscamos $101 = 13q + r$. Dividiendo, tenemos que $101 / 13 \approx 7.76$. Probamos con $q=7$. <br> $13 \cdot 7 = 91$. <br> El residuo es $r = 101 - 91 = 10$. <br>Como $0 \leq 10 < 13$, la respuesta es correcta. <br><strong>Resultado:</strong> $q=7, r=10$.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>Ejercicio 2: Algoritmo de Euclides</span>
+                        <i data-feather="chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>Problema:</strong> Calcula el $\text{mcd}(252, 198)$.</p>
+                        <p><strong>Solución:</strong>
+                        <ol>
+                            <li>$252 = 1 \cdot 198 + 54$</li>
+                            <li>$198 = 3 \cdot 54 + 36$</li>
+                            <li>$54 = 1 \cdot 36 + 18$</li>
+                            <li>$36 = 2 \cdot 18 + 0$</li>
+                        </ol>
+                        El último residuo no nulo es 18. <br><strong>Resultado:</strong> $\text{mcd}(252, 198) = 18$.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>Ejercicio 3: Congruencias</span>
+                        <i data-feather="chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>Problema:</strong> ¿Es verdad que $91 \equiv 1 \pmod 9$?</p>
+                        <p><strong>Solución:</strong> Verificamos si $9$ divide a $(91 - 1) = 90$. <br>Como $90 = 9 \cdot 10$, la división es exacta. <br><strong>Resultado:</strong> Sí, la congruencia es verdadera.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 11: Cuestionario -->
+            <div id="slide-11" class="slide">
+                <h2><i data-feather="help-circle" style="vertical-align: middle;"></i> Cuestionario Rápido</h2>
+                <div id="quiz-container" class="quiz-card">
+                    <div class="quiz-question" id="q1">
+                        <p><strong>1. ¿Cuál es el residuo cuando -34 es dividido por 9?</strong></p>
+                        <ul class="quiz-options">
+                            <li><label><input type="radio" name="q1" value="a"> -7</label></li>
+                            <li><label><input type="radio" name="q1" value="b"> 2</label></li>
+                            <li><label><input type="radio" name="q1" value="c"> 7</label></li>
+                            <li><label><input type="radio" name="q1" value="d"> -2</label></li>
+                        </ul>
+                    </div>
+                    <div class="quiz-question" id="q2">
+                        <p><strong>2. ¿Cuál es el mcd(84, 98) según el algoritmo de Euclides?</strong></p>
+                        <ul class="quiz-options">
+                            <li><label><input type="radio" name="q2" value="a"> 7</label></li>
+                            <li><label><input type="radio" name="q2" value="b"> 14</label></li>
+                            <li><label><input type="radio" name="q2" value="c"> 2</label></li>
+                            <li><label><input type="radio" name="q2" value="d"> 28</label></li>
+                        </ul>
+                    </div>
+                     <div class="quiz-question" id="q3">
+                        <p><strong>3. ¿Cuál de las siguientes congruencias es FALSA?</strong></p>
+                        <ul class="quiz-options">
+                            <li><label><input type="radio" name="q3" value="a"> $100 \equiv 2 \pmod 7$</label></li>
+                            <li><label><input type="radio" name="q3" value="b"> $-5 \equiv 10 \pmod 5$</label></li>
+                            <li><label><input type="radio" name="q3" value="c"> $50 \equiv 18 \pmod 8$</label></li>
+                            <li><label><input type="radio" name="q3" value="d"> $45 \equiv 25 \pmod 4$</label></li>
+                        </ul>
+                    </div>
+                    <button onclick="checkQuiz()">Revisar Respuestas</button>
+                    <div id="quiz-results" class="simulator-output" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Slide 12: Glosario Interactivo -->
+            <div id="slide-12" class="slide">
+                <h2><i data-feather="book-open" style="vertical-align: middle;"></i> Glosario Interactivo</h2>
+                <p>Haz clic en un término para ver su definición.</p>
+                <div class="glossary-card">
+                    <dl class="glossary-list">
+                        <dt class="glossary-term" onclick="toggleGlossary(this)">Congruencia</dt>
+                        <dd class="glossary-definition">Relación entre dos enteros que indica que tienen el mismo residuo al ser divididos por un entero positivo, llamado módulo.</dd>
+                        
+                        <dt class="glossary-term" onclick="toggleGlossary(this)">Divisibilidad</dt>
+                        <dd class="glossary-definition">Un entero $d$ divide a un entero $a$ si existe un entero $k$ tal que $a = dk$. Se denota como $d|a$.</dd>
+
+                        <dt class="glossary-term" onclick="toggleGlossary(this)">Máximo Común Divisor (MCD)</dt>
+                        <dd class="glossary-definition">El entero positivo más grande que divide a dos o más enteros sin dejar residuo.</dd>
+
+                        <dt class="glossary-term" onclick="toggleGlossary(this)">Partición</dt>
+                        <dd class="glossary-definition">Una división de un conjunto en subconjuntos no vacíos, mutuamente disjuntos, cuya unión forma el conjunto original.</dd>
+
+                        <dt class="glossary-term" onclick="toggleGlossary(this)">Residuo</dt>
+                        <dd class="glossary-definition">El entero $r$ que queda después de dividir un entero $a$ por un entero positivo $d$, tal que $0 \leq r < d$.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Slide 13: Conclusiones -->
+            <div id="slide-13" class="slide">
+                <h2><i data-feather="award" style="vertical-align: middle;"></i> Conclusiones</h2>
+                <p>Hemos viajado desde los fundamentos de la división hasta el elegante mundo de la aritmética modular. Estos no son solo conceptos abstractos, sino herramientas poderosas y esenciales en la era digital.</p>
+                <ul>
+                    <li>El <strong>Algoritmo de la División</strong> y el <strong>Algoritmo de Euclides</strong> son ejemplos perfectos de cómo procedimientos simples y antiguos siguen siendo fundamentales en la computación moderna.</li>
+                    <li>Las <strong>particiones</strong> y las <strong>clases de equivalencia</strong> nos dan una forma de estructurar y clasificar conjuntos infinitos como los enteros.</li>
+                    <li>La <strong>aritmética modular</strong> es la columna vertebral de la seguridad informática, permitiendo el desarrollo de algoritmos criptográficos como RSA, que protegen nuestra información en línea todos los días.</li>
+                </ul>
+                <p>Dominar estos temas te abre la puerta a campos fascinantes como la criptografía, la teoría de códigos, y el diseño de algoritmos complejos. ¡Sigue explorando!</p>
+            </div>
+
+            <!-- Slide 14: Bibliografía -->
+            <div id="slide-14" class="slide">
+                <h2><i data-feather="archive" style="vertical-align: middle;"></i> Bibliografía y Recursos</h2>
+                <p>Los siguientes textos sirvieron como referencia y son excelentes recursos para profundizar en los temas de matemáticas discretas (formato APA 7).</p>
+                <ul>
+                    <li>Espinosa Armenta, R. (2017). <em>Matemáticas discretas</em> (2.ª ed.). Alfaomega Grupo Editor.</li>
+                    <li>Johnsonbaugh, R. (1999). <em>Matemáticas discretas</em> (4.ª ed.). Prentice Hall.</li>
+                    <li>Lipschutz, S., & Lipson, M. L. (2009). <em>Matemáticas discretas</em> (3.ª ed.). McGraw-Hill Interamericana.</li>
+                    <li>Villalpando Becerra, J. F., & García Sandoval, A. (2014). <em>Matemáticas discretas: Aplicaciones y ejercicios</em>. Grupo Editorial Patria.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="navigation">
+            <button id="prev-btn" class="nav-button" onclick="changeSlide(-1)"><i data-feather="arrow-left"></i> Anterior</button>
+            <span id="slide-counter"></span>
+            <div id="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
+            <button id="next-btn" class="nav-button" onclick="changeSlide(1)">Siguiente <i data-feather="arrow-right"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // --- Core Presentation Logic ---
+        let currentSlide = 1;
+        const slides = document.querySelectorAll(".slide");
+        const totalSlides = slides.length;
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const progressBar = document.getElementById("progress-bar");
+        const slideCounter = document.getElementById("slide-counter");
+        let isAnimating = false; // Flag to prevent animation overlap
+
+        function showSlide(slideNumber) {
+            // Initial setup, no animation
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'slide-in-right', 'slide-in-left', 'slide-out-left', 'slide-out-right');
+                if (index + 1 === slideNumber) {
+                    slide.classList.add('active');
+                }
+            });
+            currentSlide = slideNumber;
+            updateNavigation();
+            
+            // Re-render Math and Icons for the current slide
+            const activeSlide = document.getElementById(`slide-${slideNumber}`);
+            if (activeSlide) {
+                 renderMathInElement(activeSlide, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ]
+                });
+                feather.replace();
+            }
+        }
+
+        function changeSlide(direction) {
+            if (isAnimating) return;
+
+            const oldSlideNumber = currentSlide;
+            const newSlideNumber = currentSlide + direction;
+
+            if (newSlideNumber < 1 || newSlideNumber > totalSlides) return;
+            
+            isAnimating = true;
+
+            const oldSlide = document.getElementById(`slide-${oldSlideNumber}`);
+            const newSlide = document.getElementById(`slide-${newSlideNumber}`);
+            
+            // Render math and icons on the new slide BEFORE animation
+            renderMathInElement(newSlide, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+            feather.replace();
+
+            const outClass = direction > 0 ? 'slide-out-left' : 'slide-out-right';
+            const inClass = direction > 0 ? 'slide-in-right' : 'slide-in-left';
+
+            newSlide.classList.add('active'); // Make it visible for animation
+            oldSlide.classList.add(outClass);
+            newSlide.classList.add(inClass);
+
+            currentSlide = newSlideNumber;
+            updateNavigation();
+            
+            // Clean up classes after animation
+            setTimeout(() => {
+                oldSlide.classList.remove('active', outClass);
+                newSlide.classList.remove(inClass);
+                isAnimating = false;
+            }, 500); // Must match CSS animation duration
+        }
+
+        function updateNavigation() {
+            prevBtn.disabled = (currentSlide === 1);
+            nextBtn.disabled = (currentSlide === totalSlides);
+            
+            // Update slide counter text
+            slideCounter.textContent = `${currentSlide} / ${totalSlides}`;
+
+            const progress = ((currentSlide - 1) / (totalSlides - 1)) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showSlide(1);
+        });
+
+        // --- Interactive Simulators Logic ---
+        function calculateDivision() {
+            const a = parseInt(document.getElementById('div-a').value);
+            const b = parseInt(document.getElementById('div-d').value); // Corrected id to div-d to match HTML
+            const output = document.getElementById('division-output');
+
+            if (isNaN(a) || isNaN(b)) {
+                output.innerHTML = "Por favor, introduce valores enteros.";
+                return;
+            }
+            if (b === 0) { // Corrected check for divisor
+                output.innerHTML = "El divisor 'b' no puede ser cero.";
+                return;
+            }
+            
+            const d = Math.abs(b);
+            let q = Math.floor(a / b);
+            let r = a % b;
+
+            if (r < 0) {
+                if (b > 0) {
+                    r += b;
+                    q -= 1;
+                } else {
+                    r -= b;
+                    q += 1;
+                }
+            }
+            output.innerHTML = `Resultado: <br> ${a} = ${b} &times; (${q}) + ${r} <br> q = ${q}, r = ${r}`;
+        }
+
+        function calculateGCD() {
+            let a = Math.abs(parseInt(document.getElementById('gcd-a').value));
+            let b = Math.abs(parseInt(document.getElementById('gcd-b').value));
+            const output = document.getElementById('gcd-output');
+            
+            if (isNaN(a) || isNaN(b)) {
+                output.innerHTML = "Por favor, introduce valores enteros.";
+                return;
+            }
+
+            let steps = "";
+            let originalA = a;
+            let originalB = b;
+
+            while (b) {
+                let r = a % b;
+                steps += `${a} = ${Math.floor(a/b)} &times; ${b} + ${r}<br>`;
+                [a, b] = [b, r];
+            }
+            
+            output.innerHTML = `Calculando mcd(${originalA}, ${originalB}):<br>${steps}<strong>El MCD es ${a}</strong>`;
+        }
+
+        function checkCongruence() {
+            const a = parseInt(document.getElementById('cong-a').value);
+            const b = parseInt(document.getElementById('cong-b').value);
+            const m = parseInt(document.getElementById('cong-m').value);
+            const output = document.getElementById('congruence-output');
+            
+            if (isNaN(a) || isNaN(b) || isNaN(m)) {
+                output.innerHTML = "Por favor, introduce valores enteros.";
+                return;
+            }
+             if (m <= 0) {
+                output.innerHTML = "El módulo 'm' debe ser un entero positivo.";
+                return;
+            }
+
+            if ((a - b) % m === 0) {
+                output.innerHTML = `<strong>Verdadero.</strong> ${a} &equiv; ${b} (mod ${m}) <br> porque ${m} divide a (${a} - ${b}) = ${a-b}.`;
+            } else {
+                output.innerHTML = `<strong>Falso.</strong> ${a} &not;&equiv; ${b} (mod ${m}) <br> porque ${m} no divide a (${a} - ${b}) = ${a-b}.`;
+            }
+        }
+
+        // --- Accordion Logic ---
+        function toggleAccordion(header) {
+            const content = header.nextElementSibling;
+            header.classList.toggle('open');
+            
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        }
+        
+        // --- Quiz Logic ---
+        const quizAnswers = { q1: 'b', q2: 'b', q3: 'd' };
+
+        function checkQuiz() {
+            let score = 0;
+            const totalQuestions = Object.keys(quizAnswers).length;
+            const resultsContainer = document.getElementById('quiz-results');
+
+            for (const qId in quizAnswers) {
+                const questionElement = document.getElementById(qId);
+                const selected = document.querySelector(`input[name="${qId}"]:checked`);
+                
+                // Clear previous feedback
+                questionElement.classList.remove('correct', 'incorrect');
+
+                if (selected) {
+                    if (selected.value === quizAnswers[qId]) {
+                        score++;
+                        questionElement.classList.add('correct');
+                    } else {
+                        questionElement.classList.add('incorrect');
+                    }
+                } else {
+                     questionElement.classList.add('incorrect');
+                }
+            }
+            
+            // Display explanation for q1
+            let explanation = "<strong>Explicación Pregunta 1:</strong> Para encontrar el residuo de -34/9, buscamos $-34 = 9q + r$ con $0 \leq r < 9$. Si $q=-4$, entonces $9 \cdot (-4) + r = -36 + r$. Así, $r = -34 - (-36) = 2$.";
+
+            resultsContainer.innerHTML = `Obtuviste ${score} de ${totalQuestions} respuestas correctas.<br><br>${explanation}`;
+            resultsContainer.style.display = 'block';
+        }
+        
+        // --- Glossary Logic ---
+        function toggleGlossary(term) {
+            const definition = term.nextElementSibling;
+             if (definition.style.display === "block") {
+                definition.style.display = "none";
+            } else {
+                 // Close all other definitions first
+                document.querySelectorAll('.glossary-definition').forEach(def => def.style.display = 'none');
+                definition.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>
+
