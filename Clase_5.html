@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase Interactiva: Álgebra Booleana</title>
+    <style>
+        /* --- General Styles & Variables --- */
+        :root {
+            --primary-color: #4a90e2;
+            --primary-light: #eaf2fb;
+            --secondary-color: #50e3c2;
+            --background-color: #f4f7f9;
+            --text-color: #333;
+            --light-gray: #e0e0e0;
+            --white: #ffffff;
+            --font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --warning-color: #f5a623;
+            --danger-color: #d0021b;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: 1rem;
+        }
+
+        /* --- Presentation Container --- */
+        .presentation-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 90vh;
+            max-height: 700px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Slides Wrapper & Individual Slides --- */
+        .slides-wrapper {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 2.5rem 4rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: translateX(50px);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .slide.exit-left {
+            transform: translateX(-50px);
+        }
+
+        .slide h1, .slide h2, .slide h3 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .slide h1 { font-size: 2.8rem; }
+        .slide h2 { font-size: 2.2rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.5rem; }
+        .slide h3 { font-size: 1.6rem; margin-top: 2rem; }
+        
+        .slide p, .slide li {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            max-width: 80ch;
+        }
+        
+        .slide ul {
+            list-style-position: inside;
+            padding-left: 1rem;
+        }
+
+        /* --- Cover Slide --- */
+        .cover {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .cover h1, .cover p {
+            color: var(--white);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .cover h1 { font-size: 4rem; }
+        .cover .author { font-size: 1.5rem; margin-top: 1rem; font-style: italic;}
+
+        /* --- Navigation --- */
+        .navigation {
+            position: absolute;
+            bottom: 20px;
+            right: 40px;
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+        }
+
+        .nav-btn:hover {
+            background-color: #3a80d2;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .nav-btn:disabled {
+            background-color: var(--light-gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .nav-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* --- Progress Bar --- */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--primary-light);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: var(--primary-color);
+            transition: width 0.4s ease-out;
+        }
+
+        /* --- INTERACTIVE COMPONENTS --- */
+        
+        /* Accordion */
+        .accordion-item {
+            border: 1px solid var(--primary-light);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .accordion-header {
+            background-color: var(--primary-light);
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .accordion-header:hover { background-color: #d8e6f8; }
+        .accordion-header::after {
+            content: '+';
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            transition: transform 0.3s ease-in-out;
+        }
+        .accordion-item.active .accordion-header::after {
+            transform: rotate(45deg);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+            background: #fafcff;
+        }
+        .accordion-content-inner {
+            padding: 0 1.5rem;
+        }
+        .accordion-item.active .accordion-content {
+            padding: 1.5rem;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid var(--light-gray);
+        }
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 1.1rem;
+            position: relative;
+            color: #777;
+        }
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        .tab-btn.active {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        .tab-btn.active::after {
+            transform: scaleX(1);
+        }
+        .tab-content {
+            display: none;
+            padding: 1.5rem 0;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Glossary */
+        .glossary-term {
+            color: var(--primary-color);
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            border-bottom: 2px dotted var(--primary-color);
+        }
+        .tooltip {
+            visibility: hidden;
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 101;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .glossary-term:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Karnaugh Map Styles */
+        .k-map-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            align-items: flex-start;
+            margin-top: 1rem;
+        }
+        .k-map-grid-wrapper {
+            position: relative;
+            justify-self: center;
+        }
+        .k-map-grid, .k-map-grid-3var {
+            display: grid;
+            font-family: monospace;
+            gap: 2px;
+        }
+        .k-map-grid {
+             grid-template-columns: repeat(3, 50px);
+             grid-template-rows: repeat(3, 50px);
+        }
+        .k-map-grid-3var {
+            grid-template-columns: repeat(5, 45px);
+            grid-template-rows: repeat(3, 45px);
+        }
+        .k-map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .k-map-overlay rect {
+            fill: rgba(245, 166, 35, 0.2);
+            stroke: var(--warning-color);
+            stroke-width: 3;
+            stroke-dasharray: 5, 5;
+        }
+        .k-map-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--primary-light);
+            user-select: none;
+            transition: background-color 0.2s;
+            font-size: 1.2rem;
+        }
+        .k-map-cell.value {
+             background-color: white;
+             border: 1px solid var(--light-gray);
+             cursor: pointer;
+        }
+         .k-map-cell.value:hover {
+             background-color: #f0f0f0;
+         }
+        .k-map-cell.header {
+            background-color: transparent;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .k-map-cell.one {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: bold;
+        }
+        .k-map-controls button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+            transition: background-color 0.3s;
+        }
+        .k-map-controls button:hover {
+            background-color: #3a80d2;
+        }
+        #k-map-result, #k-map-result-3var {
+            margin-top: 1rem;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            min-height: 2rem;
+            background: var(--primary-light);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+        /* K-Map Construction Examples */
+        .k-map-build-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+         @media (min-width: 900px) {
+            .k-map-build-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+         }
+        .k-map-build-item {
+            text-align: center;
+            background: #fafcff;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--primary-light);
+        }
+        .k-map-build-item h3 {
+            font-size: 1.2rem;
+        }
+        .k-map-build-item p {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        .k-map-build-table {
+            margin: 1rem auto;
+            border-collapse: collapse;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+        .k-map-build-table td {
+            border: 1px solid var(--light-gray);
+            width: 35px;
+            height: 35px;
+            text-align: center;
+            position: relative;
+        }
+        .k-map-build-table .header-col, .k-map-build-table .header-row {
+            border: none;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .k-map-build-table .empty-cell {
+            border: none;
+        }
+        .k-map-build-table .gray-code {
+            color: var(--warning-color);
+            font-weight: bold;
+        }
+        
+        /* Quiz */
+        .quiz-question {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #fafcff;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--primary-light);
+        }
+        .quiz-options label {
+            display: block;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            background: var(--primary-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .quiz-options label:hover {
+            background-color: #d8e6f8;
+            transform: translateX(5px);
+        }
+        .quiz-options input {
+            margin-right: 10px;
+        }
+        #quiz-feedback {
+            margin-top: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        /* Utility classes */
+        .flex-center {
+             display: flex;
+             justify-content: center;
+             align-items: center;
+        }
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 2rem; }
+        .split-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .slide h1 { font-size: 2.2rem; }
+            .slide h2 { font-size: 1.8rem; }
+            .split-2, .k-map-container { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            body { padding: 0; }
+            .presentation-container {
+                height: 100vh;
+                max-height: none;
+                border-radius: 0;
+            }
+            .slide { padding: 1.5rem; }
+            .navigation {
+                right: 20px;
+                bottom: 15px;
+            }
+             .nav-btn {
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="presentation-container">
+        <div class="slides-wrapper">
+
+            <!-- Slide 1: Portada -->
+            <section class="slide cover active">
+                <h1>Álgebra Booleana</h1>
+                <p>El Lenguaje Fundacional de la Lógica Digital y la Computación</p>
+                <p class="author">Por: Dudbil Olvasada Pabón Riaño</p>
+            </section>
+
+            <!-- Slide 2: Introducción -->
+            <section class="slide">
+                <h2>1. Introducción: ¿Un mundo de ceros y unos?</h2>
+                <p>Imagina que todo lo que hacemos en una computadora, desde ver un video hasta enviar un mensaje, se reduce a una idea muy simple: <strong>verdadero</strong> o <strong>falso</strong>. Encendido o apagado. 1 o 0.</p>
+                <p>El Álgebra Booleana, nombrada así por George Boole, es el sistema matemático que nos permite trabajar con estos dos estados. Es la base sobre la que se construyen los circuitos de tu teléfono, las decisiones de un programa y hasta las búsquedas que haces en internet.</p>
+                <p class="mt-2">En esta clase, exploraremos cómo esta elegante estructura matemática se convierte en la poderosa herramienta que impulsa nuestro mundo digital.</p>
+            </section>
+
+            <!-- Slide 3: Objetivos de Aprendizaje -->
+            <section class="slide">
+                <h2>2. Objetivos de Aprendizaje</h2>
+                <p>Al finalizar esta presentación, serás capaz de:</p>
+                <ul>
+                    <li><mark>Definir</mark> qué es el Álgebra Booleana y cuáles son sus componentes fundamentales (conjunto, operaciones y elementos).</li>
+                    <li><mark>Identificar y aplicar</mark> las propiedades y postulados principales del Álgebra Booleana para simplificar expresiones.</li>
+                    <li><mark>Comprender</mark> la relación directa entre el Álgebra Booleana, los circuitos lógicos y la teoría de conjuntos.</li>
+                    <li><mark>Utilizar</mark> Mapas de Karnaugh como una herramienta visual para la simplificación de funciones booleanas.</li>
+                </ul>
+            </section>
+            
+            <!-- Slide 4: ¿Qué es? ¿Para qué sirve? -->
+            <section class="slide">
+                <h2>3. El Corazón del Álgebra Booleana</h2>
+                 <div class="split-2">
+                    <div>
+                        <h3>¿Qué es?</h3>
+                        <p>Formalmente, un Álgebra de Boole es una <mark>estructura algebraica</mark> que esquematiza las operaciones lógicas. Se define como un conjunto <em>B</em> con al menos dos elementos (comúnmente {0, 1}), y dos operaciones binarias llamadas <strong>suma (+)</strong> y <strong>producto (·)</strong>, junto con una operación unaria llamada <strong>complemento (')</strong>.</p>
+                    </div>
+                    <div>
+                        <h3>¿Para qué sirve?</h3>
+                        <ul>
+                           <li><strong>Diseño de Circuitos Digitales:</strong> Es la base para diseñar y analizar los circuitos electrónicos que componen procesadores, memorias y otros componentes de hardware.</li>
+                           <li><strong>Lógica de Programación:</strong> Las condiciones en el código (if, while, etc.) se evalúan usando lógica booleana.</li>
+                           <li><strong>Bases de Datos:</strong> Las consultas complejas usan operadores booleanos (AND, OR, NOT) para filtrar datos.</li>
+                        </ul>
+                    </div>
+                </div>
+                 <h3 class="mt-2">Importancia en Ciencia de Datos</h3>
+                <p>En el campo de la Ciencia de Datos, el Álgebra Booleana es crucial para el <em>preprocesamiento de datos</em> y la <em>ingeniería de características</em>. Permite crear reglas complejas para filtrar conjuntos de datos, construir modelos basados en árboles de decisión y realizar búsquedas de información eficientes.</p>
+            </section>
+
+            <!-- Slide 5: Propiedades y Postulados -->
+            <section class="slide">
+                <h2>4. Propiedades y Postulados</h2>
+                <p>Las reglas del juego. Estas propiedades son la base para manipular y simplificar cualquier expresión booleana.</p>
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">Leyes Conmutativas, Asociativas y Distributivas</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p><strong>Conmutativa:</strong> El orden no importa.</p>
+                                <ul><li>A + B = B + A</li><li>A · B = B · A</li></ul>
+                                <p><strong>Asociativa:</strong> El agrupamiento no importa.</p>
+                                <ul><li>(A + B) + C = A + (B + C)</li><li>(A · B) · C = A · (B · C)</li></ul>
+                                <p><strong>Distributiva:</strong> Se puede "distribuir" una operación sobre otra.</p>
+                                <ul><li>A · (B + C) = A · B + A · C</li><li>A + (B · C) = (A + B) · (A + C)</li></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">Leyes de Identidad y Complemento</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p><strong>Identidad (o Neutro):</strong> Operar con 0 (para la suma) o 1 (para el producto) no cambia el valor.</p>
+                                <ul><li>A + 0 = A</li><li>A · 1 = A</li></ul>
+                                <p><strong>Complemento (o Inverso):</strong> Todo elemento tiene su opuesto.</p>
+                                <ul><li>A + A' = 1</li><li>A · A' = 0</li></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">Leyes de Idempotencia y Absorción</div>
+                        <div class="accordion-content">
+                             <div class="accordion-content-inner">
+                                <p><strong>Idempotencia:</strong> Operar un elemento consigo mismo da el mismo elemento.</p>
+                                <ul><li>A + A = A</li><li>A · A = A</li></ul>
+                                <p><strong>Absorción:</strong> Simplifican expresiones complejas.</p>
+                                <ul><li>A + (A · B) = A</li><li>A · (A + B) = A</li></ul>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="accordion-item">
+                        <div class="accordion-header">Teoremas de DeMorgan</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>Fundamentales para convertir entre sumas y productos.</p>
+                                <ul>
+                                    <li>El complemento de un producto es la suma de los complementos: <strong>(A · B)' = A' + B'</strong></li>
+                                    <li>El complemento de una suma es el producto de los complementos: <strong>(A + B)' = A' · B'</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 6: Expresiones, Redes Lógicas y Funciones -->
+            <section class="slide">
+                 <h2>5. De la Expresión al Circuito</h2>
+                 <p>Una <strong>expresión booleana</strong> combina variables (A, B, C...) y operadores lógicos (+, ·, '). Cada expresión se puede representar visualmente como una <strong>Red Lógica</strong> (o circuito lógico) usando compuertas.</p>
+                 
+                 <div class="tabs-container mt-2">
+                     <div class="tab-buttons">
+                         <button class="tab-btn active" data-tab="1">Compuerta AND (·)</button>
+                         <button class="tab-btn" data-tab="2">Compuerta OR (+)</button>
+                         <button class="tab-btn" data-tab="3">Compuerta NOT (')</button>
+                     </div>
+                     <div class="tab-content active" data-tab="1">
+                         <h3>Producto Lógico: Compuerta AND</h3>
+                         <p>La salida es 1 <em>sólo si todas</em> las entradas son 1. Equivale a una multiplicación.</p>
+                         <p><strong>Expresión:</strong> F = A · B</p>
+                     </div>
+                     <div class="tab-content" data-tab="2">
+                          <h3>Suma Lógica: Compuerta OR</h3>
+                         <p>La salida es 1 <em>si al menos una</em> de las entradas es 1. Equivale a una suma.</p>
+                         <p><strong>Expresión:</strong> F = A + B</p>
+                     </div>
+                     <div class="tab-content" data-tab="3">
+                         <h3>Negación: Compuerta NOT</h3>
+                         <p>La salida es el valor <em>inverso</em> de la entrada.</p>
+                         <p><strong>Expresión:</strong> F = A'</p>
+                     </div>
+                 </div>
+            </section>
+
+            <!-- Slide 7: Construcción de Mapas de Karnaugh -->
+            <section class="slide">
+                <h2>6. Construcción de Mapas de Karnaugh</h2>
+                <p>Antes de simplificar, debemos saber cómo construir el mapa. El tamaño depende del número de variables (n), y tendrá <strong>2<sup>n</sup></strong> celdas.</p>
+                <div class="k-map-build-container">
+                    <div class="k-map-build-item">
+                        <h3>2 Variables (A, B) → 4 Celdas</h3>
+                        <p>Se distribuyen las variables en una cuadrícula de 2x2. Cada eje toma los valores 0 y 1.</p>
+                        <table class="k-map-build-table">
+                           <tr><td class="empty-cell"></td><td class="header-col">B=0</td><td class="header-col">B=1</td></tr>
+                           <tr><td class="header-row">A=0</td><td></td><td></td></tr>
+                           <tr><td class="header-row">A=1</td><td></td><td></td></tr>
+                        </table>
+                    </div>
+                    <div class="k-map-build-item">
+                        <h3>3 Variables (A, B, C) → 8 Celdas</h3>
+                        <p>El eje con dos variables (BC) usa el <strong class="gray-code">código Gray (00, 01, 11, 10)</strong> para que solo cambie un bit entre celdas adyacentes.</p>
+                        <table class="k-map-build-table">
+                           <tr><td class="empty-cell">A\BC</td><td class="header-col">00</td><td class="header-col">01</td><td class="header-col gray-code">11</td><td class="header-col gray-code">10</td></tr>
+                           <tr><td class="header-row">0</td><td></td><td></td><td></td><td></td></tr>
+                           <tr><td class="header-row">1</td><td></td><td></td><td></td><td></td></tr>
+                        </table>
+                    </div>
+                    <div class="k-map-build-item">
+                        <h3>4 Variables (A, B, C, D) → 16 Celdas</h3>
+                        <p>Ambos ejes usan el <strong class="gray-code">código Gray</strong>. Esto es crucial para poder agrupar los '1' correctamente.</p>
+                        <table class="k-map-build-table">
+                           <tr><td class="empty-cell">AB\CD</td><td class="header-col">00</td><td class="header-col">01</td><td class="header-col gray-code">11</td><td class="header-col gray-code">10</td></tr>
+                           <tr><td class="header-row">00</td><td></td><td></td><td></td><td></td></tr>
+                           <tr><td class="header-row">01</td><td></td><td></td><td></td><td></td></tr>
+                           <tr><td class="header-row gray-code">11</td><td></td><td></td><td></td><td></td></tr>
+                           <tr><td class="header-row gray-code">10</td><td></td><td></td><td></td><td></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Slide 8: Simplificación con Mapas de Karnaugh (2 Variables) -->
+            <section class="slide">
+                <h2>7. Simplificación con K-Maps (2 Variables)</h2>
+                <p>Agrupamos los '1's adyacentes en potencias de 2 (8, 4, 2, 1) para encontrar la expresión más simple.</p>
+                
+                <h3>Ejemplo Guiado: F = A'B + AB' + AB</h3>
+                 <div class="k-map-container">
+                    <div class="k-map-explanation">
+                        <ol>
+                            <li><strong>Poblar el Mapa:</strong> Colocamos '1' en las celdas para A'B (01), AB' (10) y AB (11).</li>
+                            <li><strong>Agrupar (Grupo 1 - Vertical):</strong> Agrupamos los '1's de las celdas (01) y (11).
+                                <ul>
+                                    <li><strong>Variable A:</strong> Cambia de 0 a 1 <mark>→ se elimina</mark>.</li>
+                                    <li><strong>Variable B:</strong> Es constante en 1 <mark>→ se mantiene como B</mark>.</li>
+                                    <li><em>Término resultante:</em> <strong>B</strong></li>
+                                </ul>
+                            </li>
+                             <li><strong>Agrupar (Grupo 2 - Horizontal):</strong> Agrupamos (10) y (11). ¡Se puede reutilizar un '1'!
+                                <ul>
+                                    <li><strong>Variable A:</strong> Es constante en 1 <mark>→ se mantiene como A</mark>.</li>
+                                    <li><strong>Variable B:</strong> Cambia de 0 a 1 <mark>→ se elimina</mark>.</li>
+                                    <li><em>Término resultante:</em> <strong>A</strong></li>
+                                </ul>
+                            </li>
+                            <li><strong>Resultado Final:</strong> Sumamos los términos de cada grupo: <strong>F = A + B</strong>.</li>
+                        </ol>
+                    </div>
+                    <div class="k-map-grid-wrapper">
+                         <div class="k-map-grid">
+                            <div class="k-map-cell header">A\B</div>
+                            <div class="k-map-cell header">0</div>
+                            <div class="k-map-cell header">1</div>
+                            <div class="k-map-cell header">0</div>
+                            <div class="k-map-cell value">0</div>
+                            <div class="k-map-cell value one">1</div>
+                            <div class="k-map-cell header">1</div>
+                            <div class="k-map-cell value one">1</div>
+                            <div class="k-map-cell value one">1</div>
+                        </div>
+                        <svg class="k-map-overlay" viewBox="0 0 152 152">
+                            <rect x="101" y="51" width="50" height="100" style="stroke: var(--warning-color);"></rect>
+                            <rect x="51" y="101" width="100" height="50" style="stroke: var(--danger-color);"></rect>
+                        </svg>
+                    </div>
+                </div>
+
+                <h3>Simulador Interactivo (2 variables)</h3>
+                <div class="k-map-container">
+                    <div class="k-map-controls">
+                        <p>Haz clic en las celdas para crear una función. El simulador encontrará los grupos y la expresión mínima.</p>
+                        <button id="k-map-simplify-2var">Simplificar</button>
+                        <button id="k-map-reset-2var">Reiniciar</button>
+                        <div id="k-map-result">F = 0</div>
+                    </div>
+                     <div class="k-map-grid-wrapper">
+                         <div class="k-map-grid" id="interactive-k-map-2var">
+                            <div class="k-map-cell header">A\B</div>
+                            <div class="k-map-cell header">0</div>
+                            <div class="k-map-cell header">1</div>
+                            <div class="k-map-cell header">0</div>
+                            <div class="k-map-cell value" data-pos="00">0</div>
+                            <div class="k-map-cell value" data-pos="01">0</div>
+                            <div class="k-map-cell header">1</div>
+                            <div class="k-map-cell value" data-pos="10">0</div>
+                            <div class="k-map-cell value" data-pos="11">0</div>
+                        </div>
+                        <svg class="k-map-overlay" id="overlay-2var" viewBox="0 0 152 152"></svg>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Slide 9: Ejemplos Interactivos (3 Variables) -->
+            <section class="slide">
+                 <h2>8. Simplificación con K-Maps (3 Variables)</h2>
+                 <p>Con 3 variables, la adyacencia entre los extremos de la tabla (columnas 00 y 10) se vuelve crucial.</p>
+                 <div class="tabs-container">
+                     <div class="tab-buttons">
+                         <button class="tab-btn active" data-tab="ex1-3var">Ejemplo Guiado 1</button>
+                         <button class="tab-btn" data-tab="ex2-3var">Ejemplo Guiado 2</button>
+                         <button class="tab-btn" data-tab="sim-3var">Simulador Interactivo</button>
+                     </div>
+                     <div class="tab-content active" data-tab="ex1-3var">
+                        <h3>Ejemplo: F = A'B'C' + A'BC' + ABC' + AB'C'</h3>
+                        <div class="k-map-container">
+                            <div class="k-map-explanation">
+                                <ol>
+                                    <li><strong>Poblar:</strong> Se marcan con '1' las celdas 000, 010, 110 y 100.</li>
+                                    <li><strong>Agrupar:</strong> Se forma un grupo de cuatro '1's aprovechando la <mark>adyacencia de los extremos</mark> (la columna BC=00 es adyacente a BC=10).</li>
+                                    <li><strong>Analizar Grupo:</strong>
+                                        <ul>
+                                            <li><strong>A:</strong> Cambia de 0 a 1 <mark>→ se elimina</mark>.</li>
+                                            <li><strong>B:</strong> Cambia (0→1 y 1→0) <mark>→ se elimina</mark>.</li>
+                                            <li><strong>C:</strong> Es constante en 0 <mark>→ se mantiene como C'</mark>.</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Resultado:</strong> <strong>F = C'</strong>.</li>
+                                </ol>
+                            </div>
+                            <div class="k-map-grid-wrapper">
+                                 <div class="k-map-grid-3var">
+                                    <div class="k-map-cell header">A\BC</div><div class="k-map-cell header">00</div><div class="k-map-cell header">01</div><div class="k-map-cell header">11</div><div class="k-map-cell header">10</div>
+                                    <div class="k-map-cell header">0</div><div class="k-map-cell value one">1</div><div class="k-map-cell value">0</div><div class="k-map-cell value">0</div><div class="k-map-cell value one">1</div>
+                                    <div class="k-map-cell header">1</div><div class="k-map-cell value one">1</div><div class="k-map-cell value">0</div><div class="k-map-cell value">0</div><div class="k-map-cell value one">1</div>
+                                </div>
+                                <svg class="k-map-overlay" viewBox="0 0 227 137">
+                                     <rect x="46" y="46" width="45" height="90"></rect>
+                                     <rect x="182" y="46" width="45" height="90"></rect>
+                                </svg>
+                            </div>
+                        </div>
+                     </div>
+                      <div class="tab-content" data-tab="ex2-3var">
+                        <h3>Ejemplo: F = A'B'C + A'BC' + ABC' + ABC</h3>
+                        <div class="k-map-container">
+                            <div class="k-map-explanation">
+                                <ol>
+                                    <li><strong>Poblar:</strong> '1' en 001, 010, 110, 111.</li>
+                                    <li><strong>Grupo 1 (verde):</strong> Celdas (010) y (110).
+                                        <ul>
+                                            <li><strong>A:</strong> Cambia <mark>→ se elimina</mark>.</li>
+                                            <li><strong>B:</strong> Constante en 1 <mark>→ B</mark>.</li>
+                                            <li><strong>C:</strong> Constante en 0 <mark>→ C'</mark>.</li>
+                                            <li><em>Término:</em> <strong>BC'</strong></li>
+                                        </ul>
+                                    </li>
+                                     <li><strong>Grupo 2 (rojo):</strong> Celdas (110) y (111).
+                                        <ul>
+                                            <li><strong>A:</strong> Constante en 1 <mark>→ A</mark>.</li>
+                                            <li><strong>B:</strong> Constante en 1 <mark>→ B</mark>.</li>
+                                            <li><strong>C:</strong> Cambia <mark>→ se elimina</mark>.</li>
+                                            <li><em>Término:</em> <strong>AB</strong></li>
+                                        </ul>
+                                    </li>
+                                     <li><strong>Grupo 3 (naranja):</strong> Celda (001) sola. No se puede agrupar. <em>Término:</em> <strong>A'B'C</strong></li>
+                                    <li><strong>Resultado:</strong> <strong>F = BC' + AB + A'B'C</strong></li>
+                                </ol>
+                            </div>
+                            <div class="k-map-grid-wrapper">
+                                 <div class="k-map-grid-3var">
+                                    <div class="k-map-cell header">A\BC</div><div class="k-map-cell header">00</div><div class="k-map-cell header">01</div><div class="k-map-cell header">11</div><div class="k-map-cell header">10</div>
+                                    <div class="k-map-cell header">0</div><div class="k-map-cell value">0</div><div class="k-map-cell value one">1</div><div class="k-map-cell value">0</div><div class="k-map-cell value one">1</div>
+                                    <div class="k-map-cell header">1</div><div class="k-map-cell value">0</div><div class="k-map-cell value">0</div><div class="k-map-cell value one">1</div><div class="k-map-cell value one">1</div>
+                                </div>
+                                <svg class="k-map-overlay" viewBox="0 0 227 137">
+                                     <rect x="182" y="46" width="45" height="90" style="stroke: #4CAF50; fill: rgba(76,175,80,0.2)"></rect>
+                                     <rect x="137" y="91" width="90" height="45" style="stroke: var(--danger-color); fill: rgba(208,2,27,0.2)"></rect>
+                                     <rect x="91" y="46" width="45" height="45" style="stroke: var(--warning-color); fill: rgba(245,166,35,0.2)"></rect>
+                                </svg>
+                            </div>
+                        </div>
+                     </div>
+                     <div class="tab-content" data-tab="sim-3var">
+                        <div class="k-map-container">
+                            <div class="k-map-controls">
+                                <h4>Simulador (3 variables)</h4>
+                                <p>Crea tu propia función de 3 variables (A, BC) haciendo clic en las celdas. ¡Intenta usar la adyacencia de los extremos!</p>
+                                <button id="k-map-simplify-3var">Simplificar</button>
+                                <button id="k-map-reset-3var">Reiniciar</button>
+                                <div id="k-map-result-3var">F = 0</div>
+                            </div>
+                             <div class="k-map-grid-wrapper">
+                                <div class="k-map-grid-3var" id="interactive-k-map-3var">
+                                    <!-- Headers -->
+                                    <div class="k-map-cell header">A\BC</div><div class="k-map-cell header">00</div><div class="k-map-cell header">01</div><div class="k-map-cell header">11</div><div class="k-map-cell header">10</div>
+                                    <!-- Row 0 -->
+                                    <div class="k-map-cell header">0</div>
+                                    <div class="k-map-cell value" data-pos="000">0</div><div class="k-map-cell value" data-pos="001">0</div><div class="k-map-cell value" data-pos="011">0</div><div class="k-map-cell value" data-pos="010">0</div>
+                                    <!-- Row 1 -->
+                                    <div class="k-map-cell header">1</div>
+                                    <div class="k-map-cell value" data-pos="100">0</div><div class="k-map-cell value" data-pos="101">0</div><div class="k-map-cell value" data-pos="111">0</div><div class="k-map-cell value" data-pos="110">0</div>
+                                </div>
+                                <svg class="k-map-overlay" id="overlay-3var" viewBox="0 0 227 137"></svg>
+                            </div>
+                        </div>
+                     </div>
+                 </div>
+            </section>
+            
+            <!-- Slide 10: Comparación con Lógica y Conjuntos -->
+            <section class="slide">
+                <h2>9. Tres Caras de la Misma Moneda</h2>
+                <p>El Álgebra Booleana no es un concepto aislado. Es un isomorfismo (una correspondencia uno a uno) con la <strong>Lógica Proposicional</strong> y la <strong>Teoría de Conjuntos</strong>.</p>
+                
+                 <div class="tabs-container mt-2">
+                     <div class="tab-buttons">
+                         <button class="tab-btn active" data-tab="sets">Teoría de Conjuntos</button>
+                         <button class="tab-btn" data-tab="logic">Lógica Proposicional</button>
+                     </div>
+                     <div class="tab-content active" data-tab="sets">
+                         <h3>Analogía con Conjuntos</h3>
+                         <ul>
+                             <li><strong>Conjunto B = {0, 1}</strong> ↔️ <strong>Conjunto Universo U y Conjunto Vacío Ø</strong></li>
+                             <li><strong>Suma Lógica (+)</strong> ↔️ <strong>Unión (∪)</strong></li>
+                             <li><strong>Producto Lógico (·)</strong> ↔️ <strong>Intersección (∩)</strong></li>
+                              <li><strong>Complemento (')</strong> ↔️ <strong>Complemento de un conjunto (Aᶜ)</strong></li>
+                         </ul>
+                         <p><em>Ejemplo: La ley de DeMorgan (A · B)' = A' + B' equivale a (A ∩ B)ᶜ = Aᶜ ∪ Bᶜ</em></p>
+                     </div>
+                     <div class="tab-content" data-tab="logic">
+                          <h3>Analogía con Lógica Proposicional</h3>
+                         <ul>
+                             <li><strong>Conjunto B = {0, 1}</strong> ↔️ <strong>Valores de verdad {Falso, Verdadero}</strong></li>
+                             <li><strong>Suma Lógica (+)</strong> ↔️ <strong>Disyunción (∨, "O")</strong></li>
+                             <li><strong>Producto Lógico (·)</strong> ↔️ <strong>Conjunción (∧, "Y")</strong></li>
+                             <li><strong>Complemento (')</strong> ↔️ <strong>Negación (¬, "No")</strong></li>
+                         </ul>
+                          <p><em>Ejemplo: La expresión A + B' se lee como "A es verdadero O B es falso"</em></p>
+                     </div>
+                 </div>
+            </section>
+
+            <!-- Slide 11: Glosario Interactivo -->
+            <section class="slide">
+                 <h2>10. Glosario Interactivo</h2>
+                 <p>Pasa el cursor sobre los términos resaltados para ver su definición.</p>
+                 <ul>
+                    <li><span class="glossary-term">Postulado<span class="tooltip">Una proposición cuya verdad se admite sin pruebas y que es necesaria para servir de base en ulteriores razonamientos.</span></span>: Una regla fundamental que se asume como verdadera.</li>
+                    <li><span class="glossary-term">Literal<span class="tooltip">Una variable booleana o su complemento. Por ejemplo, A y A' son literales.</span></span>: Una variable booleana o su negación.</li>
+                    <li><span class="glossary-term">Minterm<span class="tooltip">Un producto booleano en el que cada una de las variables aparece una sola vez (negada o sin negar). Por ejemplo, A·B'·C</span></span>: Un término producto que incluye todas las variables de la función.</li>
+                    <li><span class="glossary-term">Maxterm<span class="tooltip">Una suma booleana en la que cada una de las variables aparece una sola vez (negada o sin negar). Por ejemplo, A+B'+C</span></span>: Un término suma que incluye todas las variables de la función.</li>
+                     <li><span class="glossary-term">Isomorfismo<span class="tooltip">Una correspondencia matemática uno a uno entre dos estructuras que conserva las operaciones.</span></span>: Una equivalencia estructural entre dos sistemas matemáticos.</li>
+                 </ul>
+            </section>
+            
+            <!-- Slide 12: Ejercicios Prácticos -->
+            <section class="slide">
+                <h2>11. ¡A Practicar! Cuestionario Rápido</h2>
+                <p>Pon a prueba tus conocimientos. Selecciona la respuesta correcta y comprueba tus resultados.</p>
+                <form id="quiz-form">
+                    <div class="quiz-question">
+                        <p><strong>1. ¿Cuál es el resultado de la expresión A + A · B según la ley de absorción?</strong></p>
+                        <div class="quiz-options">
+                            <label><input type="radio" name="q1" value="A"> A</label>
+                            <label><input type="radio" name="q1" value="B"> B</label>
+                            <label><input type="radio" name="q1" value="1"> 1</label>
+                        </div>
+                    </div>
+                     <div class="quiz-question">
+                        <p><strong>2. Según los Teoremas de DeMorgan, ¿a qué es igual (A + B)'?</strong></p>
+                        <div class="quiz-options">
+                            <label><input type="radio" name="q2" value="A'B'"> A' · B'</label>
+                            <label><input type="radio" name="q2" value="A'+B'"> A' + B'</label>
+                            <label><input type="radio" name="q2" value="AB"> A · B</label>
+                        </div>
+                    </div>
+                </form>
+                <button id="check-quiz" class="k-map-controls button">Comprobar Respuestas</button>
+                <div id="quiz-feedback"></div>
+            </section>
+
+
+            <!-- Slide 13: Conclusiones -->
+            <section class="slide">
+                <h2>12. Conclusiones</h2>
+                <p>El Álgebra Booleana es mucho más que un simple sistema de ceros y unos. Es un pilar fundamental que conecta la lógica abstracta con el mundo físico de la computación.</p>
+                <ul>
+                    <li>Proporciona un <strong>marco formal</strong> para el diseño y análisis de sistemas digitales.</li>
+                    <li>Sus principios de simplificación son clave para crear circuitos <strong>más eficientes, rápidos y económicos</strong>.</li>
+                    <li>Su isomorfismo con la lógica y los conjuntos demuestra una <strong>profunda unidad</strong> en las estructuras matemáticas fundamentales.</li>
+                </ul>
+                <p class="mt-2">Dominar el Álgebra Booleana es, en esencia, aprender a "hablar" el idioma nativo de las computadoras.</p>
+            </section>
+
+            <!-- Slide 14: Bibliografía -->
+            <section class="slide">
+                <h2>13. Bibliografía y Recursos</h2>
+                <p>Material consultado para la elaboración de esta presentación:</p>
+                <ul>
+                   <li>Espinosa Armenta, R. (2017). <em>Matemáticas discretas</em> (2ª ed.). Alfaomega Grupo Editor.</li>
+                   <li>Johnsonbaugh, R. (1999). <em>Matemáticas discretas</em> (4ª ed.). Prentice Hall.</li>
+                   <li>Lipschutz, S., & Lipson, M. L. (2009). <em>Matemáticas Discretas</em> (3ª ed.). McGraw-Hill Interamericana.</li>
+                   <li>Villalpando Becerra, J. F., & García Sandoval, A. (2014). <em>Matemáticas discretas: aplicaciones y ejercicios</em>. Grupo Editorial Patria.</li>
+                </ul>
+            </section>
+
+        </div>
+
+        <nav class="navigation">
+            <button id="prev-btn" class="nav-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button id="next-btn" class="nav-btn">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </nav>
+        
+        <div class="progress-bar-container">
+            <div class="progress-bar"></div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- SLIDE NAVIGATION ---
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const progressBar = document.querySelector('.progress-bar');
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.remove('active', 'exit-left');
+                    if (i < index) {
+                        slide.classList.add('exit-left');
+                    }
+                });
+                slides[index].classList.add('active');
+                updateControls();
+                updateProgressBar();
+            }
+
+            function updateControls() {
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === totalSlides - 1;
+            }
+            
+            function updateProgressBar() {
+                const progressPercentage = ((currentSlide + 1) / totalSlides) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    showSlide(currentSlide);
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    showSlide(currentSlide);
+                }
+            });
+
+            // --- ACCORDION ---
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                header.addEventListener('click', () => {
+                     const isActive = item.classList.contains('active');
+                     // Close all others
+                     accordionItems.forEach(i => {
+                         i.classList.remove('active');
+                         i.querySelector('.accordion-content').style.maxHeight = null;
+                     });
+                     // Toggle current
+                     if (!isActive) {
+                        item.classList.add('active');
+                        content.style.maxHeight = content.scrollHeight + 30 + "px"; // Add padding
+                     }
+                });
+            });
+            
+            // --- TABS ---
+            const tabContainers = document.querySelectorAll('.tabs-container');
+            tabContainers.forEach(container => {
+                const tabButtons = container.querySelectorAll('.tab-btn');
+                const tabContents = container.querySelectorAll('.tab-content');
+
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tabId = button.dataset.tab;
+
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+
+                        tabContents.forEach(content => {
+                            content.classList.remove('active');
+                            if (content.dataset.tab === tabId) {
+                                content.classList.add('active');
+                            }
+                        });
+                    });
+                });
+            });
+
+            // --- K-MAP VISUALIZATION ---
+            function drawRect(svg, x, y, width, height, color) {
+                 const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                 rect.setAttribute('x', x);
+                 rect.setAttribute('y', y);
+                 rect.setAttribute('width', width);
+                 rect.setAttribute('height', height);
+                 rect.style.stroke = color;
+                 rect.style.fill = color.replace(')', ', 0.2)').replace('rgb', 'rgba');
+                 svg.appendChild(rect);
+            }
+            const groupColors = ['#f5a623', '#d0021b', '#4caf50', '#9013fe', '#007bff'];
+
+            // --- KARNAUGH MAP SIMULATOR (2 VARIABLES) ---
+            const kMapCells2Var = document.querySelectorAll('#interactive-k-map-2var .k-map-cell.value');
+            const simplifyBtn2Var = document.getElementById('k-map-simplify-2var');
+            const resetBtn2Var = document.getElementById('k-map-reset-2var');
+            const resultDisplay2Var = document.getElementById('k-map-result');
+            const overlay2Var = document.getElementById('overlay-2var');
+            let kMapValues2Var = {'00': 0, '01': 0, '10': 0, '11': 0};
+
+            kMapCells2Var.forEach(cell => {
+                cell.addEventListener('click', () => {
+                    const pos = cell.dataset.pos;
+                    kMapValues2Var[pos] = 1 - kMapValues2Var[pos];
+                    cell.textContent = kMapValues2Var[pos];
+                    cell.classList.toggle('one', kMapValues2Var[pos] === 1);
+                });
+            });
+
+            resetBtn2Var.addEventListener('click', () => {
+                kMapCells2Var.forEach(cell => {
+                    cell.textContent = '0';
+                    cell.classList.remove('one');
+                });
+                kMapValues2Var = {'00': 0, '01': 0, '10': 0, '11': 0};
+                resultDisplay2Var.textContent = 'F = 0';
+                overlay2Var.innerHTML = '';
+            });
+            
+            simplifyBtn2Var.addEventListener('click', () => {
+                overlay2Var.innerHTML = '';
+                const minterms = Object.keys(kMapValues2Var).filter(key => kMapValues2Var[key] === 1);
+                
+                if (minterms.length === 0) {
+                    resultDisplay2Var.textContent = 'F = 0';
+                    return;
+                }
+                if (minterms.length === 4) {
+                    resultDisplay2Var.textContent = 'F = 1';
+                    drawRect(overlay2Var, 51, 51, 100, 100, groupColors[0]);
+                    return;
+                }
+
+                const groups = [];
+                const covered = new Set();
+                let colorIndex = 0;
+
+                // Find groups of 2
+                // Horizontal
+                if (kMapValues2Var['00'] && kMapValues2Var['01']) groups.push({ term: "A'", minterms: ['00', '01'], rect: [51, 51, 100, 50] });
+                if (kMapValues2Var['10'] && kMapValues2Var['11']) groups.push({ term: "A", minterms: ['10', '11'], rect: [51, 101, 100, 50] });
+                // Vertical
+                if (kMapValues2Var['00'] && kMapValues2Var['10']) groups.push({ term: "B'", minterms: ['00', '10'], rect: [51, 51, 50, 100] });
+                if (kMapValues2Var['01'] && kMapValues2Var['11']) groups.push({ term: "B", minterms: ['01', '11'], rect: [101, 51, 50, 100] });
+                
+                // Essential prime implicant logic (simplified)
+                const finalTerms = [];
+                const finalGroups = [];
+                
+                minterms.forEach(m => {
+                    const coveringGroups = groups.filter(g => g.minterms.includes(m));
+                    if(coveringGroups.length === 1 && !finalGroups.includes(coveringGroups[0])){
+                        finalGroups.push(coveringGroups[0]);
+                    }
+                });
+
+                let uncoveredMinterms = minterms.filter(m => ![...new Set(finalGroups.flatMap(g => g.minterms))].includes(m));
+                
+                while(uncoveredMinterms.length > 0){
+                    const bestGroup = groups
+                        .filter(g => !finalGroups.includes(g))
+                        .filter(g => g.minterms.some(m => uncoveredMinterms.includes(m)))
+                        .sort((a,b) => b.minterms.filter(m => uncoveredMinterms.includes(m)).length - a.minterms.filter(m => uncoveredMinterms.includes(m)).length)[0];
+                    
+                    if(bestGroup){
+                        finalGroups.push(bestGroup);
+                        uncoveredMinterms = minterms.filter(m => ![...new Set(finalGroups.flatMap(g => g.minterms))].includes(m));
+                    } else {
+                        break; // No more groups to add
+                    }
+                }
+                
+                uncoveredMinterms.forEach(m => {
+                     let term = '';
+                     if (m === '00') term = "A'B'";
+                     if (m === '01') term = "A'B";
+                     if (m === '10') term = "AB'";
+                     if (m === '11') term = "AB";
+                     finalGroups.push({term: term, rect: m === '00' ? [51,51,50,50] : m === '01' ? [101,51,50,50] : m === '10' ? [51,101,50,50] : [101,101,50,50] });
+                });
+
+                finalGroups.forEach(g => {
+                    drawRect(overlay2Var, g.rect[0], g.rect[1], g.rect[2], g.rect[3], groupColors[colorIndex % groupColors.length]);
+                    colorIndex++;
+                });
+
+                resultDisplay2Var.textContent = 'F = ' + [...new Set(finalGroups.map(g=>g.term))].join(' + ');
+
+            });
+            
+            // --- KARNAUGH MAP SIMULATOR (3 VARIABLES) ---
+            const kMapCells3Var = document.querySelectorAll('#interactive-k-map-3var .k-map-cell.value');
+            const simplifyBtn3Var = document.getElementById('k-map-simplify-3var');
+            const resetBtn3Var = document.getElementById('k-map-reset-3var');
+            const resultDisplay3Var = document.getElementById('k-map-result-3var');
+            const overlay3Var = document.getElementById('overlay-3var');
+            const grayCodeMap = {'00':0, '01':1, '11':2, '10':3};
+            let kMapValues3Var = {
+                '000': 0, '001': 0, '011': 0, '010': 0,
+                '100': 0, '101': 0, '111': 0, '110': 0
+            };
+
+            kMapCells3Var.forEach(cell => {
+                cell.addEventListener('click', () => {
+                    const pos = cell.dataset.pos;
+                    kMapValues3Var[pos] = 1 - kMapValues3Var[pos];
+                    cell.textContent = kMapValues3Var[pos];
+                    cell.classList.toggle('one', kMapValues3Var[pos] === 1);
+                });
+            });
+
+            resetBtn3Var.addEventListener('click', () => {
+                kMapCells3Var.forEach(cell => {
+                    cell.textContent = '0';
+                    cell.classList.remove('one');
+                });
+                 kMapValues3Var = Object.keys(kMapValues3Var).reduce((acc, key) => { acc[key] = 0; return acc; }, {});
+                resultDisplay3Var.textContent = 'F = 0';
+                overlay3Var.innerHTML = '';
+            });
+            
+            simplifyBtn3Var.addEventListener('click', () => {
+                overlay3Var.innerHTML = '';
+                const minterms = Object.keys(kMapValues3Var).filter(key => kMapValues3Var[key] === 1);
+                
+                if (minterms.length === 0) { resultDisplay3Var.textContent = "F = 0"; return; }
+                if (minterms.length === 8) { 
+                    resultDisplay3Var.textContent = "F = 1"; 
+                    drawRect(overlay3Var, 46, 46, 180, 90, groupColors[0]);
+                    return; 
+                }
+                
+                const implicants = [];
+                // Find all possible prime implicants (groups of 4, 2, 1)
+                // Groups of 4
+                if (['000','001','011','010'].every(m => minterms.includes(m))) implicants.push({term: "A'", minterms:['000','001','011','010'], rects:[[46,46,180,45]]});
+                if (['100','101','111','110'].every(m => minterms.includes(m))) implicants.push({term: "A", minterms:['100','101','111','110'], rects:[[46,91,180,45]]});
+                if (['000','100','010','110'].every(m => minterms.includes(m))) implicants.push({term: "C'", minterms:['000','100','010','110'], rects:[[46,46,45,90],[182,46,45,90]]});
+                if (['001','101','011','111'].every(m => minterms.includes(m))) implicants.push({term: "C", minterms:['001','101','011','111'], rects:[[91,46,45,90],[137,46,45,90]]});
+                if (['011','111','010','110'].every(m => minterms.includes(m))) implicants.push({term: "B", minterms:['011','111','010','110'], rects:[[137,46,90,90]]});
+                if (['000','100','001','101'].every(m => minterms.includes(m))) implicants.push({term: "B'", minterms:['000','100','001','101'], rects:[[46,46,90,90]]});
+
+                // Groups of 2
+                // Vertical
+                ['00','01','11','10'].forEach(bc => {
+                    if(kMapValues3Var['0'+bc] && kMapValues3Var['1'+bc]) {
+                        implicants.push({ term: (bc=='00'?"B'C'":bc=='01'?"B'C":bc=='11'?"BC":"BC'"), minterms: ['0'+bc, '1'+bc], rects:[[46 + grayCodeMap[bc]*45, 46, 45, 90]] });
+                    }
+                });
+                // Horizontal
+                ['0','1'].forEach(a => {
+                    const rowMinterms = [a+'00', a+'01', a+'11', a+'10'];
+                    if (kMapValues3Var[rowMinterms[0]] && kMapValues3Var[rowMinterms[1]]) implicants.push({ term: a=='0'?"A'B'":"AB'", minterms:[rowMinterms[0],rowMinterms[1]], rects:[[46, 46+a*45, 90, 45]] });
+                    if (kMapValues3Var[rowMinterms[1]] && kMapValues3Var[rowMinterms[2]]) implicants.push({ term: a=='0'?"A'C":"AC", minterms:[rowMinterms[1],rowMinterms[2]], rects:[[91, 46+a*45, 90, 45]] });
+                    if (kMapValues3Var[rowMinterms[2]] && kMapValues3Var[rowMinterms[3]]) implicants.push({ term: a=='0'?"A'B":"AB", minterms:[rowMinterms[2],rowMinterms[3]], rects:[[137, 46+a*45, 90, 45]] });
+                    // Adjacency
+                    if (kMapValues3Var[rowMinterms[0]] && kMapValues3Var[rowMinterms[3]]) implicants.push({ term: a=='0'?"A'C'":"AC'", minterms:[rowMinterms[0],rowMinterms[3]], rects:[[46,46+a*45,45,45],[182,46+a*45,45,45]] });
+                });
+                
+                // Classic Quine-McCluskey Chart method
+                const primeImplicants = implicants.filter((g1, idx, arr) => !arr.some(g2 => g1.minterms.length < g2.minterms.length && g1.minterms.every(m => g2.minterms.includes(m))));
+                
+                const essentialImplicants = [];
+                minterms.forEach(m => {
+                    const coveringPIs = primeImplicants.filter(pi => pi.minterms.includes(m));
+                    if (coveringPIs.length === 1 && !essentialImplicants.find(e => e.term === coveringPIs[0].term)) {
+                        essentialImplicants.push(coveringPIs[0]);
+                    }
+                });
+                
+                let finalSolution = [...essentialImplicants];
+                let coveredMinterms = new Set(finalSolution.flatMap(pi => pi.minterms));
+                let remainingMinterms = minterms.filter(m => !coveredMinterms.has(m));
+                
+                const remainingPIs = primeImplicants.filter(pi => !finalSolution.some(s => s.term === pi.term));
+
+                while(remainingMinterms.length > 0) {
+                    const bestPI = remainingPIs
+                        .map(pi => ({
+                            implicant: pi,
+                            covers: pi.minterms.filter(m => remainingMinterms.includes(m)).length
+                        }))
+                        .sort((a,b) => b.covers - a.covers || b.implicant.minterms.length - a.implicant.minterms.length)[0];
+                    
+                    if (!bestPI || bestPI.covers === 0) break;
+                    
+                    finalSolution.push(bestPI.implicant);
+                    coveredMinterms = new Set(finalSolution.flatMap(pi => pi.minterms));
+                    remainingMinterms = minterms.filter(m => !coveredMinterms.has(m));
+                }
+                
+                 minterms.forEach(m => {
+                    if (!coveredMinterms.has(m)) {
+                        let termStr = (m[0]=='0'?'A\'':'A') + (m[1]=='0'?'B\'':'B') + (m[2]=='0'?'C\'':'C');
+                        const row = m[0]; const col = grayCodeMap[m.substring(1)];
+                        finalSolution.push({ term: termStr, rects:[[46+col*45, 46+row*45, 45, 45]] });
+                    }
+                });
+
+                let colorIndex = 0;
+                [...new Set(finalSolution)].forEach(g => {
+                    g.rects.forEach(r => drawRect(overlay3Var, r[0], r[1], r[2], r[3], groupColors[colorIndex % groupColors.length]));
+                    colorIndex++;
+                });
+
+                resultDisplay3Var.textContent = 'F = ' + [...new Set(finalSolution.map(g=>g.term))].join(' + ');
+            });
+
+
+            // --- QUIZ ---
+            const checkQuizBtn = document.getElementById('check-quiz');
+            const quizFeedback = document.getElementById('quiz-feedback');
+            
+            checkQuizBtn.addEventListener('click', () => {
+                 const answers = { q1: 'A', q2: 'A\'B\'' };
+                 let score = 0;
+                 const form = document.getElementById('quiz-form');
+                 
+                 const q1Answer = form.elements['q1'].value;
+                 const q2Answer = form.elements['q2'].value;
+
+                 if (q1Answer === answers.q1) score++;
+                 if (q2Answer === answers.q2) score++;
+                 
+                 quizFeedback.textContent = `Tu puntuación es: ${score} de 2. ¡Sigue practicando!`;
+            });
+
+
+            // Initial call
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
+
