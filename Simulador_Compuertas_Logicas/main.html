@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Circuitos Lógicos Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="toolbar">
+        <div class="toolbar-header">
+            <h3>COMPONENTES</h3>
+        </div>
+        <div class="toolbar-section">
+            <h4>Entrada/Salida</h4>
+            <button class="add-component" data-type="INPUT"><span>Toggle Switch</span></button>
+            <button class="add-component" data-type="OUTPUT"><span>💡</span><span>Luz LED</span></button>
+            <button class="add-component" data-type="CLOCK"><span>🕒</span><span>Reloj (Clock)</span></button>
+        </div>
+        <div class="toolbar-section">
+            <h4>Compuertas Básicas</h4>
+            <button class="add-component" data-type="AND"><span>AND</span></button>
+            <button class="add-component" data-type="OR"><span>OR</span></button>
+            <button class="add-component" data-type="NOT"><span>NOT</span></button>
+            <button class="add-component" data-type="XOR"><span>XOR</span></button>
+        </div>
+        <div class="toolbar-section">
+            <h4>Compuertas Derivadas</h4>
+            <button class="add-component" data-type="NAND"><span>NAND</span></button>
+            <button class="add-component" data-type="NOR"><span>NOR</span></button>
+            <button class="add-component" data-type="XNOR"><span>XNOR</span></button>
+        </div>
+        <div class="toolbar-section">
+            <h4>Memoria</h4>
+            <button class="add-component" data-type="D_FLIP_FLOP"><span>D Flip-Flop</span></button>
+        </div>
+        <div class="toolbar-footer">
+            <button id="save-button">Guardar</button>
+            <button id="load-button">Cargar</button>
+        </div>
+    </div>
+    <div id="sandbox">
+        <svg id="wire-svg"></svg>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
