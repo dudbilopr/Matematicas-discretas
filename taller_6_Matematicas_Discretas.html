@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller de Matemáticas Discretas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1e1e2f;
+            --card-color: #27293d;
+            --primary-color: #89b4fa;
+            --text-color: #cad3f5;
+            --header-color: #cba6f7;
+            --border-color: #494d64;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .workshop-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--header-color);
+            margin: 0;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            font-weight: 300;
+        }
+
+        .exercise {
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 16px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .exercise:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px var(--shadow-color);
+        }
+
+        .exercise h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.8rem;
+        }
+        
+        .exercise-icon {
+            margin-right: 12px;
+            font-style: normal;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            background-color: rgba(0,0,0,0.15);
+            border-left: 4px solid var(--primary-color);
+            padding: 0.8rem 1.2rem;
+            margin-bottom: 0.8rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 1.1rem;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        code {
+            color: #f38ba8; /* Red for code */
+            background-color: var(--bg-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .instructions {
+            font-style: italic;
+            color: #a6e3a1; /* Green for instructions */
+            margin-top: 1rem;
+            border: 1px dashed var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .instructions p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="workshop-container">
+
+        <header>
+            <h1>Taller de Lógica Booleana y Circuitos</h1>
+            <p>Un enfoque práctico de Matemáticas Discretas</p>
+        </header>
+
+        <div class="exercise">
+            <h2><i class="exercise-icon">⚡️</i>Ejercicio 1: Circuito a Expresión</h2>
+            <p>Analice el siguiente circuito lógico y escriba la expresión Booleana final para la salida <strong>Q</strong>.</p>
+            <div class="instructions">
+                <p><strong>Diagrama:</strong> Un circuito con entradas A y B. La entrada B se divide; una va a una compuerta <strong>OR</strong> y la otra a una compuerta <strong>NOT</strong>. La entrada A va a la misma compuerta <strong>OR</strong>. La salida de la compuerta <strong>OR</strong> y la salida de la compuerta <strong>NOT</strong> se conectan a una compuerta <strong>AND</strong> final, que produce la salida Q.</p>
+                <p><em>Recuerde usar símbolos estándar para las compuertas y cables curvos (tipo Bézier) al dibujarlo.</em></p>
+            </div>
+        </div>
+        
+        <div class="exercise">
+            <h2><i class="exercise-icon">🔄</i>Ejercicio 2: Análisis de Compuertas</h2>
+            <p>Convierta el siguiente circuito en una expresión Booleana. Escriba las sub-expresiones intermedias en la salida de cada compuerta.</p>
+             <div class="instructions">
+                <p><strong>Diagrama:</strong> Un circuito con cuatro entradas (A, B, C, D). A y B entran a una compuerta <strong>AND</strong>. Su salida y la entrada C entran a una compuerta <strong>OR</strong>. La entrada D pasa por una compuerta <strong>NOT</strong>. Finalmente, las salidas de la compuerta <strong>OR</strong> y la compuerta <strong>NOT</strong> entran a una compuerta <strong>NAND</strong> final.</p>
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2><i class="exercise-icon">📜</i>Ejercicio 3: Pruebas con Teoremas Booleanos</h2>
+            <p>Utilizando los teoremas y postulados del álgebra de Boole, demuestre la equivalencia de las siguientes expresiones:</p>
+            <ul>
+                <li>(a) <code>(A + C)(A + D)(B + C)(B + D) = AB + CD</code></li>
+                <li>(b) <code>(X + Y) &oplus; (X + Z) = X'(Y &oplus; Z)</code></li>
+            </ul>
+        </div>
+        
+        <div class="exercise">
+            <h2><i class="exercise-icon">⚙️</i>Ejercicio 4: Simplificación de Expresiones</h2>
+            <p>Simplifique las siguientes expresiones Booleanas hasta obtener el mínimo número de literales posible.</p>
+            <ul>
+                <li>(a) <code>ABC + A'B + ABC'</code></li>
+                <li>(b) <code>(x+y)'(x'+y')</code></li>
+                <li>(c) <code>(BC' + A'D)(AB' + CD')</code></li>
+                <li>(d) <code>x'yz + xz</code></li>
+                <li>(e) <code>xy + x(wz + wz')</code></li>
+            </ul>
+        </div>
+
+        <div class="exercise">
+            <h2><i class="exercise-icon">✏️</i>Ejercicio 5: Diseño de Circuitos Lógicos</h2>
+            <p>Dibuje los diagramas lógicos que implementen cada una de las siguientes expresiones Booleanas. Use los símbolos gráficos estándar para cada compuerta.</p>
+            <ul>
+                <li>(a) <code>y = [(u + x')(y' + z)]</code></li>
+                <li>(b) <code>y = (u &oplus; y)' + x</code></li>
+                <li>(c) <code>y = (u' + x')(y + z')</code></li>
+                <li>(d) <code>y = u(x &oplus; z) + y'</code></li>
+                <li>(e) <code>y = u + yz + uxy</code></li>
+            </ul>
+             <div class="instructions">
+                <p>Para su diseño, utilice cables curvos para una mejor legibilidad, simulando un software de diseño profesional.</p>
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2><i class="exercise-icon">🧱</i>Ejercicio 6: Implementación de Funciones</h2>
+            <p>Implemente la función Booleana <code>F = xy + x'y' + y'z</code> utilizando únicamente los conjuntos de compuertas especificados para cada caso:</p>
+            <ul>
+                <li>(a) Con compuertas AND, OR e inversores.</li>
+                <li>(b) Con compuertas OR e inversores.</li>
+                <li>(c) Con compuertas AND e inversores.</li>
+                <li>(d) Con compuertas NAND e inversores.</li>
+                <li>(e) Con compuertas NOR e inversores.</li>
+            </ul>
+        </div>
+        
+        <div class="exercise">
+            <h2><i class="exercise-icon">✨</i>Ejercicio 7: Universalidad de NAND</h2>
+            <p>Demuestre la universalidad de la compuerta NAND implementando una compuerta <strong>XOR</strong>. Dibuje el diagrama del circuito y escriba la expresión Booleana final que lo representa.</p>
+        </div>
+
+        <div class="exercise">
+            <h2><i class="exercise-icon">🔒</i>Ejercicio 8: Cifrado XOR</h2>
+            <p>Realice un ejercicio de criptografía. Cifre la palabra <code>HOLA</code> utilizando la clave <code>BYTE</code> y la operación XOR. Describa el proceso paso a paso:</p>
+            <ol>
+                <li>Conversión de la palabra y la clave a sus valores binarios (usando ASCII).</li>
+                <li>Aplicación de la operación XOR bit a bit.</li>
+                <li>Muestre el mensaje cifrado resultante (puede ser en binario o como caracteres).</li>
+                <li>Explique cómo se revertiría el proceso para descifrar el mensaje.</li>
+            </ol>
+        </div>
+
+    </div>
+
+</body>
+</html>
