@@ -3,46 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Circuitos Lógicos Pro</title>
+    <title>Entorno de Diseño Lógico Interactivo</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Inconsolata&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="toolbar">
-        <div class="toolbar-header">
-            <h3>COMPONENTES</h3>
+    <div id="info-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-btn">&times;</button>
+            <div class="modal-header"><div id="modal-symbol"></div><h2 id="modal-title"></h2></div>
+            <p id="modal-explanation"></p>
+            <h3>Expresión Booleana</h3><p id="modal-expression" class="code"></p>
+            <h3>Tabla de la Verdad</h3><table id="modal-truth-table"></table>
         </div>
+    </div>
+
+    <div id="toolbar">
+        <div class="toolbar-header"><h3>COMPONENTES</h3></div>
         <div class="toolbar-section">
+            <small class="instruction-text">Arrastra para añadir. Clic para info.</small>
+            <h4>General</h4>
+            <button class="add-component" data-type="LABEL"><span>T</span><span>Etiqueta</span></button>
             <h4>Entrada/Salida</h4>
             <button class="add-component" data-type="INPUT"><span>Toggle Switch</span></button>
             <button class="add-component" data-type="OUTPUT"><span>💡</span><span>Luz LED</span></button>
             <button class="add-component" data-type="CLOCK"><span>🕒</span><span>Reloj (Clock)</span></button>
         </div>
-        <div class="toolbar-section">
-            <h4>Compuertas Básicas</h4>
-            <button class="add-component" data-type="AND"><span>AND</span></button>
-            <button class="add-component" data-type="OR"><span>OR</span></button>
-            <button class="add-component" data-type="NOT"><span>NOT</span></button>
-            <button class="add-component" data-type="XOR"><span>XOR</span></button>
-        </div>
-        <div class="toolbar-section">
-            <h4>Compuertas Derivadas</h4>
-            <button class="add-component" data-type="NAND"><span>NAND</span></button>
-            <button class="add-component" data-type="NOR"><span>NOR</span></button>
-            <button class="add-component" data-type="XNOR"><span>XNOR</span></button>
-        </div>
-        <div class="toolbar-section">
-            <h4>Memoria</h4>
-            <button class="add-component" data-type="D_FLIP_FLOP"><span>D Flip-Flop</span></button>
-        </div>
-        <div class="toolbar-footer">
-            <button id="save-button">Guardar</button>
-            <button id="load-button">Cargar</button>
-        </div>
+        <div class="toolbar-section"><h4>Compuertas Básicas</h4><button class="add-component" data-type="AND"><span>AND</span></button><button class="add-component" data-type="OR"><span>OR</span></button><button class="add-component" data-type="NOT"><span>NOT</span></button><button class="add-component" data-type="XOR"><span>XOR</span></button></div>
+        <div class="toolbar-section"><h4>Compuertas Derivadas</h4><button class="add-component" data-type="NAND"><span>NAND</span></button><button class="add-component" data-type="NOR"><span>NOR</span></button><button class="add-component" data-type="XNOR"><span>XNOR</span></button></div>
+        <div class="toolbar-section"><h4>Memoria</h4><button class="add-component" data-type="D_FLIP_FLOP"><span>D Flip-Flop</span></button></div>
+        <div class="toolbar-footer"><button id="save-button">Guardar</button><button id="load-button">Cargar</button><button id="generate-truth-table-btn">Generar Tabla</button></div>
     </div>
-    <div id="sandbox">
+    
+    <div id="sandbox-container">
+        <div id="sandbox"></div>
         <svg id="wire-svg"></svg>
+        <div id="selection-box"></div>
     </div>
+    
+    <div id="status-indicator">
+        <span id="zoom-level">Zoom: 100%</span> | 
+        <span id="selection-count">Seleccionados: 0</span>
+    </div>
+
+    <div id="truth-table-panel" class="hidden">
+        <div id="truth-table-header">
+            <span>Tabla de Verdad del Circuito</span>
+            <button id="close-table-btn">&times;</button>
+        </div>
+        <div id="truth-table-content">
+            <table id="dynamic-truth-table"></table>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
