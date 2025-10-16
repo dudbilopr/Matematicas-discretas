@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase Interactiva: Fundamentos de Álgebra Booleana - UNAB</title>
+    
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+
+    <style>
+        /* --- General Styles & Variables --- */
+        :root {
+            --primary-color: #FFC107; /* UNAB Gold */
+            --primary-dark: #e6a700;
+            --primary-light: #fff8e1;
+            --secondary-color: #005A9C; /* UNAB Blue */
+            --background-color: #f4f7f9;
+            --text-color: #212529;
+            --text-light: #5f6368;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+            --font-mono: 'Inconsolata', 'Courier New', monospace;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: 1rem;
+        }
+
+        /* --- Presentation Container --- */
+        .presentation-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            max-height: 720px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Slides Wrapper & Individual Slides --- */
+        .slides-wrapper { flex-grow: 1; position: relative; overflow: hidden; }
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            padding: 2.5rem 4rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: translateY(20px);
+            overflow-y: auto;
+        }
+        .slide.active { opacity: 1; visibility: visible; transform: translateY(0); }
+        .slide.exit-left { transform: translateY(20px); }
+
+        .slide h1, .slide h2 { color: var(--text-color); margin-bottom: 1.5rem; }
+        .slide h1 { font-size: 2.8rem; }
+        .slide h2 { font-size: 2.2rem; border-bottom: 3px solid var(--primary-color); padding-bottom: 0.5rem; display: inline-block;}
+        .slide h3 { font-size: 1.4rem; margin-top: 1.5rem; margin-bottom: 1rem; color: var(--secondary-color); }
+        .slide p, .slide li { line-height: 1.8; font-size: 1.1rem; color: var(--text-light); max-width: 75ch; margin-bottom: 1rem; }
+        .slide strong { color: var(--text-color); font-weight: 600; }
+        .slide ul { list-style-position: inside; padding-left: 1rem; }
+        .slide hr { border: 0; height: 1px; background: #e0e0e0; margin: 2rem 0; }
+        
+        /* --- Estilo para LaTeX renderizado --- */
+        .MathJax_Display, .MathJax {
+            padding: 0.1em 0.4em !important;
+            border-radius: 6px;
+            background: var(--primary-light);
+            color: #c28b00;
+            display: inline-block !important;
+        }
+        .slide .formula-block {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        .slide .formula-block .MathJax_Display {
+            margin: 0 !important;
+        }
+
+
+        /* --- Cover Slide --- */
+        .cover {
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            background: linear-gradient(135deg, var(--secondary-color), #003d69);
+        }
+        .cover img { max-width: 200px; margin-bottom: 1rem; }
+        .cover h1, .cover p { color: var(--white); text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .cover h1 { font-size: 3.5rem; }
+        .cover .course-title { font-size: 1.5rem; color: var(--primary-color); font-weight: 500; }
+        .cover .author { font-size: 1.2rem; margin-top: 1rem; }
+
+        /* --- Navigation & Progress --- */
+        .navigation { position: absolute; bottom: 20px; right: 40px; display: flex; gap: 1rem; z-index: 100; }
+        .nav-btn {
+            background-color: var(--secondary-color); color: var(--white); border: none; width: 50px; height: 50px;
+            border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.3s;
+        }
+        .nav-btn:hover { background-color: #004b80; transform: translateY(-3px); }
+        .nav-btn:disabled { background-color: #e0e0e0; cursor: not-allowed; transform: none; box-shadow: none; }
+        .nav-btn svg { width: 24px; height: 24px; }
+        .progress-bar-container { width: 100%; height: 8px; background-color: #e0e0e0; position: absolute; bottom: 0; left: 0; }
+        .progress-bar { height: 100%; width: 0; background-color: var(--primary-color); transition: width 0.4s ease-out; }
+        
+        /* --- SVG GATE DIAGRAM STYLES --- */
+        .gate-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2.5rem; text-align: center; margin-top: 2rem; }
+        .gate-wrapper { display: flex; flex-direction: column; align-items: center; }
+        .diagram-container { position: relative; width: 250px; height: 150px; margin: 0 auto; }
+        .diagram-container .label {
+            position: absolute; font-size: 1.1rem; font-weight: bold; font-family: var(--font-mono);
+            color: var(--secondary-color);
+        }
+        .diagram-container .input-a { top: 25px; left: 0; }
+        .diagram-container .input-b { top: 95px; left: 0; }
+        .diagram-container .input-c { top: 60px; left: 0; } /* For 3-input gates */
+        .diagram-container .input-single { top: 60px; left: 0; }
+        .diagram-container .output-q { top: 60px; right: 0; }
+        .gate-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .gate-symbol {
+            fill: var(--primary-light);
+            stroke: var(--secondary-color);
+            stroke-width: 2.5;
+            stroke-linejoin: round;
+        }
+        .gate-symbol.no-fill { fill: none; }
+        .wire { stroke: var(--text-light); stroke-width: 2; }
+
+        /* Full Circuit SVG Diagram */
+        .circuit-svg-container { display: flex; justify-content: center; align-items: center; margin: 2rem 0; }
+        .circuit-svg { width: 100%; max-width: 450px; font-family: var(--font-mono); }
+        .circuit-svg .wire { stroke: var(--text-light); stroke-width: 2; fill: none; }
+        .circuit-svg .gate-shape { stroke: var(--secondary-color); stroke-width: 2; fill: var(--primary-light); }
+        .circuit-svg .gate-text { fill: var(--secondary-color); font-size: 14px; font-weight: bold; }
+        .circuit-svg .label-text { fill: var(--text-color); font-size: 16px; }
+
+        /* Accordion, Quiz, Glossary, etc. */
+        .accordion-item { border: 1px solid #e0e0e0; border-radius: var(--border-radius); margin-bottom: 1rem; overflow: hidden; }
+        .accordion-header { background-color: #f8f9fa; padding: 1rem 1.5rem; cursor: pointer; font-weight: 500; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.3s; }
+        .accordion-header:hover { background-color: #f1f3f5; }
+        .accordion-header::after { content: '+'; font-size: 1.5rem; color: var(--secondary-color); transition: transform 0.3s ease-in-out; }
+        .accordion-item.active .accordion-header::after { transform: rotate(45deg); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out; }
+        .accordion-content-inner { padding: 1.5rem; display: flex; justify-content: space-around; background: #fafcff; }
+        .accordion-content-inner p { margin: 0; line-height: 1.8; }
+        .quiz-question { margin-bottom: 1rem; }
+        .quiz-options label { display: flex; align-items: center; padding: 0.8rem; margin: 0.5rem 0; background: var(--primary-light); border-radius: 8px; cursor: pointer; transition: background-color 0.3s, transform 0.2s; border: 2px solid transparent; }
+        .quiz-options label:hover { background-color: #fff0c7; transform: translateX(5px); }
+        .quiz-options input { margin-right: 10px; }
+        .quiz-options label.correct { border-color: #28a745; background: #d4edda;}
+        .quiz-options label.incorrect { border-color: #dc3545; background: #f8d7da;}
+        #quiz-feedback { margin-top: 1.5rem; font-size: 1.2rem; font-weight: bold; }
+        .glossary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem 2.5rem; }
+        .glossary-item strong { color: var(--secondary-color); }
+        .bibliography-list { list-style: none; padding: 0; }
+        .bibliography-list li { margin-bottom: 1.5rem; background: #fafcff; padding: 1rem; border-left: 4px solid var(--primary-color); }
+        .crypto-example { font-family: var(--font-mono); background-color: #2a2a2a; color: #f1f1f1; padding: 1.5rem; border-radius: 8px; white-space: pre; overflow-x: auto; font-size: 0.95rem; }
+        .crypto-example .label { color: #888; }
+        .crypto-example .key { color: #f5a623; }
+        .crypto-example .result { color: #50e3c2; }
+        .split-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+        
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; } .slide h1 { font-size: 2.2rem; } .slide h2 { font-size: 1.8rem; }
+            .split-2, .glossary-grid, .gate-container { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            body { padding: 0; }
+            .presentation-container { height: 100vh; max-height: none; border-radius: 0; }
+            .slide { padding: 1.5rem; }
+            .navigation { right: 20px; bottom: 15px; } .nav-btn { width: 45px; height: 45px; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="presentation-container">
+        <div class="slides-wrapper">
+
+            <section class="slide cover active"><p class="course-title">Matemáticas Discretas</p><h1>Curso Interactivo de Álgebra Booleana</h1><p class="author">Prof. Dudbil Pabón | Universidad Autónoma de Bucaramanga</p></section>
+            
+            <section class="slide"><h2>¿Qué es el Álgebra de Boole?</h2><p>Imagina un universo donde todo se reduce a dos únicas opciones: sí o no, verdadero o falso, encendido o apagado. No hay lugar para la ambigüedad. Este es el universo de la lógica digital, y el idioma que se habla en él es el <strong>Álgebra de Boole</strong>.</p><p>Nombrada en honor a George Boole, es un sistema matemático que nos permite trabajar con ideas que solo pueden tener dos estados. En el mundo de la computación, representamos estos estados con números:</p><ul><li>$1$ que significa <strong>Verdadero</strong>, <strong>Encendido</strong>, o un pulso eléctrico de <strong>Alto</strong> voltaje (💡).</li><li>$0$ que significa <strong>Falso</strong>, <strong>Apagado</strong>, o un pulso eléctrico de <strong>Bajo</strong> voltaje (⚫).</li></ul><p>Esta simplicidad es su mayor fortaleza. Con solo estos dos dígitos y un puñado de operaciones, podemos construir desde una simple calculadora hasta la inteligencia artificial más compleja.</p></section>
+
+            <section class="slide">
+                <h2>Operadores Lógicos Fundamentales</h2>
+                <p>Para combinar nuestros $1$s y $0$s, usamos "compuertas lógicas". Piensa en ellas como guardianes que solo dejan pasar una señal si se cumplen ciertas condiciones. Estas son las cuatro compuertas fundamentales que debes conocer.</p>
+                <div class="gate-container">
+                    <div class="gate-wrapper"><h3>AND (Conjunción)</h3><div class="diagram-container"><span class="label input-a">A</span><span class="label input-b">B</span><span class="label output-q">Q</span><svg class="gate-svg" viewBox="0 0 250 150"><line class="wire" x1="25" y1="40" x2="75" y2="40" /><line class="wire" x1="25" y1="110" x2="75" y2="110" /><path class="gate-symbol" d="M 75 20 H 150 C 200 20, 200 130, 150 130 H 75 Z" /><line class="wire" x1="190" y1="75" x2="225" y2="75" /></svg></div><p>Exigente. La salida es $1$ solo si A <strong>Y</strong> B son $1$.</p><p>$A \cdot B$</p></div>
+                    <div class="gate-wrapper"><h3>OR (Disyunción)</h3><div class="diagram-container"><span class="label input-a">A</span><span class="label input-b">B</span><span class="label output-q">Q</span><svg class="gate-svg" viewBox="0 0 250 150"><line class="wire" x1="25" y1="40" x2="70" y2="40" /><line class="wire" x1="25" y1="110" x2="70" y2="110" /><path class="gate-symbol" d="M 70 20 Q 110 75, 70 130 C 120 130, 180 100, 200 75 C 180 50, 120 20, 70 20 Z" /><line class="wire" x1="200" y1="75" x2="225" y2="75" /></svg></div><p>Inclusiva. La salida es $1$ si A <strong>O</strong> B (o ambas) son $1$.</p><p>$A + B$</p></div>
+                    <div class="gate-wrapper"><h3>NOT (Negación)</h3><div class="diagram-container"><span class="label input-single">A</span><span class="label output-q">Q</span><svg class="gate-svg" viewBox="0 0 250 150"><line class="wire" x1="25" y1="75" x2="75" y2="75" /><path class="gate-symbol" d="M 75 20 L 175 75 L 75 130 Z" /><circle class="gate-symbol" cx="185" cy="75" r="10" /><line class="wire" x1="195" y1="75" x2="225" y2="75" /></svg></div><p>Rebelde. Siempre da la salida opuesta a su única entrada.</p><p>$\overline{A}$</p></div>
+                    <div class="gate-wrapper"><h3>XOR (O Exclusiva)</h3><div class="diagram-container"><span class="label input-a">A</span><span class="label input-b">B</span><span class="label output-q">Q</span><svg class="gate-svg" viewBox="0 0 250 150"><line class="wire" x1="25" y1="40" x2="60" y2="40" /><line class="wire" x1="25" y1="110" x2="60" y2="110" /><path class="gate-symbol" d="M 70 20 Q 110 75, 70 130 C 120 130, 180 100, 200 75 C 180 50, 120 20, 70 20 Z" /><path class="gate-symbol no-fill" d="M 60 20 Q 100 75, 60 130" /><line class="wire" x1="200" y1="75" x2="225" y2="75" /></svg></div><p>Detector de diferencias. La salida es $1$ solo si las entradas son <strong>diferentes</strong>.</p><p>$A \oplus B$</p></div>
+                </div>
+            </section>
+
+            <section class="slide">
+                <h2>Compuertas Universales y Derivadas</h2>
+                <p>Además de las básicas, existen compuertas que son combinaciones. Dos de ellas, <strong>NAND</strong> y <strong>NOR</strong>, son increíblemente especiales: se las conoce como <strong>compuertas universales</strong>. Esto significa que cualquier función lógica, sin importar cuán compleja sea, se puede construir usando exclusivamente compuertas NAND o exclusivamente compuertas NOR. Son los "ladrillos LEGO" fundamentales del diseño digital.</p>
+                <div class="gate-container" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="gate-wrapper"><h3>NAND (NO Y)</h3><div class="diagram-container"><span class="label input-a">A</span><span class="label input-b">B</span><span class="label output-q">Q</span><svg class="gate-svg" viewBox="0 0 250 150"><line class="wire" x1="25" y1="40" x2="75" y2="40" /><line class="wire" x1="25" y1="110" x2="75" y2="110" /><path class="gate-symbol" d="M 75 20 H 150 C 200 20, 200 130, 150 130 H 75 Z" /><circle class="gate-symbol" cx="195" cy="75" r="10" /><line class="wire" x1="205" y1="75" x2="225" y2="75" /></svg></div><p>Una AND negada. Su salida es $0$ solo si todas sus entradas son $1$.</p><p>$\overline{A \cdot B}$</p></div>
+                    <div class="gate-wrapper"><h3>NOR (NO O)</h3><div class="diagram-container"><span class="label input-a">A</span><span class="label input-b">B</span><span class="label output-q">Q</span><svg class="gate-svg" viewBox="0 0 250 150"><line class="wire" x1="25" y1="40" x2="70" y2="40" /><line class="wire" x1="25" y1="110" x2="70" y2="110" /><path class="gate-symbol" d="M 70 20 Q 110 75, 70 130 C 120 130, 180 100, 200 75 C 180 50, 120 20, 70 20 Z" /><circle class="gate-symbol" cx="210" cy="75" r="10" /><line class="wire" x1="220" y1="75" x2="245" y2="75" /></svg></div><p>Una OR negada. Su salida es $1$ solo si todas sus entradas son $0$.</p><p>$\overline{A + B}$</p></div>
+                    <div class="gate-wrapper"><h3>XNOR (Coincidencia)</h3><div class="diagram-container"><span class="label input-a">A</span><span class="label input-b">B</span><span class="label output-q">Q</span><svg class="gate-svg" viewBox="0 0 250 150"><line class="wire" x1="25" y1="40" x2="60" y2="40" /><line class="wire" x1="25" y1="110" x2="60" y2="110" /><path class="gate-symbol" d="M 70 20 Q 110 75, 70 130 C 120 130, 180 100, 200 75 C 180 50, 120 20, 70 20 Z" /><path class="gate-symbol no-fill" d="M 60 20 Q 100 75, 60 130" /><circle class="gate-symbol" cx="210" cy="75" r="10" /><line class="wire" x1="220" y1="75" x2="245" y2="75" /></svg></div><p>Una XOR negada. Su salida es $1$ solo si las entradas son <strong>iguales</strong>.</p><p>$\overline{A \oplus B}$</p></div>
+                </div>
+            </section>
+
+            <section class="slide">
+                <h2>Compuertas con Entradas Múltiples</h2>
+                <p>En el mundo real, a menudo necesitamos tomar decisiones basadas en más de dos factores. Por ello, las compuertas AND, OR, NAND y NOR no están limitadas a solo dos entradas. Pueden diseñarse para aceptar 3, 4, o incluso más, siguiendo la misma lógica fundamental que ya conocemos.</p>
+                <div class="split-2">
+                    <div>
+                        <h3>AND de 3 Entradas</h3>
+                        <div class="diagram-container">
+                             <span class="label input-a">A</span><span class="label input-c">B</span><span class="label input-b">C</span><span class="label output-q">Q</span>
+                             <svg class="gate-svg" viewBox="0 0 250 150">
+                                <line class="wire" x1="25" y1="40" x2="75" y2="40" /><line class="wire" x1="25" y1="75" x2="75" y2="75" /><line class="wire" x1="25" y1="110" x2="75" y2="110" />
+                                <path class="gate-symbol" d="M 75 20 H 150 C 200 20, 200 130, 150 130 H 75 Z" />
+                                <line class="wire" x1="190" y1="75" x2="225" y2="75" />
+                            </svg>
+                        </div>
+                        <p>La regla sigue siendo la misma: la salida será $1$ únicamente si A <strong>Y</strong> B <strong>Y</strong> C son todas $1$.</p>
+                        <p>$A \cdot B \cdot C$</p>
+                    </div>
+                    <div>
+                        <h3>OR de 3 Entradas</h3>
+                        <div class="diagram-container">
+                            <span class="label input-a">A</span><span class="label input-c">B</span><span class="label input-b">C</span><span class="label output-q">Q</span>
+                             <svg class="gate-svg" viewBox="0 0 250 150">
+                                <line class="wire" x1="25" y1="40" x2="70" y2="40" /><line class="wire" x1="25" y1="75" x2="70" y2="75" /><line class="wire" x1="25" y1="110" x2="70" y2="110" />
+                                <path class="gate-symbol" d="M 70 20 Q 110 75, 70 130 C 120 130, 180 100, 200 75 C 180 50, 120 20, 70 20 Z" />
+                                <line class="wire" x1="200" y1="75" x2="225" y2="75" />
+                            </svg>
+                        </div>
+                        <p>La regla también se mantiene: la salida será $1$ si <strong>al menos una</strong> de las entradas es $1$.</p>
+                         <p>$A + B + C$</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="slide"><h2>Combinando Operadores: Funciones Lógicas</h2><p>Al conectar estas compuertas, creamos "funciones lógicas". Por ejemplo, la función $F = A \cdot (B + C)$ se lee:</p><p><em>"F es verdadera si A es verdadera <strong>Y</strong> (B es verdadera <strong>O</strong> C es verdadera)".</em></p><div class="circuit-svg-container"><svg viewBox="0 0 450 160" class="circuit-svg"><text x="5" y="35" class="label-text">A</text><text x="5" y="95" class="label-text">B</text><text x="5" y="135" class="label-text">C</text><text x="430" y="85" class="label-text">F</text><path class="wire" d="M 20 30 C 150 30, 150 60, 280 60"></path><path class="wire" d="M 20 90 C 40 90, 60 90, 80 90"></path><path class="wire" d="M 20 130 C 40 130, 60 130, 80 130"></path><path class="wire" d="M 160 110 C 220 110, 220 80, 280 80"></path><path class="wire" d="M 370 70 L 420 70"></path><path class="gate-shape" d="M 80 80 C 120 95, 120 125, 80 140 Q 110 110, 160 110 Q 110 110, 80 80 Z"></path><text x="110" y="115" class="gate-text">OR</text><path class="gate-shape" d="M 280 50 L 280 90 L 325 90 C 350 90, 350 50, 325 50 Z"></path><text x="295" y="75" class="gate-text">AND</text></svg></div></section>
+            <section class="slide"><h2>¿Para Qué Simplificar?</h2><p>Una misma función lógica puede representarse con muchos circuitos diferentes. Nuestro objetivo es encontrar siempre <strong>la versión más simple</strong>. Es como pasar de un mapa con mil calles a una ruta directa de GPS.</p><div class="split-2"><div><h3>Circuito Complejo</h3><p>$F = A \cdot B \cdot C + A \cdot B \cdot D$</p><p>Usa 3 compuertas AND y 1 OR.</p></div><div><h3>Circuito Simplificado</h3><p>$F = A \cdot B \cdot (C+D)$</p><p>Usa 2 compuertas AND y 1 OR.</p></div></div><h3>Beneficios de la Simplificación:</h3><ul><li><strong>Menos Costo 💰:</strong> Menos compuertas físicas significa circuitos más baratos de fabricar.</li><li><strong>Más Velocidad ⚡:</strong> La señal eléctrica tiene que atravesar menos componentes, lo que reduce el retardo y hace el circuito más rápido.</li><li><strong>Menos Espacio 🤏:</strong> Un diseño más simple ocupa menos área en un microchip, permitiendo integrar más funcionalidad.</li></ul></section>
+            <section class="slide"><h2>Los Teoremas: Herramientas de Simplificación</h2><p>Para simplificar no adivinamos. Usamos un conjunto de reglas o "teoremas" que son siempre verdaderos, como las reglas de la aritmética. Nos permiten manipular y reducir las expresiones lógicas de forma segura.</p><div id="theorems-accordion"><div class="accordion-item"><div class="accordion-header">Identidad y Anulación</div><div class="accordion-content"><div class="accordion-content-inner"><p>$A+0=A$ <br> $A \cdot 1=A$</p><p>$A+1=1$ <br> $A \cdot 0=0$</p></div></div></div><div class="accordion-item"><div class="accordion-header">Idempotencia y Complemento</div><div class="accordion-content"><div class="accordion-content-inner"><p>$A+A=A$ <br> $A \cdot A=A$</p><p>$A+\overline{A}=1$ <br> $A \cdot \overline{A}=0$</p></div></div></div><div class="accordion-item"><div class="accordion-header">Conmutativa y Asociativa</div><div class="accordion-content"><div class="accordion-content-inner"><p>$A+B=B+A$ <br> $A \cdot B=B \cdot A$</p><p>$A+(B+C)=(A+B)+C$</p></div></div></div><div class="accordion-item"><div class="accordion-header">Distributiva y De Morgan</div><div class="accordion-content"><div class="accordion-content-inner"><p>$A \cdot (B+C)=A \cdot B+A \cdot C$</p><p>$\overline{A+B}=\overline{A} \cdot \overline{B}$ <br> $\overline{A \cdot B}=\overline{A}+\overline{B}$</p></div></div></div></div></section>
+            <section class="slide"><h2>Ejemplo Guiado: ¡Simplifiquemos Juntos!</h2><p>Vamos a reducir la siguiente función paso a paso.</p><p class="formula-block">Función Original: $F = \overline{A}BC + AB + \overline{A}B\overline{C}$</p><hr><p><strong>Paso 1 (Ley Conmutativa):</strong> Reordenamos los términos para agrupar los que se parecen.</p><p>$F = \overline{A}BC + \overline{A}B\overline{C} + AB$</p><p><strong>Paso 2 (Ley Distributiva):</strong> Sacamos $\overline{A}B$ como factor común de los dos primeros términos.</p><p>$F = \overline{A}B \cdot (C + \overline{C}) + AB$</p><p><strong>Paso 3 (Ley de Complemento):</strong> Sabemos que $C + \overline{C}$ siempre es $1$.</p><p>$F = \overline{A}B \cdot 1 + AB$</p><p><strong>Paso 4 (Ley de Identidad y Distributiva):</strong> $ \overline{A}B \cdot 1 $ es $\overline{A}B$. Luego, podemos volver a sacar $B$ como factor común.</p><p>$F = B \cdot (\overline{A} + A)$</p><p><strong>Paso 5 (Ley de Complemento):</strong> De nuevo, $\overline{A} + A$ es igual a $1$.</p><p>$F = B \cdot 1$</p><hr><p class="formula-block">Resultado Final: $F = B$</p></section>
+            <section class="slide"><h2>¡Es Tu Turno! Autoevaluación</h2><p>Aplica lo que has aprendido. ¿Cuál es la forma simplificada de la siguiente expresión?</p><div class="quiz-question"><h3>Simplifica: $F = A + A \cdot B$</h3><div class="quiz-options" id="quiz1-options"><label><input type="radio" name="quiz1" value="A"> $A$</label><label><input type="radio" name="quiz1" value="B"> $B$</label><label><input type="radio" name="quiz1" value="AB"> $A \cdot B$</label><label><input type="radio" name="quiz1" avalue="A+B"> $A + B$</label></div><p id="quiz-feedback"></p><p><small>Pista: Existe una Ley de Absorción que resuelve esto en un solo paso.</small></p></div></section>
+            <section class="slide"><h2>Aplicación: Criptografía con XOR</h2><div class="split-2"><div><h3>El Secreto Reversible de XOR</h3><p>La compuerta XOR tiene una propiedad casi mágica que la hace fundamental en la criptografía: <strong>es su propia inversa</strong>.</p><p>Si aplicas una clave ($K$) a un mensaje ($M$) usando XOR, obtienes un texto cifrado ($C$). Si vuelves a aplicar la <strong>misma clave</strong> ($K$) a ese texto cifrado, recuperas el mensaje original ($M$).</p><h3>Demostración:</h3><ul><li>Encriptar: $M \oplus K = C$</li><li>Desencriptar: $C \oplus K = M$</li><li>Sustituyendo: $(M \oplus K) \oplus K = M$</li></ul></div><div><h3>Ejemplo de Cifrado de Flujo</h3><pre class="crypto-example"><span class="label">Mensaje: </span>01001000 (H)
+<span class="label">Clave  : </span><span class="key">10110101 (?)</span>
+<span class="label">         ----------------- ⊕</span>
+<span class="label">Cifrado: </span><span class="result">11111101 (ý)</span>
+
+<span class="label">Cifrado: </span><span class="result">11111101 (ý)</span>
+<span class="label">Clave  : </span><span class="key">10110101 (?)</span>
+<span class="label">         ----------------- ⊕</span>
+<span class="label">Original:</span> 01001000 (H)</pre></div></div></section>
+            <section class="slide"><h2>Glosario de Términos Clave</h2><div class="glossary-grid"><div class="glossary-item"><p><strong>Álgebra Booleana:</strong> Sistema matemático de lógica que utiliza variables binarias ($0$ y $1$) y operaciones lógicas.</p></div><div class="glossary-item"><p><strong>Compuerta Lógica:</strong> Dispositivo que implementa una operación booleana básica.</p></div><div class="glossary-item"><p><strong>Tabla de Verdad:</strong> Tabla que muestra la salida de una función para cada combinación posible de sus entradas.</p></div><div class="glossary-item"><p><strong>Función Lógica:</strong> Expresión formada por variables y operadores booleanos.</p></div><div class="glossary-item"><p><strong>Circuito Combinacional:</strong> Circuito cuya salida depende únicamente de los valores actuales de sus entradas.</p></div><div class="glossary-item"><p><strong>Cifrado Simétrico:</strong> Método criptográfico donde se usa la misma clave para encriptar y desencriptar.</p></div></div></section>
+            <section class="slide"><h2>Bibliografía Recomendada</h2><ul class="bibliography-list"><li>Mano, M. M., & Ciletti, M. D. (2013). <strong>Diseño digital (5ª ed.).</strong> Pearson Educación.</li><li>Rosen, K. H. (2019). <strong>Matemática discreta y sus aplicaciones (8ª ed.).</strong> McGraw-Hill.</li><li>Floyd, T. L. (2016). <strong>Fundamentos de sistemas digitales (11ª ed.).</strong> Pearson Educación.</li><li>Stallings, W. (2017). <strong>Criptografía y seguridad de redes (7ª ed.).</strong> Pearson Educación.</li></ul></section>
+            <section class="slide"><h2>Resumen y Próximos Pasos</h2><h3>¡Felicitaciones! Has completado la lección.</h3><p>En esta lección hemos cubierto un panorama completo de los bloques de construcción de la lógica digital. Ahora conoces:</p><ul><li>Los operadores <strong>básicos, universales y derivados</strong>.</li><li>El concepto de compuertas con <strong>entradas múltiples</strong>.</li><li>La importancia de <strong>simplificar</strong> funciones y los teoremas para hacerlo de forma metódica.</li><li>Una aplicación real y potente del operador XOR en <strong>criptografía</strong>.</li></ul><h3>¿Qué sigue?</h3><p>La teoría es importante, pero la práctica es esencial. Vuelve a la página principal del curso y utiliza la <strong>Herramienta Interactiva</strong> para construir los circuitos que hemos visto y experimentar con tus propios diseños.</p><strong>¡El mundo digital está ahora a tu alcance!</strong></section>
+
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" id="prev-btn" title="Anterior"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+            <button class="nav-btn" id="next-btn" title="Siguiente"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
+        </div>
+
+        <div class="progress-bar-container"><div class="progress-bar" id="progress-bar"></div></div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const progressBar = document.getElementById('progress-bar');
+            let currentSlide = 0;
+
+            function updateSlide() {
+                slides.forEach((slide, index) => {
+                    if (index === currentSlide) {
+                        slide.classList.add('active');
+                        slide.classList.remove('exit-left');
+                    } else {
+                        if (slide.classList.contains('active')) slide.classList.add('exit-left');
+                        slide.classList.remove('active');
+                    }
+                });
+                const progress = ((currentSlide) / (slides.length - 1)) * 100;
+                progressBar.style.width = `${progress}%`;
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === slides.length - 1;
+            }
+            
+            nextBtn.addEventListener('click', () => { if (currentSlide < slides.length - 1) { currentSlide++; updateSlide(); } });
+            prevBtn.addEventListener('click', () => { if (currentSlide > 0) { currentSlide--; updateSlide(); } });
+
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                header.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    accordionItems.forEach(i => { i.classList.remove('active'); i.querySelector('.accordion-content').style.maxHeight = null; });
+                    if (!isActive) { item.classList.add('active'); content.style.maxHeight = content.scrollHeight + "px"; }
+                });
+            });
+
+            const quizOptions = document.getElementById('quiz1-options');
+            const feedbackEl = document.getElementById('quiz-feedback');
+            const correctAnswer = "A";
+            quizOptions.addEventListener('change', (e) => {
+                const selectedValue = e.target.value;
+                const labels = quizOptions.querySelectorAll('label');
+                labels.forEach(label => {
+                    label.classList.remove('correct', 'incorrect');
+                    if(label.querySelector('input').value === selectedValue) {
+                       if (selectedValue === correctAnswer) {
+                           label.classList.add('correct');
+                           feedbackEl.innerHTML = `¡Correcto! Por la Ley de Absorción: $A + A \\cdot B = A$.`;
+                       } else {
+                           label.classList.add('incorrect');
+                           feedbackEl.textContent = "Inténtalo de nuevo. Pista: ¿Qué pasa si A es 1? ¿Y si A es 0?";
+                       }
+                       MathJax.Hub.Queue(["Typeset", MathJax.Hub, feedbackEl]);
+                    }
+                });
+            });
+            updateSlide();
+        });
+    </script>
+
+</body>
+</html>
