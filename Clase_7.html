@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase Interactiva: Teoría de Grafos</title>
+    
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+
+    <style>
+        /* --- General Styles & Variables --- */
+        :root {
+            --primary-color: #4a90e2; /* Azul principal */
+            --primary-light: #eaf2fb;
+            --secondary-color: #50e3c2; /* Verde/Turquesa */
+            --tertiary-color: #f5a623; /* Naranja para énfasis */
+            --background-color: #f4f7f9;
+            --text-color: #333;
+            --light-gray: #e0e0e0;
+            --white: #ffffff;
+            --font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: 1rem;
+        }
+
+        /* --- Presentation Container --- */
+        .presentation-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 90vh;
+            max-height: 700px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Slides Wrapper & Individual Slides --- */
+        .slides-wrapper {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 2.5rem 4rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: translateX(50px);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .slide.exit-left {
+            transform: translateX(-50px);
+        }
+
+        .slide h1, .slide h2, .slide h3 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .slide h1 { font-size: 2.8rem; }
+        .slide h2 { font-size: 2.2rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.5rem; }
+        .slide h3 { font-size: 1.6rem; margin-top: 2rem; }
+        
+        .slide p, .slide li {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            max-width: 80ch;
+            margin-bottom: 1rem;
+        }
+        
+        .slide ul {
+            list-style-position: inside;
+            padding-left: 1rem;
+        }
+
+        /* --- Cover Slide --- */
+        .cover {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .cover h1, .cover p {
+            color: var(--white);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .cover h1 { font-size: 4rem; }
+        .cover .subtitle { font-size: 1.5rem; margin-top: 1rem; font-style: italic;}
+
+        /* --- Navigation --- */
+        .navigation {
+            position: absolute;
+            bottom: 20px;
+            right: 40px;
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+        }
+
+        .nav-btn:hover {
+            background-color: #3a80d2;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .nav-btn:disabled {
+            background-color: var(--light-gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .nav-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* --- Progress Bar --- */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--primary-light);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: var(--primary-color);
+            transition: width 0.4s ease-out;
+        }
+
+        /* --- INTERACTIVE COMPONENTS --- */
+        
+        /* Accordion */
+        .accordion-item {
+            border: 1px solid var(--primary-light);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .accordion-header {
+            background-color: var(--primary-light);
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+            font-size: 1.1rem;
+        }
+        .accordion-header:hover { background-color: #d8e6f8; }
+        .accordion-header::after {
+            content: '+';
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            transition: transform 0.3s ease-in-out;
+        }
+        .accordion-item.active .accordion-header::after {
+            transform: rotate(45deg);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+            background: #fafcff;
+        }
+        .accordion-content-inner {
+            padding: 1.5rem;
+        }
+        .accordion-item.active .accordion-content {
+            max-height: 500px; /* Ajusta según sea necesario */
+        }
+
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            flex-direction: column;
+            margin-top: 1.5rem;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid var(--light-gray);
+        }
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 1.1rem;
+            position: relative;
+            color: #777;
+        }
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        .tab-btn.active {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        .tab-btn.active::after {
+            transform: scaleX(1);
+        }
+        .tab-content {
+            display: none;
+            padding: 1.5rem 0.5rem;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Glossary */
+        .glossary-term {
+            color: var(--primary-color);
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            border-bottom: 2px dotted var(--primary-color);
+        }
+        .tooltip {
+            visibility: hidden;
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 101;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            font-weight: normal;
+        }
+        .glossary-term:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Utility classes */
+         .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+         }
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 2rem; }
+        .split-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        @media (min-width: 768px) {
+            .split-2 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+         
+        .formula-box {
+            background-color: var(--primary-light);
+            border: 1px solid var(--light-gray);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-size: 1.3rem;
+            font-family: monospace;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box {
+             background: #fffaeb;
+             border: 1px solid var(--tertiary-color);
+             padding: 1rem;
+             border-radius: var(--border-radius);
+             margin-top: 1rem;
+        }
+        .highlight-box strong {
+            color: var(--tertiary-color);
+        }
+
+        /* --- Graph Diagram Styles --- */
+        .graph-diagram {
+            position: relative;
+            width: 100%;
+            height: 300px; /* Altura fija para el contenedor del diagrama */
+            margin: 1.5rem auto 0;
+            max-width: 500px;
+        }
+        
+        .graph-diagram .node {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            background-color: var(--secondary-color);
+            border: 2px solid #2da48c;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--white);
+            font-weight: bold;
+            font-size: 1rem;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .graph-diagram .node.node-alt {
+            background-color: var(--tertiary-color);
+            border-color: #c7811a;
+        }
+        
+        .graph-diagram .node-label {
+            position: absolute;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--text-color);
+            z-index: 11;
+            transform: translate(-50%, -50%);
+        }
+
+        .graph-diagram .edge-label {
+            position: absolute;
+            font-size: 0.9rem;
+            font-weight: bold; 
+            color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.8); 
+            padding: 2px 5px;
+            border-radius: 4px;
+            z-index: 5;
+            transform: translate(-50%, -50%);
+        }
+        
+        svg.graph-edges {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: visible; 
+        }
+        
+        svg.graph-edges path {
+            fill: none;
+            stroke: var(--primary-color); 
+            stroke-width: 3;
+            stroke-opacity: 0.7; 
+        }
+
+        /* --- Flecha para Grafo Dirigido (Slide 4) --- */
+        svg.graph-edges .mid-arrow {
+            fill: var(--primary-color);
+            opacity: 1;
+            stroke: var(--white); /* Borde blanco para destacar */
+            stroke-width: 0.5px;
+        }
+
+
+        .image-container {
+            width: 100%;
+            height: auto;
+            max-height: 250px; 
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover; 
+        }
+
+
+        /* --- Responsive Design --- */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .slide h1 { font-size: 2.2rem; }
+            .slide h2 { font-size: 1.8rem; }
+            .image-container {
+                 max-height: 180px;
+            }
+        }
+        @media (max-width: 600px) {
+            body { padding: 0; }
+            .presentation-container {
+                height: 100vh;
+                max-height: none;
+                border-radius: 0;
+            }
+            .slide { padding: 1.5rem; }
+            .navigation {
+                right: 20px;
+                bottom: 15px;
+            }
+            .nav-btn {
+                width: 45px;
+                height: 45px;
+            }
+            .image-container {
+                 max-height: 150px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <main class="presentation-container">
+        
+        <div class="slides-wrapper">
+
+            <section class="slide cover active">
+                <h1>Teoría de Grafos</h1>
+                <p class="subtitle">Conectando el Mundo, un Vértice a la Vez</p>
+                <div class="graph-diagram" style="height: 300px; width: 400px; margin-top: 3rem;">
+                    <div class="node" style="top: 20%; left: 20%; background-color: #fff; color: var(--primary-color);">A</div>
+                    <div class="node" style="top: 20%; left: 80%; background-color: #fff; color: var(--primary-color);">B</div>
+                    <div class="node" style="top: 80%; left: 20%; background-color: #fff; color: var(--primary-color);">C</div>
+                    <div class="node" style="top: 80%; left: 80%; background-color: #fff; color: var(--primary-color);">D</div>
+                    <div class="node" style="top: 50%; left: 50%; background-color: #fff; color: var(--primary-color);">E</div>
+                    <svg class="graph-edges">
+                        <path d="M 102.5 82.5 Q 222.5 30, 342.5 82.5" style="stroke: #fff; stroke-width: 4px;"/> <path d="M 102.5 82.5 Q 50 172.5, 102.5 262.5" style="stroke: #fff; stroke-width: 4px;"/> <path d="M 102.5 82.5 Q 162.5 127.5, 222.5 172.5" style="stroke: #fff; stroke-width: 4px;"/> <path d="M 342.5 82.5 Q 282.5 127.5, 222.5 172.5" style="stroke: #fff; stroke-width: 4px;"/> <path d="M 102.5 262.5 Q 162.5 217.5, 222.5 172.5" style="stroke: #fff; stroke-width: 4px;"/> <path d="M 102.5 262.5 Q 222.5 315, 342.5 262.5" style="stroke: #fff; stroke-width: 4px;"/> <path d="M 342.5 262.5 Q 282.5 217.5, 222.5 172.5" style="stroke: #fff; stroke-width: 4px;"/> </svg>
+                </div>
+            </section>
+
+            <section class="slide">
+                <h2>El Origen: Los 7 Puentes de Königsberg</h2>
+                <div class="split-2">
+                    <div>
+                        <p>En el siglo XVIII, la ciudad de Königsberg (hoy Kaliningrado) tenía 7 puentes que conectaban 4 masas de tierra separadas por el río Pregel.</p>
+                        <p>El problema era: <strong>¿Es posible dar un paseo que cruce cada puente exactamente una vez y regrese al punto de partida?</strong></p>
+                        <p>En 1736, <strong>Leonard Euler</strong> abordó este problema. No le importaba el tamaño de las islas ni la longitud de los puentes, solo las <strong>conexiones</strong>.</p>
+                        <p>Creó un modelo abstracto, reduciendo las 4 masas de tierra a <strong>vértices (nodos)</strong> y los 7 puentes a <strong>aristas (líneas)</strong>. Así nació la Teoría de Grafos.</p>
+                        <p class="text-center" style="margin-top: 1rem;"><strong>Spoiler:</strong> Euler demostró que era <strong>imposible</strong>. ¡Veremos por qué más adelante!</p>
+                    </div>
+                    <div>
+                        <div class="image-container">
+                             <img src="https://xomnia.com/wp-content/uploads/2025/05/Konigsberg.jpeg" alt="Mapa de Königsberg con sus siete puentes">
+                        </div>
+                        <p class="text-center" style="font-size: 0.9rem; color: #666;">Representación histórica de los puentes de Königsberg.</p>
+                        
+                        <div class="graph-diagram" style="height: 240px; width: 300px;">
+                            <div class="node" style="top: 30%; left: 10%;">B</div>
+                            <div class="node" style="top: 10%; left: 45%;">A</div>
+                            <div class="node" style="top: 30%; left: 80%;">C</div>
+                            <div class="node" style="top: 80%; left: 45%;">D</div>
+                            <svg class="graph-edges">
+                                <path d="M 52.5 94.5 Q 105 50, 157.5 46.5"/> <path d="M 52.5 94.5 Q 105 100, 157.5 46.5"/> <path d="M 262.5 94.5 Q 210 50, 157.5 46.5"/> <path d="M 262.5 94.5 Q 210 100, 157.5 46.5"/> <path d="M 52.5 94.5 Q 105 155, 157.5 214.5"/> <path d="M 262.5 94.5 Q 210 155, 157.5 214.5"/> <path d="M 157.5 46.5 Q 157.5 130, 157.5 214.5" style="stroke-dasharray: 5, 5;"/> </svg>
+                        </div>
+                        <p class="text-center" style="font-size: 0.9rem; color: #666; margin-top: 1rem;">Abstracción del problema de Königsberg como un grafo.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="slide">
+                <h2>¿Qué es un Grafo?</h2>
+                <p>Formalmente, un grafo $G$ es un par ordenado $G = (V, E)$, donde:</p>
+                <ul>
+                    <li>$V$ es un conjunto de <strong>Vértices</strong> o <strong>Nodos</strong> (los "puntos").</li>
+                    <li>$E$ es un conjunto de <strong>Aristas</strong> o <strong>Arcos</strong> (las "conexiones" entre vértices).</li>
+                </ul>
+                <p>Es una herramienta matemática poderosa para modelar <strong>relaciones</strong> y <strong>conexiones</strong> entre objetos.</p>
+                
+                <div class="graph-diagram" style="height: 250px; width: 450px;">
+                    <div class="node" style="top: 40%; left: 10%;">A</div>
+                    <div class="node" style="top: 10%; left: 45%;">B</div>
+                    <div class="node" style="top: 40%; left: 80%;">C</div>
+                    <div class="node" style="top: 85%; left: 25%;">D</div>
+                    <div class="node" style="top: 85%; left: 65%;">E</div>
+                    <svg class="graph-edges">
+                        <path d="M 67.5 122.5 Q 146.25 35, 225 47.5"/> <path d="M 225 47.5 Q 303.75 35, 382.5 122.5"/> <path d="M 67.5 122.5 Q 191.25 280, 315 235"/> <path d="M 67.5 122.5 Q 101.25 178.75, 135 235"/> <path d="M 135 235 Q 225 245, 315 235"/> <path d="M 315 235 Q 348.75 178.75, 382.5 122.5"/> </svg>
+                </div>
+                <div class="text-center" style="margin-top: 1rem;">
+                    <p><strong>V = {A, B, C, D, E}</strong><br>
+                       <strong>E = {{A,B}, {B,C}, {C,E}, {E,D}, {D,A}, {A,E}}</strong></p>
+                </div>
+            </section>
+
+            <section class="slide">
+                <h2>El Zoológico de Grafos: Tipos Principales</h2>
+                <p>Los grafos pueden tener diferentes "sabores" según las reglas de sus conexiones.</p>
+                
+                <div class="tabs-container">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" data-tab="tab-1">No Dirigido</button>
+                        <button class="tab-btn" data-tab="tab-2">Dirigido (Digrafo)</button>
+                        <button class="tab-btn" data-tab="tab-3">Ponderado</button>
+                        <button class="tab-btn" data-tab="tab-4">Cíclico vs. Acíclico</button>
+                    </div>
+
+                    <div id="tab-1" class="tab-content active">
+                        <h3>Grafo No Dirigido</h3>
+                        <p>Las aristas no tienen dirección. Son "calles de doble sentido". Una conexión entre A y B es la misma que entre B y A.</p>
+                        <div class="graph-diagram" style="height: 180px; width: 300px;">
+                            <div class="node" style="top: 50%; left: 10%;">A</div>
+                            <div class="node" style="top: 50%; left: 80%;">B</div>
+                            <div class="node" style="top: 10%; left: 45%;">C</div>
+                            <svg class="graph-edges">
+                                <path d="M 52.5 112.5 Q 157.5 160, 262.5 112.5"/> <path d="M 52.5 112.5 Q 105 76.5, 157.5 40.5"/> <path d="M 262.5 112.5 Q 210 76.5, 157.5 40.5"/> </svg>
+                        </div>
+                        <p class="text-center" style="margin-top: 1rem;"><strong>Ejemplo:</strong> Red de amigos en Facebook.</p>
+                    </div>
+
+                    <div id="tab-2" class="tab-content">
+                        <h3>Grafo Dirigido (Digrafo)</h3>
+                        <p>Las aristas tienen dirección, representadas por flechas. Son "calles de un solo sentido". Una arista $A \to B$ no implica que exista $B \to A$.</p>
+                        <div class="graph-diagram" style="height: 180px; width: 300px;">
+                            <div class="node" style="top: 50%; left: 10%;">A</div>
+                            <div class="node" style="top: 50%; left: 80%;">B</div>
+                            <div class="node" style="top: 10%; left: 45%;">C</div>
+                            
+                            <svg class="graph-edges">
+                                <defs>
+                                    <path id="mid-arrow" d="M -5 -4 L 5 0 L -5 4 z" class="mid-arrow" />
+                                </defs>
+
+                                <path d="M 52.5 112.5 Q 157.5 160, 262.5 112.5"/> <path d="M 52.5 112.5 Q 105 76.5, 157.5 40.5"/> <path d="M 157.5 40.5 Q 210 76.5, 262.5 112.5"/> <use href="#mid-arrow" transform="translate(157.5, 136.25) rotate(0)" />
+                                <use href="#mid-arrow" transform="translate(105, 76.5) rotate(-34.4)" />
+                                <use href="#mid-arrow" transform="translate(210, 76.5) rotate(34.4)" />
+                            </svg>
+                        </div>
+                        <p class="text-center" style="margin-top: 1rem;"><strong>Ejemplo:</strong> Seguir a alguien en Twitter (X).</p>
+                    </div>
+                    <div id="tab-3" class="tab-content">
+                        <h3>Grafo Ponderado</h3>
+                        <p>A cada arista se le asigna un número (un <strong>peso</strong> o <strong>costo</strong>). Este peso puede representar distancia, tiempo, dinero, etc.</p>
+                        <div class="graph-diagram" style="height: 180px; width: 300px;">
+                            <div class="node" style="top: 50%; left: 10%;">A</div>
+                            <div class="node" style="top: 50%; left: 80%;">B</div>
+                            <div class="node" style="top: 10%; left: 45%;">C</div>
+                            <svg class="graph-edges">
+                                <path d="M 52.5 112.5 Q 157.5 160, 262.5 112.5"/> <path d="M 52.5 112.5 Q 105 76.5, 157.5 40.5"/> <path d="M 262.5 112.5 Q 210 76.5, 157.5 40.5"/> </svg>
+                            <div class="edge-label" style="top: 70%; left: 45%;">10</div> <div class="edge-label" style="top: 30%; left: 28%;">5</div> <div class="edge-label" style="top: 30%; left: 62%;">8</div> </div>
+                        <p class="text-center" style="margin-top: 1rem;"><strong>Ejemplo:</strong> Mapa de carreteras con distancias en km.</p>
+                    </div>
+                    
+                    <div id="tab-4" class="tab-content">
+                        <h3>Cíclico vs. Acíclico</h3>
+                        <p>Esta es una propiedad de los grafos.</p>
+                        <ul>
+                            <li><strong>Grafo Cíclico:</strong> Contiene al menos un <strong>ciclo</strong> (un camino que empieza y termina en el mismo vértice sin repetir aristas).</li>
+                            <li><strong>Grafo Acíclico:</strong> No contiene ningún ciclo. Un grafo dirigido acíclico (DAG) es fundamental en computación (ej. tareas, dependencias).</li>
+                        </ul>
+                         <div class="split-2">
+                            <div class="text-center">
+                                <strong>Cíclico (A-B-C-A)</strong>
+                                <div class="graph-diagram" style="height: 150px; width: 200px;">
+                                    <div class="node" style="top: 50%; left: 10%;">A</div>
+                                    <div class="node" style="top: 50%; left: 80%;">B</div>
+                                    <div class="node" style="top: 10%; left: 45%;">C</div>
+                                    <svg class="graph-edges">
+                                        <path d="M 42.5 97.5 Q 112.5 130, 182.5 97.5"/>
+                                        <path d="M 42.5 97.5 Q 77.5 67.5, 112.5 37.5"/>
+                                        <path d="M 182.5 97.5 Q 147.5 67.5, 112.5 37.5"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <strong>Acíclico (Forma de Árbol)</strong>
+                                <div class="graph-diagram" style="height: 150px; width: 200px;">
+                                    <div class="node" style="top: 50%; left: 10%;">A</div>
+                                    <div class="node" style="top: 50%; left: 80%;">B</div>
+                                    <div class="node" style="top: 10%; left: 45%;">C</div>
+                                    <svg class="graph-edges">
+                                        <path d="M 42.5 97.5 Q 77.5 67.5, 112.5 37.5"/>
+                                        <path d="M 182.5 97.5 Q 147.5 67.5, 112.5 37.5"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="slide">
+                <h2>Terminología Clave Adicional</h2>
+                <p>Usemos un vocabulario común para describir partes de un grafo.</p>
+                <div class="split-2">
+                    <div class="accordion-container">
+                        <div class="accordion-item">
+                            <div class="accordion-header">Camino (Path)</div>
+                            <div class="accordion-content">
+                                <div class="accordion-content-inner">
+                                    <p>Una secuencia de vértices donde cada vértice adyacente en la secuencia está conectado por una arista.</p>
+                                    <p><strong>Ejemplo:</strong> A-B-D-C</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item active">
+                            <div class="accordion-header">Ciclo (Cycle)</div>
+                            <div class="accordion-content">
+                                <div class="accordion-content-inner">
+                                    <p>Un camino que comienza y termina en el mismo vértice, y no repite aristas ni vértices (excepto el inicio/fin).</p>
+                                    <p><strong>Ejemplo:</strong> A-B-D-A</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <div class="accordion-header">Componente Conectado</div>
+                            <div class="accordion-content">
+                                <div class="accordion-content-inner">
+                                    <p>Un subgrafo en el que existe un camino entre cualquier par de vértices. Un grafo puede estar "roto" en varias "islas" o componentes.</p>
+                                    <p><strong>Ejemplo:</strong> {A, B, D} podría ser un componente, y {E, F} otro, si no hay aristas entre ellos.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="graph-diagram" style="height: 300px; width: 400px; margin-top: 0;">
+                        <div class="node" style="top: 10%; left: 10%;">A</div>
+                        <div class="node" style="top: 10%; left: 50%;">B</div>
+                        <div class="node" style="top: 40%; left: 30%;">D</div>
+                        <div class="node node-alt" style="top: 60%; left: 60%;">E</div>
+                        <div class="node node-alt" style="top: 80%; left: 80%;">F</div>
+                        <div class="node node-alt" style="top: 80%; left: 40%;">G</div>
+                        
+                        <svg class="graph-edges">
+                            <path d="M 62.5 52.5 Q 142.5 30, 222.5 52.5"/> <path d="M 62.5 52.5 Q 102.5 97.5, 142.5 142.5"/> <path d="M 222.5 52.5 Q 182.5 97.5, 142.5 142.5"/> <path d="M 262.5 202.5 Q 302.5 232.5, 342.5 262.5" style="stroke: var(--tertiary-color);"/> <path d="M 262.5 202.5 Q 222.5 232.5, 182.5 262.5" style="stroke: var(--tertiary-color);"/> </svg>
+                        
+                        <div class="node-label" style="top: 25%; left: 30%; color: var(--secondary-color);">Componente 1</div>
+                        <div class="node-label" style="top: 75%; left: 65%; color: var(--tertiary-color);">Componente 2</div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="slide">
+                <h2>Representaciones Matemáticas (Computacionales)</h2>
+                <p>¿Cómo "guardamos" un grafo en una computadora? Las dos formas más comunes son:</p>
+                <div class="split-2" style="align-items: center;">
+                    <div>
+                        <h3>1. Matriz de Adyacencia</h3>
+                        <p>Una matriz (tabla) $N \times N$, donde $N$ es el número de vértices. La celda $(i, j)$ es 1 si hay una arista entre el vértice $i$ y el vértice $j$, y 0 si no la hay.</p>
+                        <ul style="font-family: monospace; font-size: 1.1rem; list-style: none;">
+                            <li>&nbsp;&nbsp;&nbsp;&nbsp;A B C</li>
+                            <li>A [0 1 1]</li>
+                            <li>B [1 0 1]</li>
+                            <li>C [1 1 0]</li>
+                        </ul>
+                        <p><strong>Ventaja:</strong> Rápido para ver si existe una arista ( $O(1)$ ).<br>
+                           <strong>Desventaja:</strong> Ocupa mucha memoria ( $O(V^2)$ ), incluso para grafos con pocas aristas (dispersos).</p>
+                    </div>
+                     <div>
+                        <h3>2. Lista de Adyacencia</h3>
+                        <p>Un arreglo (o diccionario) donde cada vértice tiene una lista de sus "vecinos" (los vértices a los que está conectado).</p>
+                        <ul style="font-family: monospace; font-size: 1.1rem; list-style: none;">
+                            <li>A: [B, C]</li>
+                            <li>B: [A, C]</li>
+                            <li>C: [A, B]</li>
+                        </ul>
+                         <p><strong>Ventaja:</strong> Eficiente en memoria para grafos dispersos ( $O(V+E)$ ).<br>
+                            <strong>Desventaja:</strong> Más lento para ver si existe una arista ( $O(\text{deg}(v))$ ).</p>
+                    </div>
+                </div>
+                <div class="text-center" style="margin-top: 1rem;">
+                    <strong>Ambas representaciones describen este mismo grafo:</strong>
+                    <div class="graph-diagram" style="height: 150px; width: 200px;">
+                        <div class="node" style="top: 50%; left: 10%;">A</div>
+                        <div class="node" style="top: 50%; left: 80%;">B</div>
+                        <div class="node" style="top: 10%; left: 45%;">C</div>
+                        <svg class="graph-edges">
+                            <path d="M 42.5 97.5 Q 112.5 130, 182.5 97.5"/>
+                            <path d="M 42.5 97.5 Q 77.5 67.5, 112.5 37.5"/>
+                            <path d="M 182.5 97.5 Q 147.5 67.5, 112.5 37.5"/>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="slide">
+                <h2>¿Para qué sirve todo esto? (Aplicaciones)</h2>
+                <p>La teoría de grafos es la "fontanería" invisible de nuestro mundo digital y logístico.</p>
+                <ul>
+                    <li>🗺️ <strong>Sistemas de Navegación (GPS):</strong> Google Maps y Waze usan grafos ponderados. Las ciudades son vértices, las carreteras son aristas y los pesos son el tiempo de viaje. Buscan el <strong>camino más corto</strong> (usando algoritmos como Dijkstra).</li>
+                    <li>👥 <strong>Redes Sociales:</strong> Tú eres un vértice. Tus amistades son aristas. Permite sugerir amigos ("amigos de mis amigos") o identificar "influencers" (vértices con alto grado).</li>
+                    <li>🌐 <strong>Internet:</strong> Las páginas web son vértices y los hipervínculos (links) son aristas dirigidas. El algoritmo PageRank de Google usa esto para determinar qué páginas son más importantes.</li>
+                    <li>🚚 <strong>Logística y Rutas:</strong> Optimizar rutas de entrega (el "Problema del Viajante") o, como veremos, la ruta de un cartero.</li>
+                    <li>🧬 <strong>Bioinformática:</strong> Modelar interacciones entre proteínas o genes para entender enfermedades.</li>
+                    <li>🤖 <strong>Inteligencia Artificial:</strong> Las Redes Neuronales son, en esencia, grafos dirigidos y ponderados.</li>
+                </ul>
+            </section>
+            
+            <section class="slide">
+                <h2>Analizando Vértices: Grado</h2>
+                <p>El <strong>grado de un vértice</strong>, denotado como $\text{deg}(v)$, es simplemente el número de aristas que se conectan a él. (En grafos dirigidos, se habla de "grado de entrada" y "grado de salida").</p>
+                
+                <div class="graph-diagram" style="height: 180px; width: 300px; margin-top: 1rem;">
+                    <div class="node" style="top: 50%; left: 10%;">A</div>
+                    <div class="node" style="top: 50%; left: 80%;">B</div>
+                    <div class="node" style="top: 10%; left: 45%;">C</div>
+                    <svg class="graph-edges">
+                        <path d="M 52.5 112.5 Q 157.5 160, 262.5 112.5"/> <path d="M 52.5 112.5 Q 105 76.5, 157.5 40.5"/> </svg>
+                    <div class="node-label" style="top: 70%; left: 10%;"><strong>deg(A) = 2</strong></div>
+                    <div class="node-label" style="top: 70%; left: 80%;"><strong>deg(B) = 1</strong></div>
+                    <div class="node-label" style="top: 10%; left: 65%;"><strong>deg(C) = 1</strong></div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">El Teorema del Apretón de Manos (Handshaking Theorem)</h3>
+                <p>Este es un resultado fundamental y muy elegante:</p>
+                <div class="formula-box">
+                    Suma de todos los grados = 2 * (Número de Aristas)<br>
+                    $\sum_{v \in V} \text{deg}(v) = 2|E|$
+                </div>
+                <p><strong>¿Por qué?</strong> Porque cada arista conecta <strong>dos</strong> vértices, por lo que "aporta" +1 al grado de cada uno de sus dos extremos. Al sumar los grados, contamos cada arista exactamente dos veces.</p>
+                <p><strong>Corolario clave:</strong> El número de vértices con grado <strong>impar</strong> debe ser <strong>siempre par</strong>. (¡Piensa por qué!)</p>
+            </section>
+            
+            <section class="slide">
+                <h2>Grafos Eulerianos (La Solución de Königsberg)</h2>
+                <p>Volvamos al problema de Euler. Él definió dos conceptos:</p>
+                <ul>
+                    <li><strong>Camino Euleriano:</strong> Un camino que recorre <strong>cada arista</strong> del grafo <strong>exactamente una vez</strong>. (Puedes empezar y terminar en sitios distintos).</li>
+                    <li><strong>Circuito Euleriano:</strong> Un camino euleriano que, además, <strong>empieza y termina en el mismo vértice</strong>. (Esto es lo que pedía el problema de Königsberg).</li>
+                </ul>
+                
+                <h3>La Condición de Euler</h3>
+                <p>Usando el Teorema del Apretón de Manos, Euler encontró la solución:</p>
+                <div class="split-2">
+                    <div class="highlight-box" style="border-color: var(--secondary-color);">
+                        Un grafo tiene un <strong>CIRCUIRO</strong> Euleriano si y solo si:
+                        <ol>
+                            <li>Está conectado.</li>
+                            <li><strong>TODOS</strong> sus vértices tienen grado <strong>PAR</strong>.</li>
+                        </ol>
+                    </div>
+                    <div class="highlight-box" style="border-color: var(--tertiary-color);">
+                        Un grafo tiene un <strong>CAMINO</strong> Euleriano si y solo si:
+                        <ol>
+                            <li>Está conectado.</li>
+                            <li>Tiene <strong>EXACTAMENTE DOS</strong> vértices de grado <strong>IMPAR</strong>. (El camino empieza en uno y termina en el otro).</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 1.5rem;">El Veredicto de Königsberg</h3>
+                <p>El grafo de Königsberg tenía 4 vértices. Sus grados eran: {A: 5, B: 3, C: 3, D: 3}.</p>
+                <p>¡Tenía <strong>cuatro</strong> vértices de grado impar! Por lo tanto, no cumplía la condición ni para un camino ni para un circuito. <strong>Caso cerrado: ¡Era imposible!</strong></p>
+            </section>
+            
+            <section class="slide">
+                <h2>Grafos Ponderados y el Cartero Chino</h2>
+                <p>Ya vimos los <strong>Grafos Ponderados</strong>: aquellos donde las aristas tienen un costo o peso (ej. distancia).</p>
+                
+                <h3>El Algoritmo del Cartero Chino (Chinese Postman Problem)</h3>
+                <p>Este es un problema de optimización del mundo real, propuesto por Guan Meigu en 1960.</p>
+                <p><strong>El problema:</strong> Un cartero debe entregar correo en todas las calles (aristas) de un vecindario (grafo) y volver a la oficina de correos (vértice inicial). ¿Cuál es la <strong>ruta más corta posible</strong> que recorre <strong>TODAS</strong> las aristas al menos una vez?</p>
+                
+                <p><strong>La solución combina ideas de Euler y grafos ponderados:</strong></p>
+                <ol>
+                    <li><strong>Si el grafo es Euleriano</strong> (todos los vértices de grado par), ¡perfecto! La ruta más corta es simplemente un circuito euleriano. La distancia total es la suma de todas las aristas.</li>
+                    <li><strong>Si el grafo NO es Euleriano</strong> (tiene vértices de grado impar, que sabemos que son un número par), el cartero tendrá que <strong>repetir</strong> algunas calles.</li>
+                    <li>El objetivo es encontrar la forma <strong>más barata</strong> (con menor peso total) de "emparejar" todos los vértices impares, repitiendo los caminos más cortos entre ellos, para "hacerlos pares" artificialmente. Luego, se busca el circuito euleriano en este nuevo "multigrafo".</li>
+                </ol>
+            </section>
+            
+            <section class="slide">
+                <h2>Grafos Planares y la Fórmula de Euler</h2>
+                <p>Un grafo se llama <strong>Planar</strong> si se puede dibujar en una hoja de papel (un plano) sin que ninguna de sus aristas se cruce.</p>
+                
+                <div class="split-2" style="align-items: center;">
+                    <div class="text-center">
+                        <strong>K4 (Grafo completo de 4 vértices) - Es Planar</strong>
+                        <div class="graph-diagram" style="height: 150px; width: 200px;">
+                            <div class="node" style="top: 10%; left: 45%;">A</div>
+                            <div class="node" style="top: 80%; left: 10%;">B</div>
+                            <div class="node" style="top: 80%; left: 80%;">C</div>
+                            <div class="node" style="top: 50%; left: 45%;">D</div>
+                            <svg class="graph-edges">
+                                <path d="M 112.5 37.5 Q 77.5 90, 42.5 142.5"/> <path d="M 112.5 37.5 Q 147.5 90, 182.5 142.5"/> <path d="M 42.5 142.5 Q 112.5 150, 182.5 142.5"/> <path d="M 112.5 37.5 Q 112.5 67.5, 112.5 97.5"/> <path d="M 42.5 142.5 Q 77.5 120, 112.5 97.5"/> <path d="M 182.5 142.5 Q 147.5 120, 112.5 97.5"/> </svg>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <strong>K5 (Grafo completo de 5 vértices) - NO es Planar</strong>
+                        <p style="font-size: 1rem;">(Intenta dibujarlo. ¡Siempre habrá al menos un cruce!)</p>
+                    </div>
+                </div>
+
+                <h3>La Fórmula de Euler para Grafos Planos</h3>
+                <p>Para <strong>cualquier</strong> grafo planar conectado, existe una relación mágica entre su número de Vértices (V), Aristas (E) y Caras (F).</p>
+                <p>Una <strong>Cara (F)</strong> es una región delimitada por aristas (incluyendo la región exterior "infinita").</p>
+                <div class="formula-box">
+                    $V - E + F = 2$
+                </div>
+                <p><strong>Para nuestro K4 de ejemplo:</strong></p>
+                <ul>
+                    <li>$V$ (Vértices) = 4 (A, B, C, D)</li>
+                    <li>$E$ (Aristas) = 6</li>
+                    <li>$F$ (Caras) = 4 (los 3 "triángulos" internos + 1 cara externa)</li>
+                </ul>
+                <p><strong>Comprobación:</strong> $4 - 6 + 4 = 2$. ¡Funciona!</p>
+            </section>
+            
+            <section class="slide">
+                <h2>Ejercicio: Rutas Aéreas</h2>
+                <p>El siguiente grafo ponderado muestra 5 ciudades. Los pesos en las aristas representan la tarifa (en dólares) de un vuelo directo de ida.</p>
+                
+                <div class="graph-diagram" style="height: 350px; width: 500px;">
+                    <div class="node" style="top: 10%; left: 45%;">Seattle</div>
+                    <div class="node" style="top: 35%; left: 10%;">LA</div>
+                    <div class="node" style="top: 80%; left: 20%;">Chicago</div>
+                    <div class="node" style="top: 80%; left: 70%;">Atlanta</div>
+                    <div class="node" style="top: 35%; left: 80%;">Dallas</div>
+                    
+                    <svg class="graph-edges">
+                        <path d="M 72.5 145 Q 160 101, 247.5 57.5"   style="stroke: #E63946; stroke-opacity: 1;"/>   <path d="M 72.5 145 Q 97.5 224, 122.5 302.5"  style="stroke: #0077B6; stroke-opacity: 1;"/>  <path d="M 72.5 145 Q 247.5 110, 422.5 145"   style="stroke: #2A9D8F; stroke-opacity: 1;"/>   <path d="M 72.5 145 Q 222.5 224, 372.5 302.5"  style="stroke: #6A4C93; stroke-opacity: 1;"/>  <path d="M 247.5 57.5 Q 185 180, 122.5 302.5" style="stroke: #F4A261; stroke-opacity: 1;"/> <path d="M 247.5 57.5 Q 335 101, 422.5 145"   style="stroke: #1D3557; stroke-opacity: 1;"/>   <path d="M 247.5 57.5 Q 310 180, 372.5 302.5" style="stroke: #48CAE4; stroke-opacity: 1;"/> <path d="M 122.5 302.5 Q 272.5 224, 422.5 145" style="stroke: #C71F37; stroke-opacity: 1;"/> <path d="M 122.5 302.5 Q 247.5 340, 372.5 302.5" style="stroke: #8D6E63; stroke-opacity: 1;"/> <path d="M 422.5 145 Q 397.5 224, 372.5 302.5" style="stroke: #588157; stroke-opacity: 1;"/> </svg>
+                    
+                    <div class="edge-label" style="top: 30%; left: 25%; color: #E63946;">$70</div>  <div class="edge-label" style="top: 60%; left: 12%; color: #0077B6;">$100</div> <div class="edge-label" style="top: 30%; left: 45%; color: #2A9D8F;">$150</div> <div class="edge-label" style="top: 55%; left: 40%; color: #6A4C93;">$170</div> <div class="edge-label" style="top: 45%; left: 30%; color: #F4A261;">$145</div> <div class="edge-label" style="top: 25%; left: 65%; color: #1D3557;">$120</div> <div class="edge-label" style="top: 45%; left: 60%; color: #48CAE4;">$140</div> <div class="edge-label" style="top: 60%; left: 50%; color: #C71F37;">$165</div> <div class="edge-label" style="top: 85%; left: 45%; color: #8D6E63;">$75</div>  <div class="edge-label" style="top: 60%; left: 80%; color: #588157;">$85</div>  </div>
+                
+                <h3 style="margin-top: 1rem;">Preguntas:</h3>
+                <ol type="a">
+                    <li>¿Cuántos vértices y aristas tiene el grafo?</li>
+                    <li>¿Es un grafo conectado?</li>
+                    <li>¿Cuál es el grado del vértice que representa "LA"?</li>
+                    <li>Si vuelas de Seattle a Dallas y luego a Atlanta, ¿es un camino o un circuito?</li>
+                    <li>Si vuelas de LA a Chicago, luego a Dallas y de regreso a LA, ¿es un camino o un circuito?</li>
+                </ol>
+            </section>
+            
+            <section class="slide">
+                <h2>Soluciones del Ejercicio</h2>
+                
+                <div class="accordion-container">
+                    <div class="accordion-item active">
+                        <div class="accordion-header">a. ¿Cuántos vértices y aristas tiene el grafo?</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p><strong>Vértices (V):</strong> 5 (Seattle, LA, Chicago, Dallas, Atlanta).<br>
+                                   <strong>Aristas (E):</strong> 10. El grafo es un grafo completo ($K_5$), ya que cada ciudad está conectada con todas las demás.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">b. ¿Es un grafo conectado?</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p><strong>Sí.</strong> Existe un camino desde cualquier ciudad (vértice) a cualquier otra ciudad, lo que significa que es un solo componente conectado.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">c. ¿Cuál es el grado del vértice que representa "LA"?</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p><strong>Grado(LA) = 4.</strong><br>
+                                   El vértice "LA" tiene 4 aristas conectadas a él: (LA-Seattle), (LA-Chicago), (LA-Dallas) y (LA-Atlanta).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">d. Seattle -> Dallas -> Atlanta, ¿es un camino o un circuito?</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>Es un <strong>Camino</strong>.<br>
+                                   Es una secuencia válida de vértices y aristas, pero no termina en el mismo vértice donde comenzó (Seattle).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">e. LA -> Chicago -> Dallas -> LA, ¿es un camino o un circuito?</div>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <p>Es un <strong>Circuito</strong> (o Ciclo).<br>
+                                   Es un camino que comienza y termina en el mismo vértice (LA).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="slide">
+                <h2>Glosario de Términos</h2>
+                <p>Pasa el cursor sobre los términos para ver su definición.</p>
+                <ul style="list-style: none; padding-left: 0; line-height: 2.5;">
+                    <li><span class="glossary-term">Vértice (o Nodo)<span class="tooltip">La unidad básica de un grafo. Representa un objeto o entidad (ej. una ciudad, una persona).</span></span></li>
+                    <li><span class="glossary-term">Arista (o Arco)<span class="tooltip">La conexión entre dos vértices. Representa una relación (ej. una carretera, una amistad).</span></span></li>
+                    <li><span class="glossary-term">Grado del Vértice<span class="tooltip">El número de aristas que inciden (se conectan) en un vértice.</span></span></li>
+                    <li><span class="glossary-term">Grafo Ponderado<span class="tooltip">Un grafo donde cada arista tiene un "peso" o "costo" numérico asociado (ej. distancia, tiempo).</span></span></li>
+                    <li><span class="glossary-term">Camino (Path)<span class="tooltip">Una secuencia de vértices conectados por aristas.</span></span></li>
+                    <li><span class="glossary-term">Ciclo (Cycle)<span class="tooltip">Un camino que comienza y termina en el mismo vértice.</span></span></li>
+                    <li><span class="glossary-term">Grafo Conectado<span class="tooltip">Un grafo donde existe un camino entre cualquier par de vértices (es una sola "isla").</span></span></li>
+                    <li><span class="glossary-term">Grafo Planar<span class="tooltip">Un grafo que se puede dibujar en un plano (papel) sin que sus aristas se crucen.</span></span></li>
+                    <li><span class="glossary-term">Camino/Circuito Euleriano<span class="tooltip">Un camino/circuito que recorre CADA ARISTA del grafo exactamente una vez.</span></span></li>
+                </ul>
+            </section>
+            
+            <section class="slide">
+                <h2>Bibliografía (Lecturas Recomendadas)</h2>
+                <p>Para profundizar en este fascinante tema, te recomiendo los siguientes textos clásicos y modernos:</p>
+                
+                <ul style="line-height: 2;">
+                    <li>Diestel, R. (2017). <strong>Graph Theory</strong> (5ª ed.). Springer. <br>
+                        <em style="font-size: 0.9rem;">(Un texto de posgrado moderno y riguroso, disponible gratis en línea).</em>
+                    </li>
+                    
+                    <li>West, D. B. (2001). <strong>Introduction to Graph Theory</strong> (2ª ed.). Prentice Hall. <br>
+                        <em style="font-size: 0.9rem;">(Considerado por muchos como la "biblia" de la teoría de grafos, muy completo).</em>
+                    </li>
+                    
+                    <li>Wilson, R. J. (2010). <strong>Introduction to Graph Theory</strong> (5ª ed.). Pearson Education.<br>
+                        <em style="font-size: 0.9rem;">(Una introducción clásica, muy accesible y pedagógica).</em>
+                    </li>
+                    
+                    <li>Gross, J. L., & Yellen, J. (2005). <strong>Graph Theory and Its Applications</strong> (2ª ed.). CRC Press.<br>
+                        <em style="font-size: 0.9rem;">(Excelente balance entre teoría y una gran cantidad de aplicaciones prácticas).</em>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="slide cover" style="background: linear-gradient(135deg, #50e3c2, #4a90e2);">
+                <h1>¡Gracias!</h1>
+                <p class="subtitle">¿Preguntas?</p>
+            </section>
+
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" aria-label="Diapositiva anterior">
+                <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+            </button>
+            <button class="nav-btn" id="nextBtn" aria-label="Siguiente diapositiva">
+                <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+            </button>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const nextBtn = document.getElementById('nextBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const progressBar = document.getElementById('progressBar');
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            function showSlide(index) {
+                // Ocultar diapositiva actual
+                const oldSlide = slides[currentSlide];
+                if (index > currentSlide) {
+                    oldSlide.classList.remove('active');
+                    oldSlide.classList.add('exit-left');
+                } else {
+                    oldSlide.classList.remove('active', 'exit-left');
+                }
+                
+                // Asegurar que el índice esté en los límites
+                currentSlide = (index + totalSlides) % totalSlides;
+                
+                // Mostrar nueva diapositiva
+                slides[currentSlide].classList.remove('exit-left');
+                slides[currentSlide].classList.add('active');
+
+                // Asegurarse de que MathJax reprocese el contenido
+                if (typeof MathJax !== 'undefined') {
+                    MathJax.Hub.Queue(["Typeset", MathJax.Hub, slides[currentSlide]]);
+                }
+
+
+                updateControls();
+            }
+
+            function updateControls() {
+                // Actualizar botones
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === totalSlides - 1;
+
+                // Actualizar barra de progreso
+                const progressPercent = ((currentSlide + 1) / totalSlides) * 100;
+                progressBar.style.width = `${progressPercent}%`;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentSlide < totalSlides - 1) {
+                    showSlide(currentSlide + 1);
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    showSlide(currentSlide - 1);
+                }
+            });
+            
+            // --- Manejador de Tabs ---
+            const tabContainers = document.querySelectorAll('.tabs-container');
+            
+            tabContainers.forEach(container => {
+                const tabButtons = container.querySelectorAll('.tab-btn');
+                const tabContents = container.querySelectorAll('.tab-content');
+                
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const targetTab = button.getAttribute('data-tab');
+                        
+                        // Actualizar botones
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        
+                        // Actualizar contenido
+                        tabContents.forEach(content => {
+                            if (content.id === targetTab) {
+                                content.classList.add('active');
+                            } else {
+                                content.classList.remove('active');
+                            }
+                        });
+                        // Asegurarse de que MathJax reprocese el contenido del tab activo
+                        if (typeof MathJax !== 'undefined') {
+                             MathJax.Hub.Queue(["Typeset", MathJax.Hub, container.querySelector('.tab-content.active')]);
+                        }
+                    });
+                });
+            });
+
+            // --- Manejador de Accordion ---
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                
+                header.addEventListener('click', () => {
+                    // Abrir/Cerrar el actual
+                    item.classList.toggle('active');
+                    if (item.classList.contains('active')) {
+                        // Establecer max-height al alto real del contenido
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        // Asegurarse de que MathJax reprocese el contenido
+                        if (typeof MathJax !== 'undefined') {
+                            MathJax.Hub.Queue(["Typeset", MathJax.Hub, content]);
+                        }
+                    } else {
+                        content.style.maxHeight = '0';
+                    }
+                });
+                
+                // Pre-abrir los que tengan la clase 'active' por defecto
+                if (item.classList.contains('active')) {
+                     content.style.maxHeight = content.scrollHeight + 'px';
+                }
+            });
+
+            // Iniciar la presentación
+            showSlide(0);
+        });
+    </script>
+
+</body>
+</html>
